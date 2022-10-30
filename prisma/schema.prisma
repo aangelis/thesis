@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// https://www.prisma.io/docs/concepts/components/prisma-schema/data-model
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  username String @unique
+  first_name String?
+  last_name String?
+  name_el String?
+  name_en String?
+  surname_el String?
+  surname_en String?
+  father_name_el String?
+  father_name_en String?
+  department String?
+  title String?
+  title_ldap String?
+  is_staff Boolean? @default(false)
+  is_active Boolean? @default(true)
+  is_superuser Boolean? @default(false)
+  last_login DateTime?
+  date_joined DateTime @default(now())
+  deposits Deposit[]
+}
+
+model Deposit {
+  id Int @id @default(autoincrement())
+  title String
+  title_el String
+  title_en String
+  content String?
+  abstract_el String?
+  abstract_en String?
+  pages Int @default(0)
+  language String?
+  images Int @default(0)
+  tables Int @default(0)
+  diagrams Int @default(0)
+  maps Int @default(0)
+  drawings Int @default(0)	
+  confirmed Boolean @default(false)
+  confirmed_timestamp DateTime?
+  license String?
+  comments String?
+  submitter User @relation(fields: [submitter_id], references: [id])
+  submitter_id Int
+  supervisor String?
+
+}
