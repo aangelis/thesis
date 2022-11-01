@@ -1,4 +1,8 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# thesis.hua.gr - Πύλη Φοιτητών
+
+H παρούσα εφαρμογή υποστηρίζει την αυτοαπόθεση των πτυχιακών, μεταπτυχιακών εργασιών και διδακτορικών διατριβών που εκπονούνται στο Χαροκόπειο Πανεπιστήμιο. 
+
+Βασίζεται στο [Next.js](https://nextjs.org/) και έγινε bootstrapped με [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Πώς τρέχω το project
 

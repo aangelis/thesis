@@ -64,7 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(500).json({ message: (error as Error).message });
     }
   } else {
-    // Handle any other HTTP method
+    // Handle any other HTTP methods
     res.status(400).json({ message: "Bad HTTP method." });
   }
   
