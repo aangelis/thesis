@@ -33,7 +33,7 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
       const userData: User = await result.json();
 
       // Check if user data already exists in DB
-      const userDB = await prisma.user.findMany({
+      const userDB = await prisma.user.findFirst({
         where: {
           email,
         },
@@ -42,7 +42,7 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
       const { id: userId, email: ldapEmail, username: ldapUsername, ...userDataStripped } = userData;
       // Cast Null Value to String 
       const username = (ldapUsername || "").toString();
-      if (userDB.length > 0) {
+      if (userDB) {
         // User data already exists in DB. Data will be updated.
         const updateUser = await prisma.user.update({
           where: {
@@ -50,11 +50,13 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
           },
           data: { username, ...userDataStripped, last_login: new Date() },
         });
+        userData.id = updateUser.id;
       } else {
         // Store user data in DB.
-        const updateUser = await prisma.user.create({
+        const storeUser = await prisma.user.create({
           data: { email, username, ...userDataStripped, last_login: new Date() },
-        });        
+        });
+        userData.id = storeUser.id;
       }
       const user = { ...userData, isLoggedIn: true } as User;
       req.session.user = user;

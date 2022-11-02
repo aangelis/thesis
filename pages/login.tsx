@@ -7,7 +7,7 @@ import fetchJson, { FetchError } from "lib/fetchJson";
 export default function Login() {
   // check if user is already logged in and redirect to deposits
   const { mutateUser } = useUser({
-    redirectTo: "/deposits",
+    redirectTo: "/profile",
     redirectIfFound: true,
   });
 

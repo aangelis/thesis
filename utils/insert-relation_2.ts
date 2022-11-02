@@ -5,19 +5,19 @@ const prisma = new PrismaClient()
 async function main() {
   const user = await prisma.user.update({
     where: {
-      email: 'itp21101@hua.gr',
+      email: 'itp21100@hua.gr',
     },
     data: {
-      //email: 'itp21101@hua.gr',
-      //username: 'itp21101',
+      //email: 'itp21100@hua.gr',
+      //username: 'itp21100',
       deposits: {
         create: {
-          title: 'NFR verification process',
-          title_el: 'διαδικασία επαλήθευσης NFR',
-          title_en: 'NFR verification process',
-          pages: 12,
-          tables: 3,
-          maps: 0
+          title: 'CSNFR verification process',
+          title_el: 'διαδικασία επαλήθευσης CSNFRC',
+          title_en: 'SNFR verification process',
+          pages: 86,
+          tables: 1,
+          maps: 21
         },
       },
     },

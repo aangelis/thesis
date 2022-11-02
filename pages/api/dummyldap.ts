@@ -8,7 +8,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       if (email === "itp21101@hua.gr" && password === "1234") {
         res.json({
-          
           email: "itp21101@hua.gr",
           username: "itp21101",
           first_name: "ΑΠΟΣΤΟΛΟΣ",
@@ -18,9 +17,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           department: "Πληροφορικής και Τηλεματικής",
         })
       }
+      if (email === "itp21100@hua.gr" && password === "1234") {
+        res.json({
+          email: "itp21100@hua.gr",
+          username: "itp21100",
+          first_name: "ΒΑΣΙΛΗΣ",
+          last_name: "ΗΛΙΟΥ",
+          title: "Μεταπτυχιακός Φοιτητής",
+          department: "Πληροφορικής και Τηλεματικής",
+        })
+      }
       if (email === "tsadimas@hua.gr" && password === "1234") {
         res.json({
-          
           email: "tsadimas@hua.gr",
           username: "tsadimas",
           first_name: "ΑΝΑΡΓΥΡΟΣ",
