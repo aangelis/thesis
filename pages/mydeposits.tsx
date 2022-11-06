@@ -6,7 +6,6 @@ import { User } from "pages/api/user";
 import { InferGetServerSidePropsType } from "next";
 import { PrismaClient } from "@prisma/client"
 
-
 import * as React from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -165,7 +164,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
             inputProps={{
-              'aria-label': 'select all desserts',
+              'aria-label': 'select all deposits',
             }}
           />
         </TableCell>
@@ -443,7 +442,6 @@ function DepositsPage(
     return (
       <Layout>
         <h1>Οι αποθέσεις μου</h1>
-        {/* <Table data={deposits}/>  */}
         { EnhancedTable(deposits) }
       </Layout>
     )
