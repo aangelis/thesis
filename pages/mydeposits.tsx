@@ -6,6 +6,8 @@ import { User } from "pages/api/user";
 import { InferGetServerSidePropsType } from "next";
 import { PrismaClient } from "@prisma/client"
 
+import router from 'next/router'
+
 import * as React from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -26,6 +28,7 @@ import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 
@@ -66,8 +69,10 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 
 
 interface Data {
+  id: number;
   title_el: string;
   title_en: string;
+  pages: number;
   confirmed: boolean;
 }
 
@@ -130,6 +135,12 @@ const headCells: readonly HeadCell[] = [
     label: 'Τίτλος (Αγγλικά)',
   },
   {
+    id: 'pages',
+    numeric: true,
+    disablePadding: false,
+    label: 'Σελίδες',
+  },
+  {
     id: 'confirmed',
     numeric: true,
     disablePadding: false,
@@ -189,6 +200,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             </TableSortLabel>
           </TableCell>
         ))}
+        {/* Blank heading cell for edit */}
+        {/* <TableCell/>  */}
       </TableRow>
     </TableHead>
   );
@@ -270,7 +283,7 @@ function EnhancedTable(rows: any[]) {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = rows.map((n) => n.title_el);
+      const newSelected = rows.map((n) => n.id);
       setSelected(newSelected);
       return;
     }
@@ -340,20 +353,22 @@ function EnhancedTable(rows: any[]) {
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.title_el as string);
+                  const isItemSelected = isSelected(row.id as string);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleClick(event, row.title_el as string)}
+                      // Disable click on entire row
+                      // onClick={(event) => handleClick(event, row.title_el as string)}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.title_el}
+                      key={row.id}
                       selected={isItemSelected}
                     >
-                      <TableCell padding="checkbox">
+                      <TableCell padding="checkbox"
+                      onClick={(event) => handleClick(event, row.id as string)}>
                         <Checkbox
                           color="primary"
                           checked={isItemSelected}
@@ -363,6 +378,9 @@ function EnhancedTable(rows: any[]) {
                         />
                       </TableCell>
                       <TableCell
+                        // onClick={() => {
+                        //   console.log("Detected Title_el Cell Click", row.id);}}
+                        onClick={() => router.push('/deposit/'+row.id)}
                         component="th"
                         id={labelId}
                         scope="row"
@@ -370,8 +388,16 @@ function EnhancedTable(rows: any[]) {
                       >
                         {row.title_el}
                       </TableCell>
-                      <TableCell align="left">{row.title_en}</TableCell>
+                      <TableCell
+                        // onClick={() => {
+                        //   console.log("Detected Title_en Cell Click", row.id);}}
+                        onClick={() => router.push('/deposit/'+row.id)}
+                        align="left">{row.title_en}</TableCell>
+                      <TableCell align="right">{row.pages}</TableCell>
                       <TableCell align="right">{row.confirmed ? "Ναι" : "Όχι" }</TableCell>
+                      {/* <TableCell
+                      onClick={() => {
+                        console.log("Detected Edit Cell Click");}}><EditIcon /></TableCell> */}
                     </TableRow>
                   );
                 })}
@@ -387,7 +413,7 @@ function EnhancedTable(rows: any[]) {
             </TableBody>
           </Table>
         </TableContainer>
-        {/* Show pagging options if rows are greater than 5 */}
+        {/* Show pagging options if rows are greater than n */}
         { rows.length > 0 ? 
         (
         <TablePagination
