@@ -24,13 +24,17 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
+//import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
+
+import { styled } from '@mui/material/styles';
+import Button from '@mui/material/Button';
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 
 // Fetch deposits of current user
 export const getServerSideProps = withIronSessionSsr(async function ({
@@ -73,7 +77,15 @@ interface Data {
   title_el: string;
   title_en: string;
   pages: number;
+  language: string;
+  images: number;
+  tables: number;
+  diagrams: number;
+  maps: number;
+  drawings: number;
+  supervisor: string;
   confirmed: boolean;
+  confirmed_timestamp: string;
 }
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -264,6 +276,18 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
   );
 }
 
+const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: '#f5f5f9',
+    color: 'rgba(0, 0, 0, 0.87)',
+    maxWidth: 220,
+    fontSize: theme.typography.pxToRem(12),
+    border: '1px solid #dadde9',
+  },
+}));
+
 function EnhancedTable(rows: any[]) {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Data>('title_el');
@@ -385,14 +409,29 @@ function EnhancedTable(rows: any[]) {
                         id={labelId}
                         scope="row"
                         padding="none"
-                      >
-                        {row.title_el}
-                      </TableCell>
+                        sx={{cursor: 'pointer'}}
+                      ><HtmlTooltip
+                      title={
+                        <React.Fragment>
+                          {/* https://mui.com/material-ui/react-tooltip/ */}
+                          {row.supervisor !== null ? "Supervisor: " : ""}
+                          <Typography color="inherit">
+                            {row.supervisor !== null ? row.supervisor : ""}
+                          </Typography>
+                          <u>{row.confirmed_timestamp !== null ? "Confirmation timestamp: "+row.confirmed_timestamp : ""}</u>
+                          Images: {row.images}, Tables: {row.tables},
+                          Diagrams: {row.diagrams}, Maps: {row.maps},
+                          Drawings: {row.drawings}
+                          
+                        </React.Fragment>
+                      }
+                    ><div>{row.title_el}</div></HtmlTooltip></TableCell>
                       <TableCell
                         // onClick={() => {
                         //   console.log("Detected Title_en Cell Click", row.id);}}
                         onClick={() => router.push('/deposit/'+row.id)}
-                        align="left">{row.title_en}</TableCell>
+                        align="left"
+                        sx={{cursor: 'pointer'}}>{row.title_en}</TableCell>
                       <TableCell align="right">{row.pages}</TableCell>
                       <TableCell align="right">{row.confirmed ? "Ναι" : "Όχι" }</TableCell>
                       {/* <TableCell
