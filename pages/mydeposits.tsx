@@ -414,14 +414,14 @@ function EnhancedTable(rows: any[]) {
                       title={
                         <React.Fragment>
                           {/* https://mui.com/material-ui/react-tooltip/ */}
-                          {row.supervisor !== null ? "Supervisor: " : ""}
+                          {row.supervisor !== null ? "Επιβλέπων: " : ""}
                           <Typography color="inherit">
                             {row.supervisor !== null ? row.supervisor : ""}
                           </Typography>
                           <u>{row.confirmed_timestamp !== null ? "Confirmation timestamp: "+row.confirmed_timestamp : ""}</u>
-                          Images: {row.images}, Tables: {row.tables},
-                          Diagrams: {row.diagrams}, Maps: {row.maps},
-                          Drawings: {row.drawings}
+                          Εικόνες: {row.images}, Πίνακες: {row.tables},
+                          Διαγράμματα: {row.diagrams}, Χάρτες: {row.maps},
+                          Σχέδια: {row.drawings}
                           
                         </React.Fragment>
                       }
