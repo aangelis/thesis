@@ -140,49 +140,42 @@ function DepositPage(
   };
 
   async function handleClickSave() {
-    try {
-      setLoading(true);
-      const body = {
-        id: deposit.id,
-        title_el,
-        title_en,
-        abstract_el,
-        abstract_en,
-        pages,
-        images,
-        tables,
-        diagrams,
-        maps,
-        drawings,
-        confirmed,
-        confirmed_timestamp,
-        license,
-        comments,
-        supervisor,
-      };
-      await fetch('/api/deposit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-      .then(response => {
-        setLoading(false);
-        if(!response.ok) throw new Error(response.status);
-      })
-      .then(() => {
-        setOpenSuccess(true);
-      })
-      .catch(err => {
-        setOpenError(true);
-        console.log(err);
-      });
-    } catch (error) {
-      console.error(error);
-    }
+    setLoading(true);
+    const body = {
+      id: deposit.id,
+      title_el,
+      title_en,
+      abstract_el,
+      abstract_en,
+      pages,
+      images,
+      tables,
+      diagrams,
+      maps,
+      drawings,
+      confirmed,
+      confirmed_timestamp,
+      license,
+      comments,
+      supervisor,
+    };
+    await fetch('/api/deposit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    .then(response => {
+      setLoading(false);
+      if(!response.ok) throw new Error(response.status as unknown as string);
+    })
+    .then(() => {
+      setOpenSuccess(true);
+    })
+    .catch(err => {
+      setOpenError(true);
+      console.log(err);
+    });
   }
-
-// https://vercel.com/guides/nextjs-prisma-postgres
-// edw exei paradeigma pws na grafei sto api endpoint ta data
 
   return (
     <Layout>   
