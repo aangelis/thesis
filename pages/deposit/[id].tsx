@@ -138,6 +138,8 @@ function DepositPage(
   const handleChangeConfirmed = (event: React.ChangeEvent<HTMLInputElement>) => {
     setConfirmed(event.target.value);
   };
+  
+  const [viewData, setViewData] = React.useState(JSON.stringify(deposit, null, 2));
 
   async function handleClickSave() {
     setLoading(true);
@@ -163,13 +165,15 @@ function DepositPage(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
-    })
+    }) 
     .then(response => {
       setLoading(false);
       if(!response.ok) throw new Error(response.status as unknown as string);
+      return response.json();
     })
-    .then(() => {
+    .then((data) => {
       setOpenSuccess(true);
+      setViewData(JSON.stringify(data, null, 2));
     })
     .catch(err => {
       setOpenError(true);
@@ -406,7 +410,7 @@ function DepositPage(
       
         </div>
 
-      <pre>{JSON.stringify(deposit, null, 2)}</pre>
+      <pre>{viewData}</pre>
     </Layout>
   )
 }
