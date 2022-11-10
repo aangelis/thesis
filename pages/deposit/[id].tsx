@@ -15,6 +15,17 @@ import FormControl from '@mui/material/FormControl';
 import Divider from '@mui/material/Divider';
 import React from 'react';
 import MenuItem from '@mui/material/MenuItem';
+import { color } from '@mui/system';
+import SaveIcon from '@mui/icons-material/Save';
+import LoadingButton from '@mui/lab/LoadingButton';
+
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import Stack from '@mui/material/Stack';
+
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 // Fetch deposit data
@@ -80,7 +91,6 @@ function DepositPage(
   }
   ) {
 
-
   const confirmationStatus = [
     {
       value: 'true',
@@ -91,29 +101,103 @@ function DepositPage(
       label: 'Όχι',
     },
   ]
+  const [title_el, setTitle_el] = React.useState(deposit.title_el || "");
+  const [title_en, setTitle_en] = React.useState(deposit.title_en || "");
+  const [abstract_el, setAbstract_el] = React.useState(deposit.abstract_el || "");
+  const [abstract_en, setAbstract_en] = React.useState(deposit.abstract_en || "");
+  const [pages, setPages] = React.useState(deposit.pages || "");
+  const [images, setImages] = React.useState(deposit.images || "");
+  const [tables, setTables] = React.useState(deposit.tables || "");
+  const [diagrams, setDiagrams] = React.useState(deposit.diagrams || "");
+  const [maps, setMaps] = React.useState(deposit.maps || "");
+  const [drawings, setDrawings] = React.useState(deposit.drawings || "");
+  const [confirmed, setConfirmed] = React.useState(deposit.confirmed);
+  const [confirmed_timestamp, setConfirmed_timestamp] = React.useState(deposit.confirmed_timestamp);
+  const [license, setLicense] = React.useState(deposit.license || "");
+  const [comments, setComments] = React.useState(deposit.comments || "");
+  const [supervisor, setSupervisor] = React.useState(deposit.comments || "");
 
-  const [confirmation, setConfirmation] = React.useState(deposit.confirmed);
+  const [loading, setLoading] = React.useState(false);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setConfirmation(event.target.value);
+  const [openSuccess, setOpenSuccess] = React.useState(false)
+  const [openError, setOpenError] = React.useState(false)
+
+  const handleCloseSuccess = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSuccess(false);
   };
-  
+  const handleCloseError = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenError(false);
+  };
+
+  const handleChangeConfirmed = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setConfirmed(event.target.value);
+  };
+
+  async function handleClickSave() {
+    try {
+      setLoading(true);
+      const body = {
+        id: deposit.id,
+        title_el,
+        title_en,
+        abstract_el,
+        abstract_en,
+        pages,
+        images,
+        tables,
+        diagrams,
+        maps,
+        drawings,
+        confirmed,
+        confirmed_timestamp,
+        license,
+        comments,
+        supervisor,
+      };
+      await fetch('/api/deposit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      .then(response => {
+        setLoading(false);
+        if(!response.ok) throw new Error(response.status);
+      })
+      .then(() => {
+        setOpenSuccess(true);
+      })
+      .catch(err => {
+        setOpenError(true);
+        console.log(err);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+// https://vercel.com/guides/nextjs-prisma-postgres
+// edw exei paradeigma pws na grafei sto api endpoint ta data
+
   return (
-    <Layout>
-      
-      
-      <h1>Στοιχεία απόθεσης</h1>
-        
+    <Layout>   
+      <h1>Στοιχεία απόθεσης</h1>  
         <div>
-
-
           <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-multiline-static"
               label="Τίτλος"
               multiline
               rows={2}
-              defaultValue={deposit.title_el}
+              value={title_el}
+              onChange={(v) => {
+                setTitle_el(v.target.value);
+              }}
             />
           </FormControl>
           <FormControl fullWidth sx={{ m: 1 }}>
@@ -122,7 +206,10 @@ function DepositPage(
               label="Τίτλος (Αγγλικά)"
               multiline
               rows={2}
-              defaultValue={deposit.title_en}
+              value={title_en}
+              onChange={(v) => {
+                setTitle_en(v.target.value);
+              }}
             />
           </FormControl>
           <Box sx={{ m: 2 }} />
@@ -132,7 +219,10 @@ function DepositPage(
               label="Περίληψη"
               multiline
               rows={4}
-              defaultValue={deposit.abstract_el}
+              value={abstract_el}
+              onChange={(v) => {
+                setAbstract_el(v.target.value);
+              }}
             />
           </FormControl>
           <FormControl fullWidth sx={{ m: 1 }}>
@@ -141,7 +231,10 @@ function DepositPage(
               label="Περίληψη (Αγγλικά)"
               multiline
               rows={4}
-              defaultValue={deposit.abstract_en}
+              value={abstract_en}
+              onChange={(v) => {
+                setAbstract_en(v.target.value);
+              }}
             />
           </FormControl>
           <Box sx={{ m: 2 }} />
@@ -154,14 +247,62 @@ function DepositPage(
             autoComplete="off"
           >
             <div>
-              <TextField id="outlined-basic" label="Σελίδες" variant="outlined" defaultValue={deposit.pages} />
-              <TextField id="outlined-basic" label="Εικόνες" variant="outlined" defaultValue={deposit.images} />
-              <TextField id="outlined-basic" label="Πίνακες" variant="outlined" defaultValue={deposit.tables} />
+              <TextField
+                id="outlined-basic"
+                label="Σελίδες"
+                variant="outlined"
+                value={pages}
+                onChange={(v) => {
+                  setPages(v.target.value);
+                }}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Εικόνες"
+                variant="outlined"
+                value={images}
+                onChange={(v) => {
+                  setImages(v.target.value);
+                }}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Πίνακες"
+                variant="outlined"
+                value={tables}
+                onChange={(v) => {
+                  setTables(v.target.value);
+                }}
+              />
             </div>
             <div>
-              <TextField id="outlined-basic" label="Διαγράμματα" variant="outlined" defaultValue={deposit.diagrams} />
-              <TextField id="outlined-basic" label="Χάρτες" variant="outlined" defaultValue={deposit.maps} />
-              <TextField id="outlined-basic" label="Σχέδια" variant="outlined" defaultValue={deposit.drawings} />
+              <TextField
+                id="outlined-basic"
+                label="Διαγράμματα"
+                variant="outlined"
+                value={diagrams}
+                onChange={(v) => {
+                  setDiagrams(v.target.value);
+                }}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Χάρτες"
+                variant="outlined"
+                value={maps}
+                onChange={(v) => {
+                  setMaps(v.target.value);
+                }}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Σχέδια"
+                variant="outlined"
+                value={drawings}
+                onChange={(v) => {
+                  setDrawings(v.target.value);
+                }}
+              />
             </div>
           </Box>
           <Box sx={{ m: 2 }} />
@@ -178,8 +319,8 @@ function DepositPage(
                 id="outlined-select-confirmation"
                 select
                 label="Επικυρωμένη"
-                value={confirmation}
-                onChange={handleChange}
+                value={confirmed}
+                onChange={handleChangeConfirmed}
               >
                 {confirmationStatus.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
@@ -187,7 +328,13 @@ function DepositPage(
                   </MenuItem>
                 ))}
               </TextField>
-              <TextField disabled id="outlined-disabled" label="Ημερομηνία επικύρωσης" variant="outlined" defaultValue={deposit.confirmed_timestamp === null ? "Δεν υπάρχει" : deposit.confirmed_timestamp} />
+              <TextField
+                disabled
+                id="outlined-disabled"
+                label="Ημερομηνία επικύρωσης"
+                variant="outlined"
+                value={confirmed_timestamp || "Δεν υπάρχει"}
+              />
             </div>
           </Box>
           <Box sx={{ m: 2 }} />
@@ -197,7 +344,10 @@ function DepositPage(
               label="Άδεια"
               multiline
               rows={2}
-              defaultValue={deposit.license}
+              value={license}
+              onChange={(v) => {
+                setLicense(v.target.value);
+              }}
             />
           </FormControl>
           <FormControl fullWidth sx={{ m: 1 }}>
@@ -206,23 +356,64 @@ function DepositPage(
               label="Σχόλια"
               multiline
               rows={3}
-              defaultValue={deposit.comments}
+              value={comments}
+              onChange={(v) => {
+                setComments(v.target.value);
+              }}
             />
           </FormControl>
           <Box sx={{ m: 2 }} />
           <FormControl fullWidth sx={{ m: 1 }}>
-            <TextField id="outlined-basic" label="Επιβλέπων" variant="outlined" defaultValue={deposit.supervisor} />
+            <TextField
+              id="outlined-basic"
+              label="Επιβλέπων"
+              variant="outlined"
+              value={supervisor}
+              onChange={(v) => {
+                setSupervisor(v.target.value);
+              }}
+            />
           </FormControl>
+          
+          <Box sx={{ '& > button': { m: 1 } }}>
+            <LoadingButton
+                color="secondary"
+                onClick={handleClickSave}
+                loading={loading}
+                loadingPosition="start"
+                startIcon={<SaveIcon />}
+                variant="contained"
+              >
+                Save
+              </LoadingButton>
+          </Box>
 
+          <Snackbar
+            open={openError}
+            autoHideDuration={6000}
+            onClose={handleCloseError}
+          >
+            <Alert severity="error">
+              <AlertTitle>Σφάλμα</AlertTitle>
+               — <strong>Εμφανίστηκε σφάλμα κατά την αποθήκευση!</strong>
+            </Alert>
+          </Snackbar>
 
-      </div>
+          <Snackbar
+            open={openSuccess}
+            autoHideDuration={6000}
+            onClose={handleCloseSuccess}
+          >
+            <Alert severity="success">
+              <AlertTitle>Επιτυχία</AlertTitle>
+               — <strong>Οι αλλαγές αποθηκεύτηκαν!</strong>
+            </Alert>
+          </Snackbar>
+
       
+        </div>
 
-      
-
-    
-
-    <pre>{JSON.stringify(deposit, null, 2)}</pre>
+      <pre>{JSON.stringify(deposit, null, 2)}</pre>
     </Layout>
   )
 }
