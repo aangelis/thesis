@@ -1,9 +1,18 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from '@prisma/client'
+import { withIronSessionApiRoute } from "iron-session/next";
+import { sessionOptions } from "lib/session";
+
+export default withIronSessionApiRoute(handler, sessionOptions);
 
 const prisma = new PrismaClient()
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+
+  if (!req.session.user?.isLoggedIn) {
+    res.status(400).json({ message: "Access refused. User not logged in." });
+  }
+
   if (req.method === "POST") {
     // Process a POST request
     const data = await req.body; // deposit
