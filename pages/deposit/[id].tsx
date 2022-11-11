@@ -105,22 +105,66 @@ function DepositPage(
   const [title_en, setTitle_en] = React.useState(deposit.title_en || "");
   const [abstract_el, setAbstract_el] = React.useState(deposit.abstract_el || "");
   const [abstract_en, setAbstract_en] = React.useState(deposit.abstract_en || "");
-  const [pages, setPages] = React.useState(deposit.pages || "");
-  const [images, setImages] = React.useState(deposit.images || "");
-  const [tables, setTables] = React.useState(deposit.tables || "");
-  const [diagrams, setDiagrams] = React.useState(deposit.diagrams || "");
-  const [maps, setMaps] = React.useState(deposit.maps || "");
-  const [drawings, setDrawings] = React.useState(deposit.drawings || "");
   const [confirmed, setConfirmed] = React.useState(deposit.confirmed);
   const [confirmed_timestamp, setConfirmed_timestamp] = React.useState(deposit.confirmed_timestamp);
   const [license, setLicense] = React.useState(deposit.license || "");
   const [comments, setComments] = React.useState(deposit.comments || "");
   const [supervisor, setSupervisor] = React.useState(deposit.comments || "");
-
+  
   const [loading, setLoading] = React.useState(false);
-
+  const [saveDisabled, setSaveDisabled] = React.useState(0)
+  
   const [openSuccess, setOpenSuccess] = React.useState(false)
   const [openError, setOpenError] = React.useState(false)
+  
+  // first version of error checking for pages field
+  //
+  // const [pages, setPages] = React.useState(deposit.pages || "");
+  // const [pagesError, setPagesError] = React.useState("");
+  // const [images, setImages] = React.useState(deposit.images || "");
+  // const [tables, setTables] = React.useState(deposit.tables || "");
+  // const [diagrams, setDiagrams] = React.useState(deposit.diagrams || "");
+  // const [maps, setMaps] = React.useState(deposit.maps || "");
+  // const [drawings, setDrawings] = React.useState(deposit.drawings || "");
+  // React.useEffect(() => {
+  //   if (Number(pages) >= 0 && pages !== "" && pagesError !== "") {
+  //     setPagesError("");
+  //   }
+  //   if ((Number(pages) < 0 || pages === "") && pagesError === "") {
+  //     setPagesError("Positive number needed!");
+  //   }
+  // }, [pages, pagesError]);
+
+  const numericalFields =[
+    {name: "pages", value: deposit.pages, error: "" },
+    {name: "images", value: deposit.images, error: "" },
+    {name: "tables", value: deposit.tables, error: "" },
+    {name: "diagrams", value: deposit.diagrams, error: "" },
+    {name: "maps", value: deposit.maps, error: "" },
+    {name: "drawings", value: deposit.drawings, error: "" }
+  ]
+  const [numFields, setNumFields] = React.useState(numericalFields);
+  const handleNumFields = (e: any) => {
+    const result = numFields.map((el) => {
+      if (el.name === e.target.name) {
+        el.value = e.target.value;
+        if (Number(el.value) >= 0
+            && el.value !== "" && el.error !== "") {
+          el.error = "";
+          setSaveDisabled(saveDisabled - 1);
+        }
+        if ((Number(el.value) < 0 || isNaN(+el.value) || el.value === "")
+            && el.error === "") {
+          el.error = "Positive number needed!";
+          setSaveDisabled(saveDisabled + 1);
+        }
+      }
+      return el;
+    });
+    setNumFields(result);
+  };
+  // React.useEffect(() => {
+  // }, [numFields]);
 
   const handleCloseSuccess = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -149,12 +193,12 @@ function DepositPage(
       title_en,
       abstract_el,
       abstract_en,
-      pages,
-      images,
-      tables,
-      diagrams,
-      maps,
-      drawings,
+      pages: Number(numFields.find(o => o.name === "pages")?.value),
+      images: Number(numFields.find(o => o.name === "images")?.value),
+      tables: Number(numFields.find(o => o.name === "tables")?.value),
+      diagrams: Number(numFields.find(o => o.name === "diagrams")?.value),
+      maps: Number(numFields.find(o => o.name === "maps")?.value),
+      drawings: Number(numFields.find(o => o.name === "drawings")?.value),
       confirmed,
       confirmed_timestamp,
       license,
@@ -177,7 +221,7 @@ function DepositPage(
     })
     .catch(err => {
       setOpenError(true);
-      console.log(err);
+      console.error(err);
     });
   }
 
@@ -246,14 +290,17 @@ function DepositPage(
             <div>
               <TextField
                 id="outlined-basic"
+                error={numFields.find(o => o.name === "pages")?.error !== ""}
                 label="Σελίδες"
+                name="pages"
                 variant="outlined"
-                value={pages}
+                helperText={numFields.find(o => o.name === "pages")?.error}
+                value={numFields.find(o => o.name === "pages")?.value}
                 onChange={(v) => {
-                  setPages(v.target.value);
+                  handleNumFields(v);
                 }}
               />
-              <TextField
+              {/* <TextField
                 id="outlined-basic"
                 label="Εικόνες"
                 variant="outlined"
@@ -261,43 +308,67 @@ function DepositPage(
                 onChange={(v) => {
                   setImages(v.target.value);
                 }}
+              /> */}
+              <TextField
+                id="outlined-basic"
+                error={numFields.find(o => o.name === "images")?.error !== ""}
+                label="Εικόνες"
+                name="images"
+                variant="outlined"
+                helperText={numFields.find(o => o.name === "images")?.error}
+                value={numFields.find(o => o.name === "images")?.value}
+                onChange={(v) => {
+                  handleNumFields(v);
+                }}
               />
               <TextField
                 id="outlined-basic"
+                error={numFields.find(o => o.name === "tables")?.error !== ""}
                 label="Πίνακες"
+                name="tables"
                 variant="outlined"
-                value={tables}
+                helperText={numFields.find(o => o.name === "tables")?.error}
+                value={numFields.find(o => o.name === "tables")?.value}
                 onChange={(v) => {
-                  setTables(v.target.value);
+                  handleNumFields(v);
                 }}
               />
             </div>
             <div>
               <TextField
                 id="outlined-basic"
+                error={numFields.find(o => o.name === "diagrams")?.error !== ""}
                 label="Διαγράμματα"
+                name="diagrams"
                 variant="outlined"
-                value={diagrams}
+                helperText={numFields.find(o => o.name === "diagrams")?.error}
+                value={numFields.find(o => o.name === "diagrams")?.value}
                 onChange={(v) => {
-                  setDiagrams(v.target.value);
+                  handleNumFields(v);
                 }}
               />
               <TextField
                 id="outlined-basic"
+                error={numFields.find(o => o.name === "maps")?.error !== ""}
                 label="Χάρτες"
+                name="maps"
                 variant="outlined"
-                value={maps}
+                helperText={numFields.find(o => o.name === "maps")?.error}
+                value={numFields.find(o => o.name === "maps")?.value}
                 onChange={(v) => {
-                  setMaps(v.target.value);
+                  handleNumFields(v);
                 }}
               />
               <TextField
                 id="outlined-basic"
+                error={numFields.find(o => o.name === "drawings")?.error !== ""}
                 label="Σχέδια"
                 variant="outlined"
-                value={drawings}
+                name="drawings"
+                helperText={numFields.find(o => o.name === "drawings")?.error}
+                value={numFields.find(o => o.name === "drawings")?.value}
                 onChange={(v) => {
-                  setDrawings(v.target.value);
+                  handleNumFields(v);
                 }}
               />
             </div>
@@ -375,6 +446,7 @@ function DepositPage(
           <Box sx={{ '& > button': { m: 1 } }}>
             <LoadingButton
                 color="secondary"
+                disabled={saveDisabled > 0}
                 onClick={handleClickSave}
                 loading={loading}
                 loadingPosition="start"
