@@ -10,6 +10,10 @@ https://github.com/vercel/next.js/blob/canary/examples/api-routes-cors/pages/api
 */
 
 export default async function handler(req: NextApiRequest, response: NextApiResponse) {
+  const { email, password } = await req.body;
+  const ip = req.socket.remoteAddress
+  const now = new Date()
+
   if (req.method === "POST") {
     // Process a POST request
     const { username, password } = await req.body;
@@ -82,11 +86,18 @@ export default async function handler(req: NextApiRequest, response: NextApiResp
         }
       );
     }).then(
-      (value) => { response.status(200).json( value ); },
-      (error) => { response.status(401).json({ message: error }); }
+      (value) => {
+        console.log(`${ip} - [${now}] - success - ${email}`);
+        response.status(200).json( value );
+      },
+      (error) => {
+        console.log(`${ip} - [${now}] - failure - ${email}`);
+        response.status(401).json({ message: error });
+      }
     );
   } else {
     // Handle any other HTTP method
+    console.error(`${ip} - [${now}] - failure - - Bad HTTP method`);
     response.status(400).json({ message: "Bad HTTP method." });
   }
 }
