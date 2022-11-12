@@ -17,7 +17,27 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Process a POST request
     const data = await req.body; // deposit
     const { id } = data;
-    console.log(data);
+    // console.log(data);
+
+    if (!data.title_el ||
+        !data.title_en ||
+        data.title_el === "" ||
+        data.title_en === "" ||
+        isNaN(+data.pages) ||
+        isNaN(+data.images) ||
+        isNaN(+data.tables) ||
+        isNaN(+data.diagrams) ||
+        isNaN(+data.maps) ||
+        isNaN(+data.drawings) ||
+        Number(data.pages) < 0 ||
+        Number(data.images) < 0 ||
+        Number(data.tables) < 0 ||
+        Number(data.diagrams) < 0 ||
+        Number(data.maps) < 0 ||
+        Number(data.drawings) < 0) {
+      res.status(400).json({ message: "Invalid data." });
+    }
+
     try {
       const deposit = await prisma.deposit.update({
         where: {
