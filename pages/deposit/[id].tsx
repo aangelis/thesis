@@ -27,6 +27,7 @@ import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
+import Script from 'next/script'
 
 // Fetch deposit data
 export const getServerSideProps = withIronSessionSsr(async function ({
@@ -35,16 +36,25 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 }) {
   const user: any = req.session.user;
 
+  // console.log(user);
+
   // https://github.com/aralroca/next-translate/issues/694#issuecomment-974717129
   // Get id property of request data
   const NextRequestMetaSymbol = Reflect.ownKeys(req).find(key => key.toString() === 'Symbol(NextRequestMeta)');
   // const params = NextRequestMetaSymbol && req[NextRequestMetaSymbol].__NEXT_INIT_QUERY ? req[NextRequestMetaSymbol].__NEXT_INIT_QUERY : undefined
   // const depositId = Number(params.id);
   const params = NextRequestMetaSymbol && req[NextRequestMetaSymbol].__NEXT_INIT_URL ? req[NextRequestMetaSymbol].__NEXT_INIT_URL : undefined
-  const depositId = Number(params.split('/')[params.split('/').length-1]);
+  const split = params.split('/')[params.split('/').length-1];
+  const depositId = Number(split.split('.')[0]);
+
+  // on link
+  // http://localhost:3000/_next/data/development/deposit/9.json?id=9
+  // on refresh
+  // http://localhost:3000/deposit/9
 
   // console.log(req)
   // console.log(params);
+  // console.log(split);
   // console.log(depositId);
   // console.log(typeof depositId);
 
@@ -60,10 +70,10 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     };
   }
 
-  if (typeof depositId !== 'number') {
+  if (isNaN(+depositId)) {
     return {
       props: {
-        user: {},
+        user,
         deposit: {}
       },
     };
@@ -91,6 +101,8 @@ function DepositPage(
   }
   ) {
 
+    // console.log(deposit);
+
   const confirmationStatus = [
     {
       value: 'true',
@@ -105,15 +117,15 @@ function DepositPage(
   const [title_en, setTitle_en] = React.useState(deposit.title_en || "");
   const [abstract_el, setAbstract_el] = React.useState(deposit.abstract_el || "");
   const [abstract_en, setAbstract_en] = React.useState(deposit.abstract_en || "");
-  const [confirmed, setConfirmed] = React.useState(deposit.confirmed);
+  const [confirmed, setConfirmed] = React.useState(deposit.confirmed || false);
   const [confirmed_timestamp, setConfirmed_timestamp] = React.useState(deposit.confirmed_timestamp);
   const [license, setLicense] = React.useState(deposit.license || "");
   const [comments, setComments] = React.useState(deposit.comments || "");
   const [supervisor, setSupervisor] = React.useState(deposit.comments || "");
   
   const [loading, setLoading] = React.useState(false);
-  const [saveDisabled, setSaveDisabled] = React.useState(0)
-  
+  const [numFieldsErrors, setNumFieldsErrors] = React.useState(0)
+  const [textFieldsErrors, setTextFieldsErrors] = React.useState(0) 
   const [openSuccess, setOpenSuccess] = React.useState(false)
   const [openError, setOpenError] = React.useState(false)
   
@@ -135,15 +147,45 @@ function DepositPage(
   //   }
   // }, [pages, pagesError]);
 
-  const numericalFields =[
-    {name: "pages", value: deposit.pages, error: "" },
-    {name: "images", value: deposit.images, error: "" },
-    {name: "tables", value: deposit.tables, error: "" },
-    {name: "diagrams", value: deposit.diagrams, error: "" },
-    {name: "maps", value: deposit.maps, error: "" },
-    {name: "drawings", value: deposit.drawings, error: "" }
+  const alphabeticalFields = [
+    {name: "title_el", value: deposit.title_el || "", error: "" },
+    {name: "title_en", value: deposit.title_en || "", error: "" },
   ]
+
+  const [textFields, setTextFields] = React.useState(alphabeticalFields);
+
+  const handleTextFields = (e: any) => {
+    const result = textFields.map((el) => {
+      setTextFieldsErrors(0);
+      if (el.name === e.target.name) {
+        el.value = e.target.value;
+      }
+      if (el.value === "") {
+        setTextFieldsErrors(textFieldsErrors + 1);
+      }
+      if (el.name === e.target.name && el.value === "") {
+        el.error = "Cannot left blank!";
+      }
+      if (el.name === e.target.name && el.value !== "") {
+        el.error = "";
+      }
+      return el;
+    });
+    console.log(textFieldsErrors);
+    setTextFields(result);
+  }
+
+  const numericalFields = [
+    {name: "pages", value: deposit.pages || 0, error: "" },
+    {name: "images", value: deposit.images || 0, error: "" },
+    {name: "tables", value: deposit.tables || 0, error: "" },
+    {name: "diagrams", value: deposit.diagrams || 0, error: "" },
+    {name: "maps", value: deposit.maps || 0, error: "" },
+    {name: "drawings", value: deposit.drawings || 0, error: "" }
+  ]
+
   const [numFields, setNumFields] = React.useState(numericalFields);
+
   const handleNumFields = (e: any) => {
     const result = numFields.map((el) => {
       if (el.name === e.target.name) {
@@ -151,12 +193,12 @@ function DepositPage(
         if (Number(el.value) >= 0
             && el.value !== "" && el.error !== "") {
           el.error = "";
-          setSaveDisabled(saveDisabled - 1);
+          setNumFieldsErrors(numFieldsErrors - 1);
         }
         if ((Number(el.value) < 0 || isNaN(+el.value) || el.value === "")
             && el.error === "") {
           el.error = "Positive number needed!";
-          setSaveDisabled(saveDisabled + 1);
+          setNumFieldsErrors(numFieldsErrors + 1);
         }
       }
       return el;
@@ -225,6 +267,18 @@ function DepositPage(
     });
   }
 
+  React.useEffect(() => {
+    console.log('kati')
+    handleTextFields(
+      {target:
+        {name: "title_el", value: textFields.find(o => o.name === "title_el")?.value}
+      });
+    handleTextFields(
+      {target:
+        {name: "title_en", value: textFields.find(o => o.name === "title_en")?.value}
+    });
+  }, [])
+
   return (
     <Layout>   
       <h1>Στοιχεία απόθεσης</h1>  
@@ -232,24 +286,32 @@ function DepositPage(
           <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-multiline-static"
+              error={textFields.find(o => o.name === "title_el")?.error !== ""}
               label="Τίτλος"
+              name="title_el"
+              helperText={textFields.find(o => o.name === "title_el")?.error}
               multiline
               rows={2}
-              value={title_el}
+              value={textFields.find(o => o.name === "title_el")?.value}
               onChange={(v) => {
-                setTitle_el(v.target.value);
+                // setTitle_el(v.target.value);
+                handleTextFields(v);
               }}
             />
           </FormControl>
           <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-multiline-static"
+              error={textFields.find(o => o.name === "title_en")?.error !== ""}
               label="Τίτλος (Αγγλικά)"
+              name="title_en"
+              helperText={textFields.find(o => o.name === "title_en")?.error}
               multiline
               rows={2}
-              value={title_en}
+              value={textFields.find(o => o.name === "title_en")?.value}
               onChange={(v) => {
-                setTitle_en(v.target.value);
+                // setTitle_en(v.target.value);
+                handleTextFields(v);
               }}
             />
           </FormControl>
@@ -446,14 +508,14 @@ function DepositPage(
           <Box sx={{ '& > button': { m: 1 } }}>
             <LoadingButton
                 color="secondary"
-                disabled={saveDisabled > 0}
+                disabled={numFieldsErrors > 0 || textFieldsErrors > 0}
                 onClick={handleClickSave}
                 loading={loading}
                 loadingPosition="start"
                 startIcon={<SaveIcon />}
                 variant="contained"
               >
-                Save
+                Αποθηκευση
               </LoadingButton>
           </Box>
 
