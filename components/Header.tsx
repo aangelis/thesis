@@ -28,10 +28,8 @@ export default function Header() {
               </li>
             </>
           )}
-          {user?.isLoggedIn === true && user?.isLibrarian === true && (
+          {user?.isLoggedIn === true && user?.is_superuser === true && (
             <>
-
-
               <li>
                 <Link href="/deposits">
                   <a>
@@ -51,30 +49,29 @@ export default function Header() {
               </li>
               </>
           )}
+          {user?.isLoggedIn === true && user?.is_superuser === false && (
+            <>
+              <li>
+              <Link href="/mydeposits">
+                <a>
+                  <span
+                    style={{
+                      marginRight: ".3em",
+                      verticalAlign: "middle",
+                      borderRadius: "100%",
+                      overflow: "hidden",
+                    }}
+                  >
+
+                  </span>
+                  My Deposits
+                </a>
+              </Link>
+              </li>
+            </>
+          )}
           {user?.isLoggedIn === true && (
             <>
-
-
-              <li>
-                <Link href="/mydeposits">
-                  <a>
-                    <span
-                      style={{
-                        marginRight: ".3em",
-                        verticalAlign: "middle",
-                        borderRadius: "100%",
-                        overflow: "hidden",
-                      }}
-                    >
-
-                    </span>
-                    My Deposits
-                  </a>
-                </Link>
-              </li>
-
-
-
               <li>
                 <Link href="/profile">
                   <a>
@@ -93,7 +90,6 @@ export default function Header() {
                 </Link>
               </li>
 
-            
               <li>
                 {/* In this case, we're fine with linking with a regular a in case of no JavaScript */}
                 {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
