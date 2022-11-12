@@ -19,7 +19,7 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
       email,
       password,
       }
-    const result = await fetch("http://localhost:3000/api/dummyldap",
+    const result = await fetch(process.env.LOGIN_API_ENDPOINT as string,
       {
       method: "POST",
       headers:new Headers({
