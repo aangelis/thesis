@@ -45,13 +45,24 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 }) {
   const user: any = req.session.user;
 
+  if (user.is_superuser) {
+    res.setHeader("location", "/deposits");
+    res.statusCode = 302;
+    res.end();
+    return {
+      props: {
+        deposits: {}
+      },
+    };
+  }
+
   if (user === undefined) {
     res.setHeader("location", "/login");
     res.statusCode = 302;
     res.end();
     return {
       props: {
-        user: { id: null, email: null, username: null, isLoggedIn: false } as User,
+        // user: { id: null, email: null, username: null, isLoggedIn: false, }, //as User,
         deposits: {}
       },
     };
@@ -68,10 +79,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     props : { user, deposits }
   }
 }, sessionOptions);
-
-
-
-
 
 
 interface Data {
@@ -477,30 +484,20 @@ function EnhancedTable(rows: any[]) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Display list of deposits or error message
-function DepositsPage(
-  { user, deposits }:
-  {
-    user: InferGetServerSidePropsType<typeof getServerSideProps>,
-    deposits: any[]
-  }
-  ) {
+// function DepositsPage(
+//   { user, deposits }:
+//   {
+//     user: InferGetServerSidePropsType<typeof getServerSideProps>,
+//     deposits: any[]
+//   }
+//   ) {
+export default (({deposits}: {deposits: any[]}) => {
+  const { user } = useUser({
+    // redirectTo: "/login",
+  });
 
-  if (!user)
+  if (!user || user.is_superuser)
     return(<></>);
 
   const getHeadings = () => {
@@ -545,6 +542,4 @@ function DepositsPage(
     );
   }
 
-}
-
-export default DepositsPage;
+});

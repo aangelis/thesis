@@ -14,7 +14,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 }) {
   const user: any = req.session.user;
 
-  if (!user.isAdmin) {
+  if (!user.is_superuser) {
     res.setHeader("location", "/mydeposits");
     res.statusCode = 302;
     res.end();
@@ -61,21 +61,21 @@ export default (({deposits}: {deposits: any[]}) => {
     // redirectTo: "/login",
   });
 
-  if (user?.isAdmin)
-    return (
-      <Layout>
-      <h1>Λίστα αποθέσεων</h1>
-      <ul> 
-      {deposits.map(deposit => (
-        <li key={deposit.id}>{deposit.title}</li>
-        ))}
-      </ul>
-      </Layout>)
-  
-  return (<></>)
+  if (!user || !user?.is_superuser)
+    return (<></>)
 
-  }
-);
+  return (
+    <Layout>
+    <h1>Λίστα αποθέσεων</h1>
+    <ul> 
+    {deposits.map(deposit => (
+      <li key={deposit.id}>{deposit.title}</li>
+      ))}
+    </ul>
+    </Layout>)
+  
+
+});
 
 
 

@@ -12,6 +12,7 @@ export type User = {
   isAdmin: boolean;
   isSecretary: boolean;
   isLibrarian: boolean;
+  is_superuser: boolean;
 };
 
 export default withIronSessionApiRoute(userRoute, sessionOptions);
@@ -40,6 +41,7 @@ async function userRoute(req: NextApiRequest, res: NextApiResponse<User>) {
       isAdmin,
       isSecretary,
       isLibrarian,
+      is_superuser: isAdmin || isSecretary || isLibrarian,
     });
   } else {
     res.json({
@@ -52,6 +54,7 @@ async function userRoute(req: NextApiRequest, res: NextApiResponse<User>) {
       isAdmin: false,
       isSecretary: false,
       isLibrarian: false,
+      is_superuser: false,
     });
   }
 }
