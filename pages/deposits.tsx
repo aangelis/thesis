@@ -1,11 +1,30 @@
 import { useRouter } from 'next/router'
 import { AppProps } from 'next/app';
 import Layout from "components/Layout";
-
 import { PrismaClient } from '@prisma/client'
+import { withIronSessionApiRoute } from "iron-session/next";
+import { withIronSessionSsr } from "iron-session/next";
+import { sessionOptions } from "lib/session";
+import useUser from "lib/useUser";
 
 // Fetch all deposits
-export async function getServerSideProps() {
+export const getServerSideProps = withIronSessionSsr(async function ({
+  req,
+  res,
+}) {
+  const user: any = req.session.user;
+
+  if (user === undefined) {
+    res.setHeader("location", "/login");
+    res.statusCode = 302;
+    res.end();
+    return {
+      props: {
+        deposits: {}
+      },
+    };
+  }
+
   const prisma = new PrismaClient()
   const deposits = await prisma.deposit.findMany()
 
@@ -23,18 +42,28 @@ export async function getServerSideProps() {
       props : {  }
     }
   }*/
-}
+}, sessionOptions);
 
 // Display list of deposits
-export default (({deposits}: {deposits: any[]}) =>
-  <Layout>
-  <h1>Λίστα αποθέσεων</h1>
-  <ul> 
-   {deposits.map(deposit => (
-     <li key={deposit.id}>{deposit.title}</li>
-    ))}
-  </ul>
-  </Layout>
+export default (({deposits}: {deposits: any[]}) => {
+  const { user } = useUser({
+    // redirectTo: "/login",
+  });
+
+  if (user?.isLoggedIn)
+    return (
+    <Layout>
+    <h1>Λίστα αποθέσεων</h1>
+    <ul> 
+    {deposits.map(deposit => (
+      <li key={deposit.id}>{deposit.title}</li>
+      ))}
+    </ul>
+    </Layout>)
+  
+  return (<></>)
+
+  }
 );
 
 

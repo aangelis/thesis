@@ -9,7 +9,7 @@ import styles from '../styles/Home.module.css'
 export default function Home() {
   // here we just check if user is already logged in and redirect to profile
   const { mutateUser } = useUser({
-    redirectTo: "/deposits",
+    redirectTo: "/profile",
     redirectIfFound: true,
   });
   return (
@@ -29,7 +29,7 @@ export default function Home() {
         <li><Link href="/login">
           <a>Σύνδεση</a>
         </Link></li>
-        <li><Link href="/user/deposits">
+        <li><Link href="/mydeposits">
           <a>Οι αποθέσεις μου</a>
         </Link></li>
       </ul>

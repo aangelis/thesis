@@ -171,7 +171,6 @@ function DepositPage(
       }
       return el;
     });
-    console.log(textFieldsErrors);
     setTextFields(result);
   }
 
@@ -268,7 +267,6 @@ function DepositPage(
   }
 
   React.useEffect(() => {
-    console.log('kati')
     handleTextFields(
       {target:
         {name: "title_el", value: textFields.find(o => o.name === "title_el")?.value}

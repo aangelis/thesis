@@ -3,6 +3,7 @@ import Layout from "components/Layout";
 import { withIronSessionSsr } from "iron-session/next";
 import { sessionOptions } from "lib/session";
 import { User } from "pages/api/user";
+import useUser from "lib/useUser";
 import { InferGetServerSidePropsType } from "next";
 import { PrismaClient } from "@prisma/client"
 
@@ -498,6 +499,9 @@ function DepositsPage(
     deposits: any[]
   }
   ) {
+
+  if (!user)
+    return(<></>);
 
   const getHeadings = () => {
     return Object.keys(deposits[0]);

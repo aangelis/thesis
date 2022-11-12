@@ -9,6 +9,9 @@ export default function Profile() {
     redirectTo: "/login",
   });
 
+  if (!user?.isLoggedIn)
+    return(<></>)
+    
   return (
     <Layout>
       <h1>Προφίλ</h1>
