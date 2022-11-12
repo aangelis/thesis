@@ -24,6 +24,7 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 //import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
@@ -507,6 +508,16 @@ function DepositsPage(
     return (
       <Layout>
         <h1>Οι αποθέσεις μου</h1>
+        <Box sx={{ '& > button': { m: 1 } }}>
+            <Button
+                color="secondary"
+                onClick={() => router.push('/deposit/new')}
+                startIcon={<AddCircleOutlineIcon />}
+                variant="contained"
+              >
+                δημιουργια νεας αποθεσης
+              </Button>
+          </Box>
         { EnhancedTable(deposits) }
       </Layout>
     )
@@ -516,6 +527,16 @@ function DepositsPage(
       <Layout>
         <h1>Οι αποθέσεις μου</h1>
         <h3>Δεν βρέθηκαν αποθέσεις</h3>
+        <Box sx={{ '& > button': { m: 1 } }}>
+            <Button
+                color="secondary"
+                onClick={() => router.push('/deposit/new')}
+                startIcon={<AddCircleOutlineIcon />}
+                variant="contained"
+              >
+                δημιουργια νεας αποθεσης
+              </Button>
+        </Box>
       </Layout>
     );
   }
