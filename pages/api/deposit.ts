@@ -8,8 +8,9 @@ export default withIronSessionApiRoute(handler, sessionOptions);
 const prisma = new PrismaClient()
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const user: any = req.session.user;
 
-  if (!req.session.user?.isLoggedIn) {
+  if (!user?.isLoggedIn) {
     res.status(400).json({ message: "Access refused. User not logged in." });
   }
 
@@ -18,6 +19,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const data = await req.body; // deposit
     const { id } = data;
     // console.log(data);
+
+    if (!user?.isAdmin) {
+      try {
+        const dbDepositData = await prisma.deposit.findUnique({
+          where: {
+            id: id
+          }
+        })
+        // Check if deposit belongs to user before update
+        if (dbDepositData?.submitter_id !== user.id) {
+          res.status(400).json({ message: "User cannot modify this deposit." });
+        }
+      } catch (error) {
+        res.status(500).json({ message: (error as Error).message });
+      }
+    }
 
     if (!data.title_el ||
         !data.title_en ||
