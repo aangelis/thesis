@@ -14,7 +14,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 }) {
   const user: any = req.session.user;
 
-  if (!user.is_superuser) {
+  if (!user?.is_superuser) {
     res.setHeader("location", "/mydeposits");
     res.statusCode = 302;
     res.end();

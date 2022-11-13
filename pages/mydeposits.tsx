@@ -45,17 +45,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 }) {
   const user: any = req.session.user;
 
-  if (user.is_superuser) {
-    res.setHeader("location", "/deposits");
-    res.statusCode = 302;
-    res.end();
-    return {
-      props: {
-        deposits: {}
-      },
-    };
-  }
-
   if (user === undefined) {
     res.setHeader("location", "/login");
     res.statusCode = 302;
@@ -68,6 +57,17 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     };
   }
 
+  if (user?.is_superuser) {
+    res.setHeader("location", "/deposits");
+    res.statusCode = 302;
+    res.end();
+    return {
+      props: {
+        deposits: {}
+      },
+    };
+  }
+  
   const prisma = new PrismaClient()
   const deposits = await prisma.deposit.findMany({
     where: {
