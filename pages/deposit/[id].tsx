@@ -113,8 +113,8 @@ function DepositPage(
       label: 'Όχι',
     },
   ]
-  const [title_el, setTitle_el] = React.useState(deposit.title_el || "");
-  const [title_en, setTitle_en] = React.useState(deposit.title_en || "");
+  // const [title_el, setTitle_el] = React.useState(deposit.title_el || "");
+  // const [title_en, setTitle_en] = React.useState(deposit.title_en || "");
   const [abstract_el, setAbstract_el] = React.useState(deposit.abstract_el || "");
   const [abstract_en, setAbstract_en] = React.useState(deposit.abstract_en || "");
   const [confirmed, setConfirmed] = React.useState(deposit.confirmed || false);
@@ -230,8 +230,8 @@ function DepositPage(
     setLoading(true);
     const body = {
       id: deposit.id,
-      title_el,
-      title_en,
+      title_el: textFields.find(o => o.name === "title_el")?.value,
+      title_en: textFields.find(o => o.name === "title_en")?.value,
       abstract_el,
       abstract_en,
       pages: Number(numFields.find(o => o.name === "pages")?.value),
