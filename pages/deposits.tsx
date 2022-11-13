@@ -13,20 +13,20 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   res,
 }) {
   const user: any = req.session.user;
-
+  
+    if (user === undefined) {
+      res.setHeader("location", "/login");
+      res.statusCode = 302;
+      res.end();
+      return {
+        props: {
+          deposits: {}
+        },
+      };
+    }
+  
   if (!user?.is_superuser) {
     res.setHeader("location", "/mydeposits");
-    res.statusCode = 302;
-    res.end();
-    return {
-      props: {
-        deposits: {}
-      },
-    };
-  }
-
-  if (user === undefined) {
-    res.setHeader("location", "/login");
     res.statusCode = 302;
     res.end();
     return {
