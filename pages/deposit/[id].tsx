@@ -129,6 +129,7 @@ function DepositPage(
   const [numFieldsErrors, setNumFieldsErrors] = React.useState(0)
   const [textFieldsErrors, setTextFieldsErrors] = React.useState(0) 
   const [openSuccess, setOpenSuccess] = React.useState(false)
+  const [openUploadSuccess, setOpenUploadSuccess] = React.useState(false)
   const [openError, setOpenError] = React.useState(false)
   const [openFileError, setOpenFileError] = React.useState("")
   
@@ -216,6 +217,14 @@ function DepositPage(
     }
     setOpenSuccess(false);
   };
+
+  const handleCloseUploadSuccess = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenUploadSuccess(false);
+  };
+
   const handleCloseError = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
@@ -338,9 +347,9 @@ function DepositPage(
   };
 
   const onUploadFile = async (e: MouseEvent<HTMLButtonElement>) => {
+  // const onUploadFile = async () => {
     e.preventDefault();
-
-
+    setLoading(true);
 
     if (!file) {
       return;
@@ -353,7 +362,6 @@ function DepositPage(
 
       
       const res = await fetch("/api/upload", {
-      // const res = await fetch("/api/on-form-submit", {
         method: "POST",
         body: formData,
       });
@@ -369,14 +377,19 @@ function DepositPage(
       } = await res.json();
 
       if (error || !data) {
-        alert(error || "Sorry! something went wrong.");
+        setOpenFileError("Κάτι δεν πήγε καλά!");
+        // alert(error || "Sorry! something went wrong.");
         return;
       }
 
-      console.log("File was uploaded successfylly:", data);
+      setLoading(false);
+      setOpenUploadSuccess(true);
+      // console.log("File was uploaded successfylly:", data);
     } catch (error) {
+      setLoading(false);
       console.error(error);
-      alert("Sorry! something went wrong.");
+      setOpenFileError("Κάτι δεν πήγε καλά!");
+      // alert("Sorry! something went wrong.");
     }
   };
 
@@ -611,49 +624,72 @@ function DepositPage(
           {/* https://kiranvj.com/blog/blog/file-upload-in-material-ui/ */}
           {/* https://codesandbox.io/s/eager-euclid-mo7de?from-embed=&file=/src/index.js:241-271 */}
 
-          <TextField
-            disabled
-            id="show-pdf"
-            label="Αρχείο PDF απόθεσης"
-            variant="outlined"
-            value={file?.name || ""}
-          />
-
-          <label htmlFor="upload-file">
-            <input
-            style={{ display: "none" }}
-            id="upload-file"
-            name="file"
-            type="file"
-            onChange={onFileUploadChange}
-            />
-            <Fab
-              color="secondary"
-              size="small"
-              component="span"
-              aria-label="add"
-              variant="extended"
-            >
-              <AddCircleOutlineIcon /> Upload PDF
-            </Fab>
-          </label>
-
-
-          <Button
-            disabled={!previewUrl}
-            onClick={onCancelFile}
+          <Box sx={{ m: 2 }} />
+          <Box
+            component="form"
+            sx={{
+              '& .MuiTextField-root': { m: 1, width: '25ch' },
+            }}
+            noValidate
+            autoComplete="off"
           >
-            Cancel file
-          </Button>
+            <div>
+              
 
-          
-          <Button
-            disabled={!previewUrl}
-            onClick={onUploadFile}
-          >
-            Upload file
-          </Button>
+              <TextField
+                disabled
+                id="show-pdf"
+                label="Αρχείο PDF απόθεσης"
+                variant="outlined"
+                value={file?.name || deposit.original_filename || ""}
+              />
 
+
+                <label htmlFor="upload-file">
+                  <input
+                  style={{ display: "none" }}
+                  id="upload-file"
+                  name="file"
+                  type="file"
+                  onChange={onFileUploadChange}
+                  />
+                  <Fab
+                    color="secondary"
+                    size="small"
+                    component="span"
+                    aria-label="add"
+                    variant="extended"
+                    sx={{ marginLeft:2, marginTop:2}}
+                  >
+                    Choose file
+                  </Fab>
+                </label>
+
+
+                {/* <Button
+                  disabled={!previewUrl}
+                  onClick={onCancelFile}
+                >
+                  Cancel file
+                </Button> */}
+
+                
+                <LoadingButton
+                  color="secondary"
+                  disabled={!previewUrl}
+                  onClick={onUploadFile}
+                  loading={loading}
+                  loadingPosition="start"
+                  startIcon={<AddCircleOutlineIcon />}
+                  variant="contained"
+                  sx={{ marginLeft:2, marginTop:2}}
+                >
+                  Upload PDF
+                </LoadingButton>
+              
+
+            </div>
+          </Box>
 
 
           <Box sx={{ '& > button': { m: 1 } }}>
@@ -703,6 +739,16 @@ function DepositPage(
             </Alert>
           </Snackbar>
 
+          <Snackbar
+            open={openUploadSuccess}
+            autoHideDuration={6000}
+            onClose={handleCloseUploadSuccess}
+          >
+            <Alert severity="success">
+              <AlertTitle>Επιτυχία</AlertTitle>
+               — <strong>Το αρχείο αποθηκεύτηκε!</strong>
+            </Alert>
+          </Snackbar>
       
         </div>
 
