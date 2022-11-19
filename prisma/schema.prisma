@@ -57,5 +57,7 @@ model Deposit {
   submitter User @relation(fields: [submitter_id], references: [id])
   submitter_id Int
   supervisor String?
-
+  new_filename String?
+  original_filename String?
 }
+

@@ -43,6 +43,8 @@ CREATE TABLE "Deposit" (
     "comments" TEXT,
     "submitter_id" INTEGER NOT NULL,
     "supervisor" TEXT,
+    "new_filename" TEXT,
+    "original_filename" TEXT,
     CONSTRAINT "Deposit_submitter_id_fkey" FOREIGN KEY ("submitter_id") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 

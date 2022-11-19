@@ -29,6 +29,16 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import Script from 'next/script'
 
+import type { NextPage } from "next";
+import Head from "next/head";
+import Image from "next/image";
+import { ChangeEvent, MouseEvent, useState } from "react";
+import Button from '@mui/material/Button';
+import InputLabel from '@mui/material/InputLabel';
+import { Input } from '@mui/icons-material';
+import Fab from '@mui/material/Fab';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+
 // Fetch deposit data
 export const getServerSideProps = withIronSessionSsr(async function ({
   req,
@@ -36,7 +46,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 }) {
   const user: any = req.session.user;
 
-  // console.log(user);
+
 
   // https://github.com/aralroca/next-translate/issues/694#issuecomment-974717129
   // Get id property of request data
@@ -51,12 +61,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   // http://localhost:3000/_next/data/development/deposit/9.json?id=9
   // on refresh
   // http://localhost:3000/deposit/9
-
-  // console.log(req)
-  // console.log(params);
-  // console.log(split);
-  // console.log(depositId);
-  // console.log(typeof depositId);
 
   if (user === undefined) {
     res.setHeader("location", "/login");
@@ -101,8 +105,6 @@ function DepositPage(
   }
   ) {
 
-    // console.log(deposit);
-
   const confirmationStatus = [
     {
       value: 'true',
@@ -121,13 +123,14 @@ function DepositPage(
   const [confirmed_timestamp, setConfirmed_timestamp] = React.useState(deposit.confirmed_timestamp);
   const [license, setLicense] = React.useState(deposit.license || "");
   const [comments, setComments] = React.useState(deposit.comments || "");
-  const [supervisor, setSupervisor] = React.useState(deposit.comments || "");
+  const [supervisor, setSupervisor] = React.useState(deposit.supervisor || "");
   
   const [loading, setLoading] = React.useState(false);
   const [numFieldsErrors, setNumFieldsErrors] = React.useState(0)
   const [textFieldsErrors, setTextFieldsErrors] = React.useState(0) 
   const [openSuccess, setOpenSuccess] = React.useState(false)
   const [openError, setOpenError] = React.useState(false)
+  const [openFileError, setOpenFileError] = React.useState("")
   
   // first version of error checking for pages field
   //
@@ -220,6 +223,13 @@ function DepositPage(
     setOpenError(false);
   };
 
+  const handleCloseFileError = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenFileError("");
+  };
+
   const handleChangeConfirmed = (event: React.ChangeEvent<HTMLInputElement>) => {
     setConfirmed(event.target.value);
   };
@@ -276,6 +286,101 @@ function DepositPage(
         {name: "title_en", value: textFields.find(o => o.name === "title_en")?.value}
     });
   }, [])
+
+
+
+
+  const [file, setFile] = React.useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+
+  const onFileUploadChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const fileInput = e.target;
+
+    if (!fileInput.files) {
+      alert("No file was chosen");
+      console.log("No file was chosen");
+      return;
+    }
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+      alert("Files list is empty");
+      console.log("Files list is empty");
+      return;
+    }
+
+    const file = fileInput.files[0];
+    /** File validation */
+    if (file.type !== "application/pdf") {
+      /** Reset file input */
+      e.currentTarget.type = "text";
+      e.currentTarget.type = "file";
+
+      setOpenFileError("Επιλέξτε ένα έγκυρο αρχείο pdf!");
+      return;
+    }
+
+    // Setting file state
+    // file state, to send it later to the server
+    setFile(file);
+    // previewUrl state, to show the preview of the file
+    setPreviewUrl(URL.createObjectURL(file));
+
+  };
+
+  const onCancelFile = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (!previewUrl && !file) {
+      return;
+    }
+
+    setFile(null);
+    setPreviewUrl(null);
+  };
+
+  const onUploadFile = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      var formData = new FormData();
+      formData.append("depositId", deposit.id);
+      formData.append("media", file);
+
+      
+      const res = await fetch("/api/upload", {
+      // const res = await fetch("/api/on-form-submit", {
+        method: "POST",
+        body: formData,
+      });
+
+      const {
+        data,
+        error,
+      }: {
+        data: {
+          url: string | string[];
+        } | null;
+        error: string | null;
+      } = await res.json();
+
+      if (error || !data) {
+        alert(error || "Sorry! something went wrong.");
+        return;
+      }
+
+      console.log("File was uploaded successfylly:", data);
+    } catch (error) {
+      console.error(error);
+      alert("Sorry! something went wrong.");
+    }
+  };
+
+
 
   return (
     <Layout>   
@@ -503,6 +608,54 @@ function DepositPage(
             />
           </FormControl>
           
+          {/* https://kiranvj.com/blog/blog/file-upload-in-material-ui/ */}
+          {/* https://codesandbox.io/s/eager-euclid-mo7de?from-embed=&file=/src/index.js:241-271 */}
+
+          <TextField
+            disabled
+            id="show-pdf"
+            label="Αρχείο PDF απόθεσης"
+            variant="outlined"
+            value={file?.name || ""}
+          />
+
+          <label htmlFor="upload-file">
+            <input
+            style={{ display: "none" }}
+            id="upload-file"
+            name="file"
+            type="file"
+            onChange={onFileUploadChange}
+            />
+            <Fab
+              color="secondary"
+              size="small"
+              component="span"
+              aria-label="add"
+              variant="extended"
+            >
+              <AddCircleOutlineIcon /> Upload PDF
+            </Fab>
+          </label>
+
+
+          <Button
+            disabled={!previewUrl}
+            onClick={onCancelFile}
+          >
+            Cancel file
+          </Button>
+
+          
+          <Button
+            disabled={!previewUrl}
+            onClick={onUploadFile}
+          >
+            Upload file
+          </Button>
+
+
+
           <Box sx={{ '& > button': { m: 1 } }}>
             <LoadingButton
                 color="secondary"
@@ -516,6 +669,17 @@ function DepositPage(
                 Αποθηκευση
               </LoadingButton>
           </Box>
+
+          <Snackbar
+            open={openFileError !== ""}
+            autoHideDuration={6000}
+            onClose={handleCloseFileError}
+          >
+            <Alert severity="error">
+              <AlertTitle>Σφάλμα</AlertTitle>
+               — <strong>{openFileError}</strong>
+            </Alert>
+          </Snackbar>
 
           <Snackbar
             open={openError}
