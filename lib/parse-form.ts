@@ -3,7 +3,7 @@ import mime from "mime";
 import { join } from "path";
 import * as dateFn from "date-fns";
 import formidable from "formidable";
-import { mkdir, stat, rename } from "fs/promises";
+import { mkdir, stat, rename, readdir, unlink } from "fs/promises";
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -76,12 +76,12 @@ export const parseForm = async (
     let depositId: any;
 
     form.on("field", (name, value) => {
-      console.log({name, value});
+      // console.log({name, value});
       depositId = JSON.parse(value);
     });
 
     form.on("file", (field, file) => {
-      console.log({field, file});
+      // console.log({field, file});
       let filePath = file.filepath;
       let destinationPath = filePath.split('uploads')[0] + `uploads/${depositId}/`;
 
@@ -94,9 +94,13 @@ export const parseForm = async (
           console.error(err);
         }
       })
-      // Move uploaded PDF file to new destination folder
+      // Move the uploaded PDF file to new destination folder
       .finally(() => {
-        rename(filePath, destinationPath + file.newFilename);
+        // Fist find all files inside destination folder, delete them
+        // and then move the uploaded file
+        readdir(destinationPath)
+        .then((f) => Promise.all(f.map(e => unlink(destinationPath + e))))
+        .then(() => rename(filePath, destinationPath + file.newFilename))
       })
 
       prisma.deposit.update({
@@ -108,24 +112,21 @@ export const parseForm = async (
           original_filename: file.originalFilename,
         },
       })
-      .then((result) => { console.log(result)})
+      .then((result) => {
+        // console.log(result)
+      })
       .catch(error => {
         console.error(error);
         reject(error);
       })
       .finally(() => {
-        console.log({ depositId, url: filePath });
+        // console.log({ depositId, url: filePath });
         resolve({ depositId, url: filePath });
       })
         
-
     });
 
-    form.on("end", () => { 
-      console.log("form end")
-    });
-
-
+    form.on("end", () => {});
 
   });
 };
