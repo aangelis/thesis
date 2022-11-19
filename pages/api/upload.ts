@@ -1,4 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { withIronSessionApiRoute } from "iron-session/next";
+import { sessionOptions } from "lib/session";
 import { parseForm, FormidableError } from "lib/parse-form";
 
 const handler = async (
@@ -20,6 +22,12 @@ const handler = async (
     return;
   }
   // Just after the "Method Not Allowed" code
+  const user: any = req.session.user;
+
+  if (!user?.isLoggedIn) {
+    res.status(400).json({ data: null, error: "Access refused. User not logged in." });
+  }
+
   try {
 
     // const { fields, files } = await parseForm(req);
@@ -52,4 +60,5 @@ export const config = {
   },
 };
 
-export default handler;
+// export default handler;
+export default withIronSessionApiRoute(handler, sessionOptions);

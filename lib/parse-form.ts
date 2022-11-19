@@ -5,6 +5,8 @@ import * as dateFn from "date-fns";
 import formidable from "formidable";
 import { mkdir, stat, rename, readdir, unlink } from "fs/promises";
 import { PrismaClient } from '@prisma/client'
+import { withIronSessionApiRoute } from "iron-session/next";
+import { sessionOptions } from "lib/session";
 
 const prisma = new PrismaClient()
 
@@ -15,6 +17,8 @@ export const parseForm = async (
 ): Promise<{ depositId: string, url: string }> => {
 // ): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
   return await new Promise(async (resolve, reject) => {
+
+    const user: any = req.session.user;
 
     const uploadDir = join(
       process.env.ROOT_DIR || process.cwd(),
@@ -78,6 +82,25 @@ export const parseForm = async (
     form.on("field", (name, value) => {
       // console.log({name, value});
       depositId = JSON.parse(value);
+     
+
+      prisma.deposit.findUnique({
+        where: {
+          id: depositId as unknown as number
+        }
+      })
+      .then(deposit => {
+        // Check if deposit belongs to user before update
+        if (deposit?.submitter_id !== user.id) {
+          // res.status(400).json({ data: null, error: "User cannot modify this deposit." });
+          reject("User cannot modify this deposit.");
+        }
+      }).catch (error => {
+        // res.status(500).json({ data: null, error: (error as Error).message });
+        reject((error as Error).message);
+      })
+     
+      
     });
 
     form.on("file", (field, file) => {
@@ -130,3 +153,5 @@ export const parseForm = async (
 
   });
 };
+
+export default withIronSessionApiRoute(parseForm, sessionOptions);
