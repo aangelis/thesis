@@ -59,7 +59,7 @@ export const parseForm = async (
         }`;
         return filename;
       },
-      filter: (part) => {
+      filter: part => {
         return (
           part.name === "media" && (part.mimetype?.includes("application/pdf") || false)
         );
@@ -93,6 +93,7 @@ export const parseForm = async (
         // Check if deposit belongs to user before update
         if (deposit?.submitter_id !== user.id) {
           // res.status(400).json({ data: null, error: "User cannot modify this deposit." });
+          // TODO: delete uploaded file 
           reject("User cannot modify this deposit.");
         }
       }).catch (error => {
@@ -122,7 +123,7 @@ export const parseForm = async (
         // Fist find all files inside destination folder, delete them
         // and then move the uploaded file
         readdir(destinationPath)
-        .then((f) => Promise.all(f.map(e => unlink(destinationPath + e))))
+        .then(f => Promise.all(f.map(e => unlink(destinationPath + e))))
         .then(() => rename(filePath, destinationPath + file.newFilename))
       })
 
@@ -135,7 +136,7 @@ export const parseForm = async (
           original_filename: file.originalFilename,
         },
       })
-      .then((result) => {
+      .then(result => {
         // console.log(result)
       })
       .catch(error => {

@@ -1,5 +1,5 @@
 // import React from "react";
-import { useRouter } from 'next/router'
+import router, { useRouter } from 'next/router'
 import Layout from "components/Layout";
 import { withIronSessionSsr } from "iron-session/next";
 import { sessionOptions } from "lib/session";
@@ -8,6 +8,8 @@ import { InferGetServerSidePropsType } from "next";
 import useUser from "lib/useUser";
 import { PrismaClient } from '@prisma/client'
 import { IncomingMessage } from "http";
+import { join } from "path";
+
 import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
@@ -26,6 +28,7 @@ import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 
 import Script from 'next/script'
 
@@ -38,6 +41,9 @@ import InputLabel from '@mui/material/InputLabel';
 import { Input } from '@mui/icons-material';
 import Fab from '@mui/material/Fab';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
+import { promisify } from 'util';
+
 
 // Fetch deposit data
 export const getServerSideProps = withIronSessionSsr(async function ({
@@ -90,6 +96,33 @@ export const getServerSideProps = withIronSessionSsr(async function ({
      submitter_id: user.id,
     }
   })
+
+  // Compute and return ecnrypted download file data info
+  if (deposit.new_filename !== (undefined || null)) {
+    // const iv = randomBytes(16);
+    // console.log(iv.toString('hex'));
+    const iv = Buffer.from(process.env.ENCRYPTION_RANDOM_BYTES as string || "bafc0c62416f50d567dd198359e79937", 'hex');
+    const password: string = process.env.ENCRYPTION_PRIVATE_KEY as string || "mP3LHZRRjRmP3LHZRRjR"
+    const key = (await promisify(scrypt)(password, 'salt', 32)) as Buffer;
+    const cipher = createCipheriv('aes-256-ctr', key, iv);
+
+    const downloadPath = {
+      id: deposit.id,
+      original_filename: deposit.original_filename,
+      new_filename: deposit.new_filename,
+    }
+    const textToEncrypt = JSON.stringify(downloadPath);
+    const encryptedBuffer = Buffer.concat([
+      cipher.update(textToEncrypt),
+      cipher.final(),
+    ]);
+    const encryptedText = encryptedBuffer.toString('hex')
+
+    return {
+      props : { user, deposit: { ...deposit, download_data: encryptedText.toString() } }
+    }
+
+  }
 
   return {
     props : { user, deposit }
@@ -393,6 +426,11 @@ function DepositPage(
     }
   };
 
+  const onDownloadFile = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    router.push('/api/download/' + deposit.download_data);
+
+  };
 
 
   return (
@@ -620,7 +658,31 @@ function DepositPage(
               }}
             />
           </FormControl>
-          
+
+          <Box sx={{ m: 2 }} />
+          <Box
+            component="form"
+            sx={{
+              '& .MuiTextField-root': { m: 1, width: '25ch' },
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            <div>
+            <LoadingButton
+                color="secondary"
+                disabled={!deposit.original_filename}
+                onClick={onDownloadFile}
+                loadingPosition="start"
+                startIcon={<DownloadForOfflineIcon />}
+                variant="contained"
+                sx={{ marginLeft:1, marginTop:2}}
+              >
+                Κατεβασμα υπαρχοντος αρχειου {deposit.original_filename}
+              </LoadingButton>
+            </div>
+          </Box>
+
           {/* https://kiranvj.com/blog/blog/file-upload-in-material-ui/ */}
           {/* https://codesandbox.io/s/eager-euclid-mo7de?from-embed=&file=/src/index.js:241-271 */}
 
@@ -637,7 +699,8 @@ function DepositPage(
               
 
               <TextField
-                disabled
+                // disabled
+                inputProps={{readOnly: true, disableUnderline: true}}
                 id="show-pdf"
                 label="Αρχείο PDF απόθεσης"
                 variant="outlined"
@@ -666,12 +729,18 @@ function DepositPage(
                 </label>
 
 
-                {/* <Button
+                <Fab
+                  color="secondary"
+                  size="small"
                   disabled={!previewUrl}
                   onClick={onCancelFile}
+                  component="span"
+                  aria-label="add"
+                  variant="extended"
+                  sx={{ marginLeft:2, marginTop:2}}
                 >
-                  Cancel file
-                </Button> */}
+                  Ακυρωση αρχειου
+                </Fab>
 
                 
                 <LoadingButton
@@ -684,13 +753,15 @@ function DepositPage(
                   variant="contained"
                   sx={{ marginLeft:2, marginTop:2}}
                 >
-                  Upload PDF
+                  Ανεβασμα PDF
                 </LoadingButton>
+
               
 
             </div>
           </Box>
 
+          <Box sx={{ m: 2 }} />
 
           <Box sx={{ '& > button': { m: 1 } }}>
             <LoadingButton
