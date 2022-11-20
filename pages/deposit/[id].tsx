@@ -334,6 +334,7 @@ function DepositPage(
 
   const [file, setFile] = React.useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+  const [storedFile, setStoredFile] = React.useState(deposit.original_filename || null);
 
   const onFileUploadChange = (e: ChangeEvent<HTMLInputElement>) => {
     const fileInput = e.target;
@@ -417,6 +418,9 @@ function DepositPage(
 
       setLoading(false);
       setOpenUploadSuccess(true);
+      setStoredFile(file.name);
+      setFile(null);
+      setPreviewUrl(null);
       // console.log("File was uploaded successfylly:", data);
     } catch (error) {
       setLoading(false);
@@ -671,14 +675,14 @@ function DepositPage(
             <div>
             <LoadingButton
                 color="secondary"
-                disabled={!deposit.original_filename}
+                disabled={!storedFile}
                 onClick={onDownloadFile}
                 loadingPosition="start"
                 startIcon={<DownloadForOfflineIcon />}
                 variant="contained"
                 sx={{ marginLeft:1, marginTop:2}}
               >
-                Κατεβασμα υπαρχοντος αρχειου {deposit.original_filename}
+                Κατεβασμα υπαρχοντος αρχειου {storedFile}
               </LoadingButton>
             </div>
           </Box>
@@ -704,7 +708,7 @@ function DepositPage(
                 id="show-pdf"
                 label="Αρχείο PDF απόθεσης"
                 variant="outlined"
-                value={file?.name || deposit.original_filename || ""}
+                value={file?.name || storedFile}
               />
 
 
