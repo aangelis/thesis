@@ -47,26 +47,28 @@ import { promisify } from 'util';
 
 // Fetch deposit data
 export const getServerSideProps = withIronSessionSsr(async function ({
+  params,
   req,
   res,
 }) {
   const user: any = req.session.user;
 
+  // // https://github.com/aralroca/next-translate/issues/694#issuecomment-974717129
+  // // Get id property of request data
+  // const NextRequestMetaSymbol = Reflect.ownKeys(req).find(key => key.toString() === 'Symbol(NextRequestMeta)');
+  // // const params = NextRequestMetaSymbol && req[NextRequestMetaSymbol].__NEXT_INIT_QUERY ? req[NextRequestMetaSymbol].__NEXT_INIT_QUERY : undefined
+  // // const depositId = Number(params.id);
+  // const params_ = NextRequestMetaSymbol && req[NextRequestMetaSymbol].__NEXT_INIT_URL ? req[NextRequestMetaSymbol].__NEXT_INIT_URL : undefined
+  // const split = params_.split('/')[params_.split('/').length-1];
+  // const depositId = Number(split.split('.')[0]);
 
+  // // on link
+  // // http://localhost:3000/_next/data/development/deposit/9.json?id=9
+  // // on refresh
+  // // http://localhost:3000/deposit/9
 
-  // https://github.com/aralroca/next-translate/issues/694#issuecomment-974717129
-  // Get id property of request data
-  const NextRequestMetaSymbol = Reflect.ownKeys(req).find(key => key.toString() === 'Symbol(NextRequestMeta)');
-  // const params = NextRequestMetaSymbol && req[NextRequestMetaSymbol].__NEXT_INIT_QUERY ? req[NextRequestMetaSymbol].__NEXT_INIT_QUERY : undefined
-  // const depositId = Number(params.id);
-  const params = NextRequestMetaSymbol && req[NextRequestMetaSymbol].__NEXT_INIT_URL ? req[NextRequestMetaSymbol].__NEXT_INIT_URL : undefined
-  const split = params.split('/')[params.split('/').length-1];
-  const depositId = Number(split.split('.')[0]);
-
-  // on link
-  // http://localhost:3000/_next/data/development/deposit/9.json?id=9
-  // on refresh
-  // http://localhost:3000/deposit/9
+  // https://www.learnbestcoding.com/post/25/nextjs-how-to-use-getserversideprops
+  const depositId = Number(params?.id);
 
   if (user === undefined) {
     res.setHeader("location", "/login");
