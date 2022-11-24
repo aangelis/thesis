@@ -7,6 +7,7 @@ import { mkdir, stat, rename, readdir, unlink } from "fs/promises";
 import { PrismaClient } from '@prisma/client'
 import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "lib/session";
+import { minioClient } from "lib/mc";
 
 const prisma = new PrismaClient()
 
@@ -125,6 +126,36 @@ export const parseForm = async (
         readdir(destinationPath)
         .then(f => Promise.all(f.map(e => unlink(destinationPath + e))))
         .then(() => rename(filePath, destinationPath + file.newFilename))
+        .then(() => {
+
+          const fileMinio = destinationPath + file.newFilename
+          minioClient.makeBucket(
+            process.env.MINIO_BUCKET || "thesis",
+            'local',
+            function(err: any) {
+              if (err.code === "BucketAlreadyOwnedByYou") return;
+              return console.log(err);
+            })
+
+          const metaData = {
+            'Content-Type': 'application/pdf',
+            'Original-Filename': file.originalFilename
+          }
+          
+          // Append folder name (deposit's id) to filename
+          const objectName = depositId + '/' + file.newFilename;
+
+          minioClient.fPutObject(
+            process.env.MINIO_BUCKET || "thesis",
+            objectName,
+            fileMinio,
+            metaData,
+            function(err, etag) {
+              if (err) return console.log(err)
+              console.log('File uploaded successfully.')
+          });
+
+        })
       })
 
       prisma.deposit.update({
