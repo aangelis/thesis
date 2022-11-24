@@ -157,6 +157,11 @@ export const parseForm = async (
 
         })
       })
+      // Delete file after upload to min.io
+      .then(() => {
+        readdir(destinationPath)
+        .then(f => Promise.all(f.map(e => unlink(destinationPath + e))))
+      })
 
       prisma.deposit.update({
         where: {
