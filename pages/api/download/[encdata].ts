@@ -7,6 +7,7 @@ import { join } from "path";
 import { promises as fs } from 'fs';
 import { pipeline } from "stream/promises";
 import { PrismaClient } from '@prisma/client'
+import { minioClient } from "lib/mc";
 
 function tryParseJSONObject (jsonString: string){
   try {
@@ -87,16 +88,45 @@ const handler = async (
       return;
     }
   }
-
-  const downloadDir = join(
-    process.env.ROOT_DIR || process.cwd(),
-    '/uploads/'
-  );
       
   // https://stackoverflow.com/questions/68490546/how-to-download-a-file-on-next-js-using-an-api-route
   // https://vercel.com/guides/loading-static-file-nextjs-api-route
 
-  const fileContents = await fs.readFile(downloadDir + data.id + '/' + data.new_filename, 'utf8');
+  // Append folder name (deposit's id) to filename
+  const objectName = data.id + '/' + data.new_filename;
+  
+  // const fileContents = await fs.readFile(downloadDir + data.id + '/' + data.new_filename, 'utf8');
+  
+  async function getObjectContents() {
+
+    const promise = new Promise((resolve, reject) => {
+
+      var buff:any = [];
+      var size = 0;
+      minioClient.getObject(
+        process.env.MINIO_BUCKET || "thesis",
+        objectName).then(function(dataStream) {
+        dataStream.on('data', async function(chunk) {
+          buff.push(chunk)
+          size += chunk.length
+        })
+        dataStream.on('end', function() {
+          console.log('End. Total size = ' + size)
+          // console.log("End Buffer : " + buff)
+  
+          resolve(buff)
+        })
+        dataStream.on('error', function(err) {
+          console.log(err)
+          reject(err)
+        })
+      }).catch(reject);
+  
+    })
+    return promise
+  }
+
+  const fileContents = await getObjectContents()
 
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', `attachment; filename=${data.original_filename}`);
