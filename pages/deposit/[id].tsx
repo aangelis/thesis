@@ -434,7 +434,7 @@ function DepositPage(
 
   const onDownloadFile = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    router.push('/api/download/' + deposit.download_data);
+    router.push('/api/download_file/' + deposit.id);
 
   };
 
