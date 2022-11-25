@@ -146,6 +146,27 @@ export const parseForm = async (
           // Append folder name (deposit's id) to filename
           const objectName = depositId + '/' + file.newFilename;
     
+          var objectsList:any = []
+          var stream = minioClient.listObjects(
+            process.env.MINIO_BUCKET || "thesis",
+            depositId + '/',
+            true)
+          stream.on('data', function(obj) { objectsList.push(obj.name) } )
+          stream.on('end', function () { 
+
+            minioClient.removeObjects(
+              process.env.MINIO_BUCKET || "thesis",
+              objectsList,
+              function(e) {
+              if (e) {
+                  return console.log('Unable to remove Objects ',e)
+              }
+              console.log('Removed the objects successfully')
+            })
+
+           })
+          stream.on('error', function(err) { console.log(err) } )
+
           minioClient.fPutObject(
             process.env.MINIO_BUCKET || "thesis",
             objectName,
