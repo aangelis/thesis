@@ -120,15 +120,16 @@ export const parseForm = async (
         }
       })
       // Move the uploaded PDF file to new destination folder
-      .finally(() => {
+      .then(() => {
         // Fist find all files inside destination folder, delete them
         // and then move the uploaded file
         readdir(destinationPath)
         .then(f => Promise.all(f.map(e => unlink(destinationPath + e))))
         .then(() => rename(filePath, destinationPath + file.newFilename))
         .then(() => {
-
+    
           const fileMinio = destinationPath + file.newFilename
+          
           minioClient.makeBucket(
             process.env.MINIO_BUCKET || "thesis",
             'local',
@@ -136,7 +137,7 @@ export const parseForm = async (
               if (err.code === "BucketAlreadyOwnedByYou") return;
               return console.log(err);
             })
-
+    
           const metaData = {
             'Content-Type': 'application/pdf',
             'Original-Filename': file.originalFilename
@@ -144,46 +145,44 @@ export const parseForm = async (
           
           // Append folder name (deposit's id) to filename
           const objectName = depositId + '/' + file.newFilename;
-
+    
           minioClient.fPutObject(
             process.env.MINIO_BUCKET || "thesis",
             objectName,
             fileMinio,
             metaData,
             function(err, etag) {
-              if (err) return console.log(err)
+              if (err) return console.log("fdfd ", err)
               console.log('File uploaded successfully.')
-          });
-
+              
+              // Delete file after upload to min.io
+              readdir(destinationPath)
+              .then(f => Promise.all(f.map(e => unlink(destinationPath + e))))
+              
+              prisma.deposit.update({
+                where: {
+                  id: depositId,
+                },
+                data: {
+                  new_filename: file.newFilename,
+                  original_filename: file.originalFilename,
+                },
+              })
+              .then(result => {
+                // console.log(result)
+              })
+              .catch(error => {
+                console.error(error);
+                reject(error);
+              })
+              .finally(() => {
+                // console.log({ depositId, url: filePath });
+                resolve({ depositId, url: filePath });
+              })
+          })          
         })
       })
-      // Delete file after upload to min.io
-      .then(() => {
-        readdir(destinationPath)
-        .then(f => Promise.all(f.map(e => unlink(destinationPath + e))))
-      })
 
-      prisma.deposit.update({
-        where: {
-          id: depositId,
-        },
-        data: {
-          new_filename: file.newFilename,
-          original_filename: file.originalFilename,
-        },
-      })
-      .then(result => {
-        // console.log(result)
-      })
-      .catch(error => {
-        console.error(error);
-        reject(error);
-      })
-      .finally(() => {
-        // console.log({ depositId, url: filePath });
-        resolve({ depositId, url: filePath });
-      })
-        
     });
 
     form.on("end", () => {});
