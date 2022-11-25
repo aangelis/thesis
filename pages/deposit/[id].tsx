@@ -99,32 +99,32 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     }
   })
 
-  // Compute and return ecnrypted download file data info
-  if (deposit.new_filename !== (undefined || null)) {
-    // const iv = randomBytes(16);
-    // console.log(iv.toString('hex'));
-    const iv = Buffer.from(process.env.ENCRYPTION_RANDOM_BYTES as string || "bafc0c62416f50d567dd198359e79937", 'hex');
-    const password: string = process.env.ENCRYPTION_PRIVATE_KEY as string || "mP3LHZRRjRmP3LHZRRjR"
-    const key = (await promisify(scrypt)(password, 'salt', 32)) as Buffer;
-    const cipher = createCipheriv('aes-256-ctr', key, iv);
+  // // Compute and return ecnrypted download file data info
+  // if (deposit.new_filename !== (undefined || null)) {
+  //   // const iv = randomBytes(16);
+  //   // console.log(iv.toString('hex'));
+  //   const iv = Buffer.from(process.env.ENCRYPTION_RANDOM_BYTES as string || "bafc0c62416f50d567dd198359e79937", 'hex');
+  //   const password: string = process.env.ENCRYPTION_PRIVATE_KEY as string || "mP3LHZRRjRmP3LHZRRjR"
+  //   const key = (await promisify(scrypt)(password, 'salt', 32)) as Buffer;
+  //   const cipher = createCipheriv('aes-256-ctr', key, iv);
 
-    const downloadPath = {
-      id: deposit.id,
-      original_filename: deposit.original_filename,
-      new_filename: deposit.new_filename,
-    }
-    const textToEncrypt = JSON.stringify(downloadPath);
-    const encryptedBuffer = Buffer.concat([
-      cipher.update(textToEncrypt),
-      cipher.final(),
-    ]);
-    const encryptedText = encryptedBuffer.toString('hex')
+  //   const downloadPath = {
+  //     id: deposit.id,
+  //     original_filename: deposit.original_filename,
+  //     new_filename: deposit.new_filename,
+  //   }
+  //   const textToEncrypt = JSON.stringify(downloadPath);
+  //   const encryptedBuffer = Buffer.concat([
+  //     cipher.update(textToEncrypt),
+  //     cipher.final(),
+  //   ]);
+  //   const encryptedText = encryptedBuffer.toString('hex')
 
-    return {
-      props : { user, deposit: { ...deposit, download_data: encryptedText.toString() } }
-    }
+  //   return {
+  //     props : { user, deposit: { ...deposit, download_data: encryptedText.toString() } }
+  //   }
 
-  }
+  // }
 
   return {
     props : { user, deposit }
