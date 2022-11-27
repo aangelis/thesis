@@ -65,8 +65,8 @@ export default function Form({
     // if (password === "") { setDisableSubmit(true); return; }
     // small valid minimum length for development purposes
     if (password.length < 4) { setDisableSubmit(true); return; }
-    const validEmail = validateEmail(email);
     if (email.split('@')[1] !== 'hua.gr') { setDisableSubmit(true); return; }
+    const validEmail = validateEmail(email);
     if (validEmail === null) { setDisableSubmit(true); return; }
 
     setDisableSubmit(false);

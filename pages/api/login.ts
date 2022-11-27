@@ -19,6 +19,33 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
       email,
       password,
       }
+
+    const validateEmail = (m: string) => {
+      return String(m)
+        .toLowerCase()
+        .match(
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        );
+    }
+
+    if (email === "") {
+      res.status(401).json({ message: "No email provided." });
+      return;
+    }
+    if (password.length < 4) {
+      res.status(401).json({ message: "Invalid password length." });
+      return;
+    }
+    if (email.split('@')[1] !== 'hua.gr') {
+      res.status(401).json({ message: "Invalid email." });
+      return;
+    }
+    const validEmail = validateEmail(email);
+    if (validEmail === null) {
+      res.status(401).json({ message: "Invalid email." });
+      return;
+    }
+
     const result = await fetch(process.env.LOGIN_API_ENDPOINT as string,
       {
       method: "POST",
