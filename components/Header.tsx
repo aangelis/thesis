@@ -23,7 +23,7 @@ export default function Header() {
               
               <li>
                 <Link href="/login">
-                  <a>Σύνδεση</a>
+                  <a>Είσοδος</a>
                 </Link>
               </li>
             </>

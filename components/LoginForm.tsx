@@ -89,7 +89,7 @@ export default function Form({
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Σύνδεση
+            Είσοδος
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField

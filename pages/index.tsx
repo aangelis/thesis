@@ -1,10 +1,12 @@
-import type { NextPage } from 'next'
-import Link from 'next/link'
+import Link from '@mui/material/Link';
 import Layout from "components/Layout";
 import useUser from "lib/useUser";
-import Head from 'next/head'
 import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import LoginIcon from '@mui/icons-material/Login';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 
 export default function Home() {
   // here we just check if user is already logged in and redirect to profile
@@ -12,27 +14,43 @@ export default function Home() {
     redirectTo: "/profile",
     redirectIfFound: true,
   });
+
   return (
         
       <Layout>
-      <a href="https://www.hua.gr">Χαροκόπειο Πανεπιστήμιο</a>
-      <h4>Βιβλιοθήκη και Κέντρο Πληροφόρησης</h4>
-      <h4>Υπηρεσία Αυτοαπόθεσης Εργασιών</h4>
+        <List dense>
+          <ListItem>
+            <Link href="https://www.hua.gr" underline="none">
+              <Image src="/Hua-Logo.webp" alt="Χαροκόπειο Πανεπιστήμιο" width="90" height="85" />
+            </Link>
+          </ListItem>
+          <ListItem>
+            <Link href="https://www.hua.gr" underline="none">Χαροκόπειο Πανεπιστήμιο</Link>
+          </ListItem>
+          <ListItem>
+            <Link href="http://www.library.hua.gr/" underline="none">Βιβλιοθήκη και Κέντρο Πληροφόρησης</Link> 
+          </ListItem>
+          <ListItem>
+            <Link href="/" underline="none">Υπηρεσία Αυτοαπόθεσης Εργασιών</Link>
+          </ListItem>
+        </List>
+        <h1>Πύλη Φοιτητών</h1>
+        <div>
+        H παρούσα εφαρμογή υποστηρίζει την αυτοαπόθεση των πτυχιακών, μεταπτυχιακών εργασιών
+        και διδακτορικών διατριβών που εκπονούνται στο Χαροκόπειο Πανεπιστήμιο. 
+        </div>
 
-      <h1>Πύλη Φοιτητών</h1>
-      <div>
-      H παρούσα εφαρμογή υποστηρίζει την αυτοαπόθεση των πτυχιακών, μεταπτυχιακών εργασιών
-      και διδακτορικών διατριβών που εκπονούνται στο Χαροκόπειο Πανεπιστήμιο. 
-      </div>
+        <Box sx={{ m: 2 }} />
 
-      <ul>
-        <li><Link href="/login">
-          <a>Σύνδεση</a>
-        </Link></li>
-        <li><Link href="/mydeposits">
-          <a>Οι αποθέσεις μου</a>
-        </Link></li>
-      </ul>
+        <Link href="/login">
+          <Button
+            variant="contained"
+            endIcon={<LoginIcon />}
+          >
+          Εισοδος
+          </Button>
+        </Link>
+
       </Layout>
   )
 }
