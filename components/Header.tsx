@@ -17,13 +17,13 @@ export default function Header() {
             <>
               <li>
                 <Link href="/">
-                  <a>Home</a>
+                  <a>Κεντρική σελίδα</a>
                 </Link>
               </li>
               
               <li>
                 <Link href="/login">
-                  <a>Login</a>
+                  <a>Σύνδεση</a>
                 </Link>
               </li>
             </>
@@ -43,7 +43,7 @@ export default function Header() {
                     >
 
                     </span>
-                    Deposits
+                    Αποθέσεις
                   </a>
                 </Link>
               </li>
@@ -64,7 +64,7 @@ export default function Header() {
                   >
 
                   </span>
-                  My Deposits
+                  Οι αποθέσεις μου
                 </a>
               </Link>
               </li>
@@ -85,7 +85,7 @@ export default function Header() {
                     >
 
                     </span>
-                    Profile
+                    Προφίλ
                   </a>
                 </Link>
               </li>
@@ -104,7 +104,7 @@ export default function Header() {
                     router.push("/login");
                   }}
                 >
-                  Logout
+                  Αποσύνδεση
                 </a>
               </li>
             </>
