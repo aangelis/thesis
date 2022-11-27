@@ -11,6 +11,15 @@ const prisma = new PrismaClient()
 export default withIronSessionApiRoute(loginRoute, sessionOptions);
 
 async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
+  
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    res.status(405).json({
+      message: "Method Not Allowed",
+    });
+    return;
+  }
+
   const { email, password } = await req.body;
 
   try {
@@ -93,11 +102,13 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
     } else if (result.status === 401) {
 
       res.status(401).json({ message: "Wrong credentials." });
+      return;
 
     } else {
       
 
       console.log(result);
+      return;
 
       
       //res.status(result.status).json({ result });
