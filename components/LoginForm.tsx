@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { FormEvent } from "react";
 
 import Avatar from '@mui/material/Avatar';
@@ -12,8 +13,8 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-
+import { createTheme, styled, ThemeProvider } from '@mui/material/styles';
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 
 export default function Form({
   errorMessage,
@@ -32,6 +33,44 @@ export default function Form({
     });
     onSubmit(event);
   };
+
+  const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+  ))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: '#f5f5f9',
+      color: 'rgba(0, 0, 0, 0.87)',
+      maxWidth: 220,
+      fontSize: theme.typography.pxToRem(12),
+      border: '1px solid #dadde9',
+    },
+  }));
+
+  
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  
+  const [disableSubmit, setDisableSubmit] = React.useState(true);
+
+  const validateEmail = (m: string) => {
+    return String(m)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
+
+  React.useEffect(() => {
+    if (email === "") { setDisableSubmit(true); return; }
+    const validEmail = validateEmail(email);
+    if (validEmail === null) { setDisableSubmit(true); return; }
+    if (email.split('@')[1] !== 'hua.gr') { setDisableSubmit(true); return; }
+    if (password === "") { setDisableSubmit(true); return; }
+    // small valid minimum length for development purposes
+    if (password.length < 4) { setDisableSubmit(true); return; }
+
+    setDisableSubmit(false);
+}, [email, password]);
 
   return (
 
@@ -61,6 +100,10 @@ export default function Form({
               label="Email Address"
               name="email"
               autoComplete="email"
+              value={email}
+              onChange={(v) => {
+                setEmail(v.target.value);
+              }}
               autoFocus
             />
             <TextField
@@ -68,6 +111,10 @@ export default function Form({
               required
               fullWidth
               name="password"
+              value={password}
+              onChange={(v) => {
+                setPassword(v.target.value);
+              }}
               label="Password"
               type="password"
               id="password"
@@ -77,6 +124,7 @@ export default function Form({
             <Button
               type="submit"
               fullWidth
+              disabled={disableSubmit}
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
@@ -84,9 +132,24 @@ export default function Form({
             </Button>
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
-                  Πώς βρίσκω τα στοιχεία της σύνδεσης;
-                </Link>
+              
+              <HtmlTooltip
+                      title={
+                        <React.Fragment>
+                          {/* https://mui.com/material-ui/react-tooltip/ */}
+                          
+                          <Typography color="inherit">
+                            Στοιχεία σύνδεσης
+                          </Typography>
+                          Για να συνδεθείτε στην υπηρεσία μπορείτε να χρησιμοποιήσετε
+                          τα στοιχεία πρόσβασης του <u>ιδρυματικού σας λογαριασμού</u>. 
+                          
+                        </React.Fragment>
+                      }
+                    ><div>Πώς βρίσκω τα στοιχεία της σύνδεσης;</div></HtmlTooltip>
+                
+                  
+                
               </Grid>
             </Grid>
           </Box>

@@ -19,7 +19,7 @@ export default function Login() {
 
   return (
     <Layout>
-      <div className="login">
+      {/* <div className="login"> */}
         <Form
           errorMessage={errorMsg}
           onSubmit={async function handleSubmit(event) {
@@ -48,16 +48,7 @@ export default function Login() {
             }
           }}
         />
-      </div>
-      <style jsx>{`
-        .login {
-          max-width: 21rem;
-          margin: 0 auto;
-          padding: 1rem;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-        }
-      `}</style>
+      {/* </div> */}
     </Layout>
   );
 }
