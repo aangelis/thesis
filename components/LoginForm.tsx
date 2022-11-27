@@ -50,7 +50,7 @@ export default function Form({
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Σύνδεση
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
@@ -73,7 +73,7 @@ export default function Form({
               id="password"
               autoComplete="current-password"
             />
-              {errorMessage && <p className="error">{errorMessage}</p>}
+              {errorMessage && <Box sx={{color: 'red'}}>{errorMessage}</Box>}
             <Button
               type="submit"
               fullWidth
