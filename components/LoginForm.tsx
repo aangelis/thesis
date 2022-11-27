@@ -1,5 +1,20 @@
 import { FormEvent } from "react";
 
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Link from '@mui/material/Link';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+
 export default function Form({
   errorMessage,
   onSubmit,
@@ -7,39 +22,82 @@ export default function Form({
   errorMessage: string;
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
 }) {
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    console.log({
+      email: data.get('email'),
+      password: data.get('password'),
+    });
+    onSubmit(event);
+  };
+
   return (
-    <form onSubmit={onSubmit}>
-      <label>
-        <span>Type your email</span>
-        <input type="email" name="email" required />
-        <span>Type your password</span>
-        <input type="password" name="password" required />
-      </label>
 
-      <button type="submit">Login</button>
+<>
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <Box
+          sx={{
+            marginTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Sign in
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+            />
+              {errorMessage && <p className="error">{errorMessage}</p>}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Συνδεση
+            </Button>
+            <Grid container>
+              <Grid item xs>
+                <Link href="#" variant="body2">
+                  Πώς βρίσκω τα στοιχεία της σύνδεσης;
+                </Link>
+              </Grid>
+            </Grid>
+          </Box>
+        </Box>
 
-      {errorMessage && <p className="error">{errorMessage}</p>}
+      </Container>
 
-      <style jsx>{`
-        form,
-        label {
-          display: flex;
-          flex-flow: column;
-        }
-        label > span {
-          font-weight: 600;
-        }
-        input {
-          padding: 8px;
-          margin: 0.3rem 0 1rem;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-        }
-        .error {
-          color: brown;
-          margin: 1rem 0 0;
-        }
-      `}</style>
-    </form>
+
+
+  
+    </>
+  
   );
 }
