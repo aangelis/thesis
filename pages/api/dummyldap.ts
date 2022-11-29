@@ -19,6 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         title: "Μεταπτυχιακός Φοιτητής",
         department: "Πληροφορικής και Τηλεματικής",
       })
+      return;
     } else if (email === "itp21100@hua.gr" && password === "1234") {
       console.log(`${ip} - [${now}] - success - ${email}`);
       res.json({
@@ -29,6 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         title: "Μεταπτυχιακός Φοιτητής",
         department: "Πληροφορικής και Τηλεματικής",
       })
+      return;
     } else if (email === "tsadimas@hua.gr" && password === "1234") {
       console.log(`${ip} - [${now}] - success - ${email}`);
       res.json({
@@ -40,6 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         department: "Πληροφορικής και Τηλεματικής",
         is_superuser: true,
       })
+      return;
     } else if (email === "ifigenia@hua.gr" && password === "1234") {
       console.log(`${ip} - [${now}] - success - ${email}`);
       res.json({          
@@ -66,18 +69,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // date_joined is auto polulated due to prisma conf 
         // date_joined: "2022-10-17T18:34:10.969Z"
       }); 
+      return;
     } else if ( !email || !password ) {
       console.error(`${ip} - [${now}] - failure - - No email and/or password provided`);
       res.status(400).json({ message: "No email and/or password provided." });
+      return;
     } else {
       console.error(`${ip} - [${now}] - failure - ${email} - Wrong credentials provided`);
       res.status(401).json({ message: "Wrong credentials provided." });
+      return;
     }
 
   } else {
     // Handle any other HTTP methods
     console.error(`${ip} - [${now}] - failure - - Bad HTTP method`);
     res.status(400).json({ message: "Bad HTTP method." });
+    return;
   }
   
 }
