@@ -41,7 +41,7 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
       res.status(401).json({ message: "No email provided." });
       return;
     }
-    if (password.length < 4) {
+    if (password.length < (process.env.NEXT_PUBLIC_LOGIN_PASSWORD_MIN_LENGTH || 8)) {
       res.status(401).json({ message: "Invalid password length." });
       return;
     }
@@ -55,17 +55,32 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
       return;
     }
 
-    const result = await fetch(process.env.LOGIN_API_ENDPOINT as string,
-      {
-      method: "POST",
-      headers:new Headers({
-          "Content-Type": "application/json"
-      }),
-      body: JSON.stringify(requestBody)
-    });
+    const isAdminLogin = (
+      process.env.LOGIN_ADMIN_EMAIL
+      && process.env.LOGIN_ADMIN_EMAIL
+      && email === process.env.LOGIN_ADMIN_EMAIL
+      && password === process.env.LOGIN_ADMIN_PASSWORD
+      );
+
+    const result = isAdminLogin?
+      { ok: true, status: 200, json: () => {
+        return { 
+          email: process.env.LOGIN_ADMIN_EMAIL,
+          username: "administrator",
+          title: "Administrator staff",
+          department: "Πληροφορικής και Τηλεματικής",
+        }
+      }}
+      : await fetch(process.env.LOGIN_API_ENDPOINT as string,
+        {
+        method: "POST",
+        headers:new Headers({
+            "Content-Type": "application/json"
+        }),
+        body: JSON.stringify(requestBody)
+      });
 
     if (result.ok) {
-      // User data from ldap rest API endpoint
       const userData: User = await result.json();
 
       // Check if user data already exists in DB
@@ -98,6 +113,7 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
       req.session.user = user;
       await req.session.save();
       res.json(user);
+      return;
 
     } else if (result.status === 401) {
 
@@ -119,5 +135,6 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
 
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
+    return;
   }
 }
