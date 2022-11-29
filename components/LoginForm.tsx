@@ -27,10 +27,10 @@ export default function Form({
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    // console.log({
+    //   email: data.get('email'),
+    //   password: data.get('password'),
+    // });
     onSubmit(event);
   };
 
@@ -64,7 +64,7 @@ export default function Form({
     if (email === "") { setDisableSubmit(true); return; }
     // if (password === "") { setDisableSubmit(true); return; }
     // small valid minimum length for development purposes
-    if (password.length < 4) { setDisableSubmit(true); return; }
+    if (password.length < (process.env.NEXT_PUBLIC_LOGIN_PASSWORD_MIN_LENGTH || 8)) { setDisableSubmit(true); return; }
     if (email.split('@')[1] !== 'hua.gr') { setDisableSubmit(true); return; }
     const validEmail = validateEmail(email);
     if (validEmail === null) { setDisableSubmit(true); return; }
