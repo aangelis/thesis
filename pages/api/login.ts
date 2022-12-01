@@ -66,7 +66,7 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
       { ok: true, status: 200, json: () => {
         return { 
           email: process.env.LOGIN_ADMIN_EMAIL,
-          username: "administrator",
+          username: process.env.LOGIN_ADMIN_EMAIL?.split('@')[0],
           title: "Administrator staff",
           department: "Πληροφορικής και Τηλεματικής",
         }
@@ -113,12 +113,12 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
       const roles = [
         { username: "ifigenia", isLibrarian: true  },
         { username: "tsadimas", isLibrarian: true, isSecretary: true, isAdmin: true  },
-        { username: (process.env.LOGIN_ADMIN_USERNAME || "administrator"), isLibrarian: true, isSecretary: true, isAdmin: true  },
+        { username: (process.env.LOGIN_ADMIN_EMAIL?.split('@')[0]), isLibrarian: true, isSecretary: true, isAdmin: true  },
         { username: "daneli", isSecretary: true },
       ]
   
       const currentUserRoles = roles.find((o) => {
-        return (o.username === req.session.user?.username);
+        return (o.username === userData.username);
       })
   
       const isAdmin = currentUserRoles?.isAdmin ?? false;
@@ -133,7 +133,6 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
         isLibrarian,
         is_superuser: isAdmin || isSecretary || isLibrarian,
       } as User;
-      console.log(user);
       req.session.user = user;
       await req.session.save();
       res.json(user);
