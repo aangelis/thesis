@@ -109,7 +109,31 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
         });
         userData.id = storeUser.id;
       }
-      const user = { ...userData, isLoggedIn: true } as User;
+
+      const roles = [
+        { username: "ifigenia", isLibrarian: true  },
+        { username: "tsadimas", isLibrarian: true, isSecretary: true, isAdmin: true  },
+        { username: (process.env.LOGIN_ADMIN_USERNAME || "administrator"), isLibrarian: true, isSecretary: true, isAdmin: true  },
+        { username: "daneli", isSecretary: true },
+      ]
+  
+      const currentUserRoles = roles.find((o) => {
+        return (o.username === req.session.user?.username);
+      })
+  
+      const isAdmin = currentUserRoles?.isAdmin ?? false;
+      const isSecretary = currentUserRoles?.isSecretary ?? false;
+      const isLibrarian = currentUserRoles?.isLibrarian ?? false;
+
+      const user = {
+        ...userData,
+        isLoggedIn: true,
+        isAdmin,
+        isSecretary,
+        isLibrarian,
+        is_superuser: isAdmin || isSecretary || isLibrarian,
+      } as User;
+      console.log(user);
       req.session.user = user;
       await req.session.save();
       res.json(user);

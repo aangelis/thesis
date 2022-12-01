@@ -20,28 +20,9 @@ export default withIronSessionApiRoute(userRoute, sessionOptions);
 async function userRoute(req: NextApiRequest, res: NextApiResponse<User>) {
 
   if (req.session.user) {
-
-    const roles = [
-      { username: "ifigenia", isLibrarian: true  },
-      { username: "tsadimas", isLibrarian: true, isSecretary: true, isAdmin: true  },
-      { username: "daneli", isSecretary: true },
-    ]
-
-    const currentUserRoles = roles.find((o) => {
-      return (o.username === req.session.user?.username);
-    })
-
-    const isAdmin = currentUserRoles?.isAdmin ?? false;
-    const isSecretary = currentUserRoles?.isSecretary ?? false;
-    const isLibrarian = currentUserRoles?.isLibrarian ?? false;
-
     res.json({
       ...req.session.user,
       isLoggedIn: true,
-      isAdmin,
-      isSecretary,
-      isLibrarian,
-      is_superuser: isAdmin || isSecretary || isLibrarian,
     });
   } else {
     res.json({

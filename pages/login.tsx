@@ -19,7 +19,6 @@ export default function Login() {
 
   return (
     <Layout>
-      {/* <div className="login"> */}
         <Form
           errorMessage={errorMsg}
           onSubmit={async function handleSubmit(event) {
@@ -48,7 +47,6 @@ export default function Login() {
             }
           }}
         />
-      {/* </div> */}
     </Layout>
   );
 }
