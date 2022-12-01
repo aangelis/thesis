@@ -49,6 +49,27 @@ export default function Header() {
               </li>
               </>
           )}
+          {user?.isLoggedIn === true && user?.isAdmin === true && (
+            <>
+              <li>
+                <Link href="/siteadmin">
+                  <a>
+                    <span
+                      style={{
+                        marginRight: ".3em",
+                        verticalAlign: "middle",
+                        borderRadius: "100%",
+                        overflow: "hidden",
+                      }}
+                    >
+
+                    </span>
+                    Διαχείριση
+                  </a>
+                </Link>
+              </li>
+              </>
+          )}
           {user?.isLoggedIn === true && user?.is_superuser === false && (
             <>
               <li>
