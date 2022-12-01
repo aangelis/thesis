@@ -52,7 +52,7 @@ export default function Header() {
           {user?.isLoggedIn === true && user?.isAdmin === true && (
             <>
               <li>
-                <Link href="/siteadmin">
+                <Link href="/usersroles">
                   <a>
                     <span
                       style={{
@@ -64,7 +64,24 @@ export default function Header() {
                     >
 
                     </span>
-                    Διαχείριση
+                    Ρόλοι χρηστών
+                  </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/submissionrights">
+                  <a>
+                    <span
+                      style={{
+                        marginRight: ".3em",
+                        verticalAlign: "middle",
+                        borderRadius: "100%",
+                        overflow: "hidden",
+                      }}
+                    >
+
+                    </span>
+                    Δικαιώματα αυτοαπόθεσης
                   </a>
                 </Link>
               </li>
