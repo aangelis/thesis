@@ -142,11 +142,11 @@ function DepositPage(
 
   const confirmationStatus = [
     {
-      value: 'true',
+      value: true,
       label: 'Ναι',
     },
     {
-      value: 'false',
+      value: false,
       label: 'Όχι',
     },
   ]
@@ -613,7 +613,7 @@ function DepositPage(
                 onChange={handleChangeConfirmed}
               >
                 {confirmationStatus.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
+                  <MenuItem key={String(option.value)} value={String(option.value)}>
                     {option.label}
                   </MenuItem>
                 ))}
