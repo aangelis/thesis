@@ -61,3 +61,11 @@ model Deposit {
   original_filename String?
 }
 
+model Role {
+  id Int @id @default(autoincrement())
+  email String @unique
+  is_admin Boolean @default(false)
+  is_secretary Boolean @default(false)
+  is_librarian Boolean @default(false)
+  is_enabled Boolean @default(false)
+}
