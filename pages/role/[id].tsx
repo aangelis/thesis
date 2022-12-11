@@ -114,7 +114,7 @@ function RolePage(
   const [isAdmin, setIsAdmin] = React.useState(role.is_admin || false);
   const [isSecretary, setIsSecretary] = React.useState(role.is_secretary || false);
   const [isLibrarian, setIsLibrarian] = React.useState(role.is_librarian || false);
-  const [isEnabled, setIsEnabled] = React.useState(role.is_enabled || false);
+  const [isActive, setIsActive] = React.useState(role.is_active || false);
 
   const [loading, setLoading] = React.useState(false);
   
@@ -143,10 +143,10 @@ function RolePage(
     const body = {
       id: role.id,
       email,
-      is_admin: isAdmin,
-      is_secretary: isSecretary,
-      is_librarian: isLibrarian,
-      is_enabled: isEnabled,
+      is_admin: isAdmin === 'true',
+      is_secretary: isSecretary === 'true',
+      is_librarian: isLibrarian === 'true',
+      is_active: isActive === 'true',
     };
     await fetch('/api/role', {
       method: 'POST',
@@ -282,13 +282,13 @@ function RolePage(
           </TextField>
 
           <TextField
-            id="outlined-select-enabled"
+            id="outlined-select-active"
             select
             label="Ενεργός"
-            value={isEnabled}
+            value={isActive}
             // onChange={handleChangeConfirmed}
             onChange={
-              (v) => { setIsEnabled(v.target.value); }
+              (v) => { setIsActive(v.target.value) }
             }
             sx={{ m: 1, width: 200 }}
           >
