@@ -110,20 +110,36 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
         userData.id = storeUser.id;
       }
 
-      const roles = [
-        { username: "ifigenia", isLibrarian: true  },
-        { username: "tsadimas", isLibrarian: true, isSecretary: true, isAdmin: true  },
-        { username: (process.env.LOGIN_ADMIN_EMAIL?.split('@')[0]), isLibrarian: true, isSecretary: true, isAdmin: true  },
-        { username: "daneli", isSecretary: true },
-      ]
+      // static role assignments for development purposes
+      // const roles = [
+      //   { username: "ifigenia", isLibrarian: true  },
+      //   { username: "tsadimas", isLibrarian: true, isSecretary: true, isAdmin: true  },
+      //   { username: (process.env.LOGIN_ADMIN_EMAIL?.split('@')[0]), isLibrarian: true, isSecretary: true, isAdmin: true  },
+      //   { username: "daneli", isSecretary: true },
+      // ]
   
-      const currentUserRoles = roles.find((o) => {
-        return (o.username === userData.username);
-      })
+      // const currentUserRoles = roles.find((o) => {
+      //   return (o.username === userData.username);
+      // })
   
-      const isAdmin = currentUserRoles?.isAdmin ?? false;
-      const isSecretary = currentUserRoles?.isSecretary ?? false;
-      const isLibrarian = currentUserRoles?.isLibrarian ?? false;
+      // const isAdmin = currentUserRoles?.isAdmin ?? false;
+      // const isSecretary = currentUserRoles?.isSecretary ?? false;
+      // const isLibrarian = currentUserRoles?.isLibrarian ?? false;
+
+      // Check if user data already exists in roles table
+      const userRoles = isAdminLogin?
+        { is_admin: true,  is_secretary: true, is_librarian: true, } 
+        :
+        await prisma.role.findFirst({
+          where: {
+            email,
+            is_active: true,
+          },
+        })
+
+      const isAdmin = userRoles?.is_admin ?? false;
+      const isSecretary = userRoles?.is_secretary ?? false;
+      const isLibrarian = userRoles?.is_librarian ?? false;
 
       const user = {
         ...userData,
@@ -131,7 +147,7 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
         isAdmin,
         isSecretary,
         isLibrarian,
-        is_superuser: isAdmin || isSecretary || isLibrarian,
+        is_superuser: isAdmin || isSecretary || isLibrarian, // must check what is_superuser means
       } as User;
       req.session.user = user;
       await req.session.save();
