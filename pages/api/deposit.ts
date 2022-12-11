@@ -12,6 +12,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   if (!user?.isLoggedIn) {
     res.status(400).json({ message: "Access refused. User not logged in." });
+    return;
   }
 
   if (req.method === "POST") {
@@ -53,21 +54,32 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         Number(data.maps) < 0 ||
         Number(data.drawings) < 0) {
       res.status(400).json({ message: "Invalid data." });
+      return;
     }
 
     try {
-      const deposit = await prisma.deposit.update({
-        where: {
-          id,
-        },
-        data
-      })
-      res.json(deposit);
+      if (data.id) {
+        const deposit = await prisma.deposit.update({
+          where: {
+            id,
+          },
+          data
+        })
+        res.json(deposit);
+      } else {
+        const deposit = await prisma.deposit.create({
+          data
+        })
+        res.json(deposit);
+      }
+      return;
     } catch (error) {
       res.status(500).json({ message: (error as Error).message });
+      return;
     }
   } else {
     // Handle any other HTTP methods
     res.status(400).json({ message: "Bad HTTP method." });
+    return;
   }
 }
