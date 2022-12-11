@@ -67,5 +67,5 @@ model Role {
   is_admin Boolean @default(false)
   is_secretary Boolean @default(false)
   is_librarian Boolean @default(false)
-  is_enabled Boolean @default(false)
+  is_active Boolean @default(false)
 }
