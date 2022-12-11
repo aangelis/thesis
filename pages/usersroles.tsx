@@ -85,7 +85,7 @@ interface Data {
   is_admin: boolean;
   is_secretary: boolean;
   is_librarian: boolean;
-  is_enabled: boolean;
+  is_active: boolean;
 }
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -159,7 +159,7 @@ const headCells: readonly HeadCell[] = [
     label: 'Βιβλιοθηκονόμος',
   },
   {
-    id: 'is_enabled',
+    id: 'is_active',
     numeric: true,
     disablePadding: false,
     label: 'Ενεργός',
@@ -416,26 +416,11 @@ function EnhancedTable(rows: any[]) {
                         scope="row"
                         padding="none"
                         sx={{cursor: 'pointer'}}
-                      ><HtmlTooltip
-                      title={
-                        <React.Fragment>
-                          {/* https://mui.com/material-ui/react-tooltip/ */}
-                          {row.supervisor !== null ? "Επιβλέπων: " : ""}
-                          <Typography color="inherit">
-                            {row.supervisor !== null ? row.supervisor : ""}
-                          </Typography>
-                          <u>{row.confirmed_timestamp !== null ? "Confirmation timestamp: "+row.confirmed_timestamp : ""}</u>
-                          Εικόνες: {row.images}, Πίνακες: {row.tables},
-                          Διαγράμματα: {row.diagrams}, Χάρτες: {row.maps},
-                          Σχέδια: {row.drawings}
-                          
-                        </React.Fragment>
-                      }
-                    ><div>{row.email}</div></HtmlTooltip></TableCell>
+                      >{row.email}</TableCell>
                       <TableCell align="right">{row.is_admin ? "Ναι" : "Όχι" }</TableCell>
                       <TableCell align="right">{row.is_secretary ? "Ναι" : "Όχι" }</TableCell>
                       <TableCell align="right">{row.is_librarian ? "Ναι" : "Όχι" }</TableCell>
-                      <TableCell align="right">{row.is_enabled ? "Ναι" : "Όχι" }</TableCell>
+                      <TableCell align="right">{row.is_active ? "Ναι" : "Όχι" }</TableCell>
                       {/* <TableCell
                       onClick={() => {
                         console.log("Detected Edit Cell Click");}}><EditIcon /></TableCell> */}
