@@ -33,8 +33,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const data = await req.body; // role
   const { id } = data;
   const validEmail = validateEmail(data.email);
-  console.log(data);
-  console.log(typeof data.is_secretary);
+  // console.log(data);
+  // console.log(typeof data.is_secretary);
   
   if (!data.email ||
       data.email === "" ||
