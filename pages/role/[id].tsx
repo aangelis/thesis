@@ -100,11 +100,11 @@ function RolePage(
 
   const booleanStatus = [
     {
-      value: 'true',
+      value: true,
       label: 'Ναι',
     },
     {
-      value: 'false',
+      value: false,
       label: 'Όχι',
     },
   ]
@@ -239,7 +239,7 @@ function RolePage(
             sx={{ m: 1, width: 200 }}
           >
             {booleanStatus.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
+              <MenuItem key={String(option.value)} value={String(option.value)}>
                 {option.label}
               </MenuItem>
             ))}
@@ -257,7 +257,7 @@ function RolePage(
             sx={{ m: 1, width: 200 }}
           >
             {booleanStatus.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
+              <MenuItem key={String(option.value)} value={String(option.value)}>
                 {option.label}
               </MenuItem>
             ))}
@@ -275,7 +275,7 @@ function RolePage(
             sx={{ m: 1, width: 200 }}
           >
             {booleanStatus.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
+              <MenuItem key={String(option.value)} value={String(option.value)}>
                 {option.label}
               </MenuItem>
             ))}
@@ -293,7 +293,7 @@ function RolePage(
             sx={{ m: 1, width: 200 }}
           >
             {booleanStatus.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
+              <MenuItem key={String(option.value)} value={String(option.value)}>
                 {option.label}
               </MenuItem>
             ))}
