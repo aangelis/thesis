@@ -440,7 +440,7 @@ function EnhancedTable(rows: any[]) {
           </Table>
         </TableContainer>
         {/* Show pagging options if rows are greater than n */}
-        { rows.length > 0 ? 
+        { rows.length > 5 ? 
         (
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
@@ -464,6 +464,9 @@ function EnhancedTable(rows: any[]) {
 
 
 export default (({roles}: {roles: any[]}) => {
+  // Rendered more hooks than during the previous render with custom hook
+  const tableToShow = EnhancedTable(roles);
+
   const { user } = useUser({
     // redirectTo: "/login",
   });
@@ -475,42 +478,29 @@ export default (({roles}: {roles: any[]}) => {
     return Object.keys(roles[0]);
   }
 
-  if (roles && Object.keys(roles).length > 0) {
-    
-    return (
-      <Layout>
-        <h1>Διαχείριση ρόλων χρηστών</h1>
-        <Box sx={{ '& > button': { m: 1 } }}>
-            <Button
-                color="secondary"
-                onClick={() => router.push('/role/new')}
-                startIcon={<AddCircleOutlineIcon />}
-                variant="contained"
-              >
-                δημιουργια νεου ρολου
-              </Button>
-          </Box>
-        { EnhancedTable(roles) }
-      </Layout>
-    )
-    // return EnhancedTable(deposits);
-  } else {
-    return (
-      <Layout>
-        <h1>Διαχείριση ρόλων χρηστών</h1>
+  const hasRoles = roles && Object.keys(roles).length > 0
+
+
+  return (
+    <Layout>
+      <h1>Διαχείριση ρόλων χρηστών</h1>
+      { !hasRoles && (
         <h3>Δεν βρέθηκαν ρόλοι χρηστών</h3>
-        <Box sx={{ '& > button': { m: 1 } }}>
-            <Button
-                color="secondary"
-                onClick={() => router.push('/role/new')}
-                startIcon={<AddCircleOutlineIcon />}
-                variant="contained"
-              >
-                δημιουργια νεου ρολου
-              </Button>
+      )
+      }
+      <Box sx={{ '& > button': { m: 1 } }}>
+          <Button
+              color="secondary"
+              onClick={() => router.push('/role/new')}
+              startIcon={<AddCircleOutlineIcon />}
+              variant="contained"
+            >
+              δημιουργια νεου ρολου
+            </Button>
         </Box>
-      </Layout>
-    );
-  }
+      { hasRoles && tableToShow }
+    </Layout>
+  )
+
 
 });
