@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         last_name: "ΤΣΑΔΗΜΑΣ",
         title: "Διδακτικό Προσωπικό",
         department: "Πληροφορικής και Τηλεματικής",
-        is_superuser: true,
+        // is_superuser: true,
       })
       return;
     } else if (email === "ifigenia@hua.gr" && password === "1234") {
