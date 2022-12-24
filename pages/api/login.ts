@@ -102,6 +102,13 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
           data: { username, ...userDataStripped, last_login: new Date() },
         });
         userData.id = updateUser.id;
+        // store additional information
+        userData.name_el = updateUser.name_el || "";
+        userData.name_en = updateUser.name_en || "";
+        userData.surname_el = updateUser.surname_el || "";
+        userData.surname_en = updateUser.surname_en || "";
+        userData.father_name_el = updateUser.father_name_el || "";
+        userData.father_name_en = updateUser.father_name_en || "";
       } else {
         // Store user data in DB.
         const storeUser = await prisma.user.create({
@@ -149,8 +156,10 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
         isLibrarian,
         is_superuser: isAdmin || isSecretary || isLibrarian, // must check what is_superuser means
       } as User;
+      // store new user data to session
       req.session.user = user;
       await req.session.save();
+      // return data
       res.json(user);
       return;
 
