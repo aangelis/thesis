@@ -67,6 +67,18 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     };
   }
 
+  if (!user?.isAdmin) {
+    res.setHeader("location", "/profile");
+    res.statusCode = 302;
+    res.end();
+    return {
+      props: {
+        user,
+        role: {}
+      },
+    };
+  }
+
   if (isNaN(+roleId)) {
     return {
       props: {
