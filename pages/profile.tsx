@@ -18,12 +18,12 @@ export default function Profile() {
     redirectTo: "/login",
   });
   
-  const [nameEl, setNameEl] = React.useState(user.name_el)
-  const [nameEn, setNameEn] = React.useState(user.name_en)
-  const [surnameEl, setSurnameEl] = React.useState(user.surname_el)
-  const [surnameEn, setSurnameEn] = React.useState(user.surname_en)
-  const [fatherNameEl, setFatherNameEl] = React.useState(user.father_name_el)
-  const [fatherNameEn, setFatherNameEn] = React.useState(user.father_name_en)
+  const [nameEl, setNameEl] = React.useState(user?.name_el)
+  const [nameEn, setNameEn] = React.useState(user?.name_en)
+  const [surnameEl, setSurnameEl] = React.useState(user?.surname_el)
+  const [surnameEn, setSurnameEn] = React.useState(user?.surname_en)
+  const [fatherNameEl, setFatherNameEl] = React.useState(user?.father_name_el)
+  const [fatherNameEn, setFatherNameEn] = React.useState(user?.father_name_en)
 
   const [loading, setLoading] = React.useState(false);
   const [openSuccess, setOpenSuccess] = React.useState(false);
@@ -73,6 +73,10 @@ export default function Profile() {
     });
   }
   
+  // https://stackoverflow.com/questions/23346506/javascript-normalize-accented-greek-characters
+  function normalizeGreek(text: string) {
+    return text.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+  }
 
   if (!user?.isLoggedIn)
     return(<></>)
@@ -159,7 +163,7 @@ export default function Profile() {
           label="Όνομα (Ελληνικά)"
           value={nameEl}
           onChange={
-            (v) => { setNameEl(v.target.value); }
+            (v) => { setNameEl(normalizeGreek(v.target.value).toUpperCase()); }
           }
           sx={{ width: 400 }}
         />
@@ -173,7 +177,7 @@ export default function Profile() {
           label="Όνομα (Αγγλικά)"
           value={nameEn}
           onChange={
-            (v) => { setNameEn(v.target.value); }
+            (v) => { setNameEn(normalizeGreek(v.target.value).toUpperCase()); }
           }
           sx={{ width: 400 }}
         />
@@ -187,7 +191,7 @@ export default function Profile() {
           label="Επίθετο (Ελληνικά)"
           value={surnameEl}
           onChange={
-            (v) => { setSurnameEl(v.target.value); }
+            (v) => { setSurnameEl(normalizeGreek(v.target.value).toUpperCase()); }
           }
           sx={{ width: 400 }}
         />
@@ -201,7 +205,7 @@ export default function Profile() {
           label="Επίθετο (Αγγλικά)"
           value={surnameEn}
           onChange={
-            (v) => { setSurnameEn(v.target.value); }
+            (v) => { setSurnameEn(normalizeGreek(v.target.value).toUpperCase()); }
           }
           sx={{ width: 400 }}
         />
@@ -215,7 +219,7 @@ export default function Profile() {
           label="Όνομα πατέρα (Ελληνικά)"
           value={fatherNameEl}
           onChange={
-            (v) => { setFatherNameEl(v.target.value); }
+            (v) => { setFatherNameEl(normalizeGreek(v.target.value).toUpperCase()); }
           }
           sx={{ width: 400 }}
         />
@@ -229,7 +233,7 @@ export default function Profile() {
           label="Όνομα πατέρα (Αγγλικά)"
           value={fatherNameEn}
           onChange={
-            (v) => { setFatherNameEn(v.target.value); }
+            (v) => { setFatherNameEn(normalizeGreek(v.target.value).toUpperCase()); }
           }
           sx={{ width: 400 }}
         />
