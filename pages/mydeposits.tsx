@@ -493,6 +493,9 @@ function EnhancedTable(rows: any[]) {
 //   }
 //   ) {
 export default (({deposits}: {deposits: any[]}) => {
+  // Rendered more hooks than during the previous render with custom hook
+  const tableToShow = EnhancedTable(deposits);
+
   const { user } = useUser({
     // redirectTo: "/login",
   });
@@ -504,42 +507,29 @@ export default (({deposits}: {deposits: any[]}) => {
     return Object.keys(deposits[0]);
   }
   
-  if (deposits && Object.keys(deposits).length > 0) {
-    // console.log(deposits);
-    return (
-      <Layout>
-        <h1>Οι αποθέσεις μου</h1>
-        <Box sx={{ '& > button': { m: 1 } }}>
-            <Button
-                color="secondary"
-                onClick={() => router.push('/deposit/new')}
-                startIcon={<AddCircleOutlineIcon />}
-                variant="contained"
-              >
-                δημιουργια νεας αποθεσης
-              </Button>
-          </Box>
-        { EnhancedTable(deposits) }
-      </Layout>
+  const hasDeposits = deposits && Object.keys(deposits).length > 0
+
+
+  // console.log(deposits);
+  return (
+    <Layout>
+      <h1>Οι αποθέσεις μου</h1>
+      { !hasDeposits && (
+      <h3>Δεν βρέθηκαν αποθέσεις</h3>
     )
-    // return EnhancedTable(deposits);
-  } else {
-    return (
-      <Layout>
-        <h1>Οι αποθέσεις μου</h1>
-        <h3>Δεν βρέθηκαν αποθέσεις</h3>
-        <Box sx={{ '& > button': { m: 1 } }}>
-            <Button
-                color="secondary"
-                onClick={() => router.push('/deposit/new')}
-                startIcon={<AddCircleOutlineIcon />}
-                variant="contained"
-              >
-                δημιουργια νεας αποθεσης
-              </Button>
+    }
+      <Box sx={{ '& > button': { m: 1 } }}>
+          <Button
+              color="secondary"
+              onClick={() => router.push('/deposit/new')}
+              startIcon={<AddCircleOutlineIcon />}
+              variant="contained"
+            >
+              δημιουργια νεας αποθεσης
+            </Button>
         </Box>
-      </Layout>
-    );
-  }
+        { hasDeposits && tableToShow }
+    </Layout>
+  )
 
 });
