@@ -52,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         first_name: "ΙΦΙΓΕΝΕΙΑ",
         last_name: "ΒΑΡΔΑΚΩΣΤΑ",
         title: "Bιβλιοθηκάριος",
-        department: "Βιβλιοθήκη και Κέντρο Πληροφόρησηςς",
+        department: "Βιβλιοθήκη και Κέντρο Πληροφόρησης",
         // name_el: null,
         // name_en: null,
         // surname_el: null,
@@ -68,6 +68,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // last_login: null,
         // date_joined is auto polulated due to prisma conf 
         // date_joined: "2022-10-17T18:34:10.969Z"
+      }); 
+      return;
+    } else if (email === "mitsi@hua.gr" && password === "1234") {
+      console.log(`${ip} - [${now}] - success - ${email}`);
+      res.json({          
+        // id: 2,
+        email: "mitsi@hua.gr",
+        username: "mitsi",
+        first_name: "ΜΗΤΣΗ",
+        last_name: "ΛΟΡΕΤΑ",
+        title: "Διοικητική Υπάλληλος",
+        department: "Γραμματεία Τμήματος Πληροφορικής και Τηλεματικής",
       }); 
       return;
     } else if ( !email || !password ) {
