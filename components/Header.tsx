@@ -68,8 +68,12 @@ export default function Header() {
                   </a>
                 </Link>
               </li>
+              </>
+          )}
+          {user?.isLoggedIn === true && user?.isSecretary === true && (
+            <>
               <li>
-                <Link href="/submissionrights">
+                <Link href="/depositpermission">
                   <a>
                     <span
                       style={{
@@ -85,7 +89,7 @@ export default function Header() {
                   </a>
                 </Link>
               </li>
-              </>
+            </>
           )}
           {user?.isLoggedIn === true && user?.is_superuser === false && (
             <>
