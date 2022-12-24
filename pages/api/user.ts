@@ -13,6 +13,14 @@ export type User = {
   isSecretary: boolean;
   isLibrarian: boolean;
   is_superuser: boolean;
+  title?: string;
+  department?: string;
+  name_el?: string;
+  name_en?: string;
+  surname_el?: string;
+  surname_en?: string;
+  father_name_el?: string;
+  father_name_en?: string;
 };
 
 export default withIronSessionApiRoute(userRoute, sessionOptions);
