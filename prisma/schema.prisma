@@ -69,3 +69,10 @@ model Role {
   is_librarian Boolean @default(false)
   is_active Boolean @default(false)
 }
+
+model Permission {
+  id  Int @id @default(autoincrement())
+  submitter_email String
+  due_to DateTime
+  secretary_id Int
+}
