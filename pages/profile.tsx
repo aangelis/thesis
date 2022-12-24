@@ -17,9 +17,6 @@ export default function Profile() {
   const { user } = useUser({
     redirectTo: "/login",
   });
-
-  if (!user?.isLoggedIn)
-    return(<></>)
   
   const [nameEl, setNameEl] = React.useState(user.name_el)
   const [nameEn, setNameEn] = React.useState(user.name_en)
@@ -45,7 +42,7 @@ export default function Profile() {
     }
     setOpenError(false);
   };
-
+  
   async function handleClickSave() {
     setLoading(true);
     const body = {
@@ -75,6 +72,10 @@ export default function Profile() {
       console.error(err);
     });
   }
+  
+
+  if (!user?.isLoggedIn)
+    return(<></>)
 
   return (
     <Layout>
@@ -87,7 +88,7 @@ export default function Profile() {
           label="Ηλεκτρονική διεύθυνση ταχυδρομείου"
           value={user.email}
           sx={{ width: 400 }}
-        />
+          />
       </FormControl>
 
       <Box sx={{ m: 2 }} />
