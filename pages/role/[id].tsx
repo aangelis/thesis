@@ -137,16 +137,16 @@ function RolePage(
     }
     setOpenError(false);
   };
-
+  // console.log(role,isAdmin,isSecretary,isLibrarian,isActive);
   async function handleClickSave() {
     setLoading(true);
     const body = {
       id: role.id,
       email,
-      is_admin: isAdmin === 'true',
-      is_secretary: isSecretary === 'true',
-      is_librarian: isLibrarian === 'true',
-      is_active: isActive === 'true',
+      is_admin: isAdmin,
+      is_secretary: isSecretary,
+      is_librarian: isLibrarian,
+      is_active: isActive,
     };
     await fetch('/api/role', {
       method: 'POST',
@@ -234,7 +234,7 @@ function RolePage(
             value={isAdmin}
             // onChange={handleChangeConfirmed}
             onChange={
-              (v) => { setIsAdmin(v.target.value); }
+              (v) => { setIsAdmin(v.target.value.toLowerCase() === 'true'); }
             }
             sx={{ m: 1, width: 200 }}
           >
@@ -252,7 +252,7 @@ function RolePage(
             value={isSecretary}
             // onChange={handleChangeConfirmed}
             onChange={
-              (v) => { setIsSecretary(v.target.value); }
+              (v) => { setIsSecretary(v.target.value.toLowerCase() === 'true'); }
             }
             sx={{ m: 1, width: 200 }}
           >
@@ -270,7 +270,7 @@ function RolePage(
             value={isLibrarian}
             // onChange={handleChangeConfirmed}
             onChange={
-              (v) => { setIsLibrarian(v.target.value); }
+              (v) => { setIsLibrarian(v.target.value.toLowerCase() === 'true'); }
             }
             sx={{ m: 1, width: 200 }}
           >
@@ -288,7 +288,7 @@ function RolePage(
             value={isActive}
             // onChange={handleChangeConfirmed}
             onChange={
-              (v) => { setIsActive(v.target.value) }
+              (v) => { setIsActive(v.target.value.toLowerCase() === 'true') }
             }
             sx={{ m: 1, width: 200 }}
           >
