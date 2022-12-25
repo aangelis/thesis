@@ -33,6 +33,7 @@ model User {
   last_login DateTime?
   date_joined DateTime @default(now())
   deposits Deposit[]
+  permissions Permission[]
 }
 
 model Deposit {
@@ -74,5 +75,6 @@ model Permission {
   id  Int @id @default(autoincrement())
   submitter_email String
   due_to DateTime
+  secretary User @relation(fields: [secretary_id], references: [id])
   secretary_id Int
 }
