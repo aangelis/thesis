@@ -66,22 +66,55 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   }
 
   const prisma = new PrismaClient()
-  const permissions = await prisma.permission.findMany()
+  const permissions = await prisma.permission.findMany({
+    include: {
+      secretary: {
+        select: {
+          first_name: true,
+          last_name: true,
+        }
+      }
+    }
+  })
+
+  // view only your own permissions
+  // const permissions = await prisma.permission.findMany({
+  //   where: {
+  //     secretary_id: user.id
+  //   }
+  // })
+
+  // https://stackoverflow.com/questions/70449092/reason-object-object-date-cannot-be-serialized-as-json-please-only-ret
+  // data hooks provided by Next.js do not allow you to transmit Javascript objects like Dates
+  // https://github.com/blitz-js/superjson
 
   return {
-    props : { permissions }
+    props : { permissions: JSON.parse(JSON.stringify(permissions)) }
   }
 
 
 }, sessionOptions);
 
+interface Secretary {
+  first_name: string;
+  last_name: string;
+}
 
 interface Data {
   id: number;
   submitter_email: string;
-  due_to: string;
+  due_to: Date;
   secretary_id: number;
+  secretary: Secretary;
 }
+
+// const testddata: Data = {
+//   id: 2,
+//   submitter_email: 'itp21101@hua.gr',
+//   due_to: new Date('2022-12-29T06:32:59.000Z'),
+//   secretary_id: 7,
+//   secretary: { first_name: 'ΜΗΤΣΗ', last_name: 'ΛΟΡΕΤΑ' }
+// }
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -142,7 +175,7 @@ const headCells: readonly HeadCell[] = [
     label: 'Καταληκτική ημερομηνία',
   },
   {
-    id: 'secretary_id',
+    id: 'secretary',
     numeric: true,
     disablePadding: false,
     label: 'Υπεύθυνος/η Γραμματείας',
@@ -368,7 +401,7 @@ function EnhancedTable(rows: any[]) {
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.id as string);
                   const labelId = `enhanced-table-checkbox-${index}`;
-
+                  const rowDate = new Date(row.due_to);
                   return (
                     <TableRow
                       hover
@@ -400,8 +433,8 @@ function EnhancedTable(rows: any[]) {
                         padding="none"
                         sx={{cursor: 'pointer'}}
                       >{row.submitter_email}</TableCell>
-                      <TableCell align="right">{row.due_to}</TableCell>
-                      <TableCell align="right">{row.secretary_id}</TableCell>
+                      <TableCell align="right">{rowDate.toString()}</TableCell>
+                      <TableCell align="right">{row.secretary.first_name} {row.secretary.last_name}</TableCell>
                       {/* <TableCell
                       onClick={() => {
                         console.log("Detected Edit Cell Click");}}><EditIcon /></TableCell> */}
@@ -447,7 +480,6 @@ function EnhancedTable(rows: any[]) {
 export default (({permissions}: {permissions: any[]}) => {
   // Rendered more hooks than during the previous render with custom hook
   const tableToShow = EnhancedTable(permissions);
-
   const { user } = useUser({
     // redirectTo: "/login",
   });
