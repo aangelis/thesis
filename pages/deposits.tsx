@@ -52,7 +52,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     return {
       props: {
         // user: { id: null, email: null, username: null, isLoggedIn: false, }, //as User,
-        deposits: {}
+        deposits: {}, unconfirmedCount: 0, addNewCount: 0
       },
     };
   }
