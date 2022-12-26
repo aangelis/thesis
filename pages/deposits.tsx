@@ -326,7 +326,7 @@ function EnhancedTable(rows: Data[]) {
                         component="th"
                         id={labelId}
                         scope="row"
-                        sx={{cursor: 'pointer'}}
+                        sx={{cursor: 'pointer', fontWeight: row.confirmed? 'plain' : 'bold'}}
                       ><HtmlTooltip
                       title={
                         <React.Fragment>
@@ -346,9 +346,13 @@ function EnhancedTable(rows: Data[]) {
                       <TableCell
                         onClick={() => router.push('/deposit/'+row.id)}
                         align="left"
-                        sx={{cursor: 'pointer'}}>{row.title_en}</TableCell>
-                      <TableCell align="right">{row.pages}</TableCell>
-                      <TableCell align="right">{row.confirmed ? "Ναι" : "Όχι" }</TableCell>
+                        sx={{cursor: 'pointer', fontWeight: row.confirmed? 'plain' : 'bold'}}>{row.title_en}</TableCell>
+                      <TableCell
+                        align="right"
+                        sx={{fontWeight: row.confirmed? 'plain' : 'bold'}}>{row.pages}</TableCell>
+                      <TableCell
+                        align="right"
+                        sx={{fontWeight: row.confirmed? 'plain' : 'bold'}}>{row.confirmed ? "Ναι" : "Όχι" }</TableCell>
                     </TableRow>
                   );
                 })}
