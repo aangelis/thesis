@@ -57,26 +57,56 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     };
   }
 
-  if (user?.is_superuser) {
-    res.setHeader("location", "/deposits");
-    res.statusCode = 302;
-    res.end();
-    return {
-      props: {
-        deposits: {}
-      },
-    };
-  }
+  // if (user?.is_superuser) {
+  //   res.setHeader("location", "/deposits");
+  //   res.statusCode = 302;
+  //   res.end();
+  //   return {
+  //     props: {
+  //       deposits: {}
+  //     },
+  //   };
+  // }
   
   const prisma = new PrismaClient()
-  const deposits = await prisma.deposit.findMany({
+
+  const deposits = user.is_superuser?
+  (await prisma.deposit.findMany())
+  :
+  (await prisma.deposit.findMany({
     where: {
       submitter_id: user.id || undefined,
     }
-  })
+  }))
+
+  const unconfirmedCount = (await prisma.deposit.aggregate({
+    where: {
+      submitter_id: user.id || undefined,
+      confirmed: false,
+    },
+    _count: {
+      confirmed: true,
+    },
+  }))._count.confirmed || 0
+
+  // https://github.com/prisma/prisma/discussions/11443
+  const addNewCount = (await prisma.permission.aggregate({
+    where: {
+      submitter_email: user.email,
+      due_to: {
+        gte: new Date(),
+        // gte: new Date('2022-12-26'),
+      },
+    },
+    _count: {
+      _all: true
+    }
+  }))._count._all || 0
 
   return {
-    props : { user, deposits }
+    // props : { deposits }
+    props : { deposits, unconfirmedCount, addNewCount }
+    // props : { user, deposits }
   }
 }, sessionOptions);
 
@@ -402,13 +432,17 @@ function EnhancedTable(rows: any[]) {
                     >
                       <TableCell padding="checkbox"
                       onClick={(event) => handleClick(event, row.id as string)}>
-                        <Checkbox
-                          color="primary"
-                          checked={isItemSelected}
-                          inputProps={{
-                            'aria-labelledby': labelId,
-                          }}
-                        />
+                        {
+                          !row.confirmed && (
+                            <Checkbox
+                              color="primary"
+                              checked={isItemSelected}
+                              inputProps={{
+                                'aria-labelledby': labelId,
+                              }}
+                            />
+                          )
+                        }
                       </TableCell>
                       <TableCell
                         // onClick={() => {
@@ -492,7 +526,10 @@ function EnhancedTable(rows: any[]) {
 //     deposits: any[]
 //   }
 //   ) {
-export default (({deposits}: {deposits: any[]}) => {
+export default ((
+  {deposits, unconfirmedCount, addNewCount }:
+    {deposits: any[], unconfirmedCount: number, addNewCount: number },
+  ) => {
   // Rendered more hooks than during the previous render with custom hook
   const tableToShow = EnhancedTable(deposits);
 
@@ -500,8 +537,11 @@ export default (({deposits}: {deposits: any[]}) => {
     // redirectTo: "/login",
   });
 
-  if (!user || user.is_superuser)
-    return(<></>);
+  const canAddNewDeposit = !user?.is_superuser && unconfirmedCount < addNewCount;
+
+  // use deposits page for all user types
+  // if (!user || user.is_superuser)
+  //   return(<></>);
 
   const getHeadings = () => {
     return Object.keys(deposits[0]);
@@ -509,16 +549,25 @@ export default (({deposits}: {deposits: any[]}) => {
   
   const hasDeposits = deposits && Object.keys(deposits).length > 0
 
-
   // console.log(deposits);
   return (
     <Layout>
-      <h1>Οι αποθέσεις μου</h1>
+      { user?.is_superuser && (
+        <h1>Λίστα αποθέσεων</h1>
+      )}
+      { !user?.is_superuser && (
+        <h1>Οι αποθέσεις μου</h1>
+      )}
       { !hasDeposits && (
-      <h3>Δεν βρέθηκαν αποθέσεις</h3>
-    )
-    }
-      <Box sx={{ '& > button': { m: 1 } }}>
+        <h3>Δεν βρέθηκαν αποθέσεις</h3>
+      )}
+      { !canAddNewDeposit && (
+        <Box sx={{ '& > button': { m: 1 }, color: 'red' }}>
+          <h3>Δεν έχετε δικαιώματα δημιουργίας απόθεσης</h3>
+        </Box>
+      )}
+      { canAddNewDeposit && (
+        <Box sx={{ '& > button': { m: 1 } }}>
           <Button
               color="secondary"
               onClick={() => router.push('/deposit/new')}
@@ -528,7 +577,8 @@ export default (({deposits}: {deposits: any[]}) => {
               δημιουργια νεας αποθεσης
             </Button>
         </Box>
-        { hasDeposits && tableToShow }
+      )}
+      { hasDeposits && tableToShow }
     </Layout>
   )
 
