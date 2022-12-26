@@ -123,7 +123,8 @@ interface Data {
   maps: number;
   drawings: number;
   supervisor: string;
-  confirmed: boolean;
+  // confirmed: boolean;
+  confirmed: string;
   confirmed_timestamp: string;
 }
 
@@ -176,7 +177,7 @@ const headCells: readonly HeadCell[] = [
   {
     id: 'title_el',
     numeric: false,
-    disablePadding: true,
+    disablePadding: false,
     label: 'Τίτλος',
   },
   {
@@ -200,16 +201,14 @@ const headCells: readonly HeadCell[] = [
 ];
 
 interface EnhancedTableProps {
-  numSelected: number;
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
-  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
   orderBy: string;
   rowCount: number;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
+  const { order, orderBy, rowCount, onRequestSort } =
     props;
   const createSortHandler =
     (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
@@ -219,17 +218,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              'aria-label': 'select all deposits',
-            }}
-          />
-        </TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -251,67 +239,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             </TableSortLabel>
           </TableCell>
         ))}
-        {/* Blank heading cell for edit */}
-        {/* <TableCell/>  */}
       </TableRow>
     </TableHead>
-  );
-}
-
-interface EnhancedTableToolbarProps {
-  numSelected: number;
-}
-
-function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected } = props;
-
-  return (
-    <Toolbar
-      sx={{
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-        }),
-      }}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected === 1 ?
-          (<>Επιλέχθηκε μια απόθεση</>)  : 
-          (<>Επιλέχθηκαν {numSelected} αποθέσεις</>)
-          }
-        </Typography>
-      ) : (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          Επιλογή αποθέσεων
-        </Typography>
-      )}
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Toolbar>
   );
 }
 
@@ -327,9 +256,9 @@ const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
   },
 }));
 
-function EnhancedTable(rows: any[]) {
+function EnhancedTable(rows: Data[]) {
   const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('title_el');
+  const [orderBy, setOrderBy] = React.useState<keyof Data>('confirmed');
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(true);
@@ -344,35 +273,6 @@ function EnhancedTable(rows: any[]) {
     setOrderBy(property);
   };
 
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: readonly string[] = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
-    }
-
-    setSelected(newSelected);
-  };
-
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -380,10 +280,6 @@ function EnhancedTable(rows: any[]) {
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
-
-  const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDense(event.target.checked);
   };
 
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
@@ -395,7 +291,6 @@ function EnhancedTable(rows: any[]) {
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -403,10 +298,8 @@ function EnhancedTable(rows: any[]) {
             size={dense ? 'small' : 'medium'}
           >
             <EnhancedTableHead
-              numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
@@ -416,42 +309,23 @@ function EnhancedTable(rows: any[]) {
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.id as string);
+                  const isItemSelected = isSelected(row.id as unknown as string);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
                     <TableRow
                       hover
-                      // Disable click on entire row
-                      // onClick={(event) => handleClick(event, row.title_el as string)}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.id}
                       selected={isItemSelected}
                     >
-                      <TableCell padding="checkbox"
-                      onClick={(event) => handleClick(event, row.id as string)}>
-                        {
-                          !row.confirmed && (
-                            <Checkbox
-                              color="primary"
-                              checked={isItemSelected}
-                              inputProps={{
-                                'aria-labelledby': labelId,
-                              }}
-                            />
-                          )
-                        }
-                      </TableCell>
                       <TableCell
-                        // onClick={() => {
-                        //   console.log("Detected Title_el Cell Click", row.id);}}
                         onClick={() => router.push('/deposit/'+row.id)}
                         component="th"
                         id={labelId}
                         scope="row"
-                        padding="none"
                         sx={{cursor: 'pointer'}}
                       ><HtmlTooltip
                       title={
@@ -470,16 +344,11 @@ function EnhancedTable(rows: any[]) {
                       }
                     ><div>{row.title_el}</div></HtmlTooltip></TableCell>
                       <TableCell
-                        // onClick={() => {
-                        //   console.log("Detected Title_en Cell Click", row.id);}}
                         onClick={() => router.push('/deposit/'+row.id)}
                         align="left"
                         sx={{cursor: 'pointer'}}>{row.title_en}</TableCell>
                       <TableCell align="right">{row.pages}</TableCell>
                       <TableCell align="right">{row.confirmed ? "Ναι" : "Όχι" }</TableCell>
-                      {/* <TableCell
-                      onClick={() => {
-                        console.log("Detected Edit Cell Click");}}><EditIcon /></TableCell> */}
                     </TableRow>
                   );
                 })}
