@@ -94,7 +94,7 @@ export default function Header() {
           {user?.isLoggedIn === true && user?.is_superuser === false && (
             <>
               <li>
-              <Link href="/mydeposits">
+              <Link href="/deposits">
                 <a>
                   <span
                     style={{
