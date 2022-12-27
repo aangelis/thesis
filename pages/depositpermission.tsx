@@ -241,8 +241,8 @@ const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
 }));
 
 function EnhancedTable(rows: Data[], user: any) {
-  const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('submitter_email');
+  const [order, setOrder] = React.useState<Order>('desc');
+  const [orderBy, setOrderBy] = React.useState<keyof Data>('due_to');
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(true);
@@ -295,7 +295,7 @@ function EnhancedTable(rows: Data[], user: any) {
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.id as unknown as string);
                   const labelId = `enhanced-table-checkbox-${index}`;
-                  const rowDate = new Date(row.due_to);
+                  const rowDate = new Date(row.due_to).toLocaleDateString('el');
                   const owned = row.secretary_id == user?.id;
                   return (
                     <TableRow
