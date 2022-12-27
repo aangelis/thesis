@@ -94,11 +94,13 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   //   return x;
   // })
                 
-  type PermissionType = {
-    id: number;
-    submitter_email: string;
-    due_to: Date;
-    secretary_id: number;
+  interface Permission {
+    // Declaration merging
+    // https://blog.logrocket.com/types-vs-interfaces-in-typescript/
+    // id: number;
+    // submitter_email: string;
+    // due_to: Date;
+    // secretary_id: number;
     secretary: {
       first_name: string | null;
       last_name: string | null;
@@ -106,7 +108,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     secretary_fullname?: string | null;
   }
   
-  const permissions: PermissionType[] = await prisma.permission.findMany({
+  const permissions: Permission[] = await prisma.permission.findMany({
     include: {
       secretary: {
         select: {
