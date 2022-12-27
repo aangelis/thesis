@@ -96,7 +96,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
                 
   type PermissionType = {
     id: number;
-    submitter_email: string
+    submitter_email: string;
     due_to: Date;
     secretary_id: number;
     secretary: {
@@ -107,14 +107,14 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   }
   
   const permissions: PermissionType[] = await prisma.permission.findMany({
-      include: {
-        secretary: {
-          select: {
-            first_name: true,
-            last_name: true,
-          }
+    include: {
+      secretary: {
+        select: {
+          first_name: true,
+          last_name: true,
         }
       }
+    }
   })
 
   permissions.map((x) => {
