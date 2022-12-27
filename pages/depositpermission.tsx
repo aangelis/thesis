@@ -49,7 +49,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     res.end();
     return {
       props: {
-        roles: {}
+        permissions: {}
       },
     };
   }
@@ -66,7 +66,8 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   }
 
   const prisma = new PrismaClient()
-  const permissions = await prisma.permission.findMany({
+  // Record<string, any> to solve error - Property 'secretary_fullname' does not exist on type ''
+  const permissions: Record<string, any> = await prisma.permission.findMany({
     include: {
       secretary: {
         select: {
@@ -88,6 +89,11 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   // data hooks provided by Next.js do not allow you to transmit Javascript objects like Dates
   // https://github.com/blitz-js/superjson
 
+  permissions.map((x: Record<string, any>) => {
+    x.secretary_fullname = x.secretary.first_name + ' ' + x.secretary.last_name;
+    return x;
+  })
+
   return {
     props : { permissions: JSON.parse(JSON.stringify(permissions)) }
   }
@@ -95,17 +101,13 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 
 }, sessionOptions);
 
-interface Secretary {
-  first_name: string;
-  last_name: string;
-}
-
 interface Data {
   id: number;
   submitter_email: string;
-  due_to: Date;
+  // due_to: Date;
+  due_to: string;
   secretary_id: number;
-  secretary: Secretary;
+  secretary_fullname: string;
 }
 
 // const testddata: Data = {
@@ -165,7 +167,7 @@ const headCells: readonly HeadCell[] = [
   {
     id: 'submitter_email',
     numeric: false,
-    disablePadding: true,
+    disablePadding: false,
     label: 'E-mail',
   },
   {
@@ -175,7 +177,7 @@ const headCells: readonly HeadCell[] = [
     label: 'Καταληκτική ημερομηνία',
   },
   {
-    id: 'secretary',
+    id: 'secretary_fullname',
     numeric: true,
     disablePadding: false,
     label: 'Υπεύθυνος/η Γραμματείας',
@@ -183,16 +185,14 @@ const headCells: readonly HeadCell[] = [
 ];
 
 interface EnhancedTableProps {
-  numSelected: number;
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
-  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
   orderBy: string;
   rowCount: number;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
+  const { order, orderBy, rowCount, onRequestSort } =
     props;
   const createSortHandler =
     (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
@@ -202,17 +202,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              'aria-label': 'select all roles',
-            }}
-          />
-        </TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -234,67 +223,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             </TableSortLabel>
           </TableCell>
         ))}
-        {/* Blank heading cell for edit */}
-        {/* <TableCell/>  */}
       </TableRow>
     </TableHead>
-  );
-}
-
-interface EnhancedTableToolbarProps {
-  numSelected: number;
-}
-
-function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected } = props;
-
-  return (
-    <Toolbar
-      sx={{
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-        }),
-      }}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected === 1 ?
-          (<>Επιλέχθηκε ένας ρόλος</>)  : 
-          (<>Επιλέχθηκαν {numSelected} ρόλοι</>)
-          }
-        </Typography>
-      ) : (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          Επιλογή ρόλων
-        </Typography>
-      )}
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Toolbar>
   );
 }
 
@@ -310,7 +240,7 @@ const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
   },
 }));
 
-function EnhancedTable(rows: any[]) {
+function EnhancedTable(rows: Data[], user: any) {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Data>('submitter_email');
   const [selected, setSelected] = React.useState<readonly string[]>([]);
@@ -327,35 +257,6 @@ function EnhancedTable(rows: any[]) {
     setOrderBy(property);
   };
 
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: readonly string[] = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
-    }
-
-    setSelected(newSelected);
-  };
-
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -363,10 +264,6 @@ function EnhancedTable(rows: any[]) {
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
-
-  const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDense(event.target.checked);
   };
 
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
@@ -378,7 +275,6 @@ function EnhancedTable(rows: any[]) {
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -386,10 +282,8 @@ function EnhancedTable(rows: any[]) {
             size={dense ? 'small' : 'medium'}
           >
             <EnhancedTableHead
-              numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
@@ -399,45 +293,34 @@ function EnhancedTable(rows: any[]) {
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.id as string);
+                  const isItemSelected = isSelected(row.id as unknown as string);
                   const labelId = `enhanced-table-checkbox-${index}`;
                   const rowDate = new Date(row.due_to);
+                  const owned = row.secretary_id == user?.id;
                   return (
                     <TableRow
                       hover
-                      // Disable click on entire row
-                      // onClick={(event) => handleClick(event, row.title_el as string)}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.id}
                       selected={isItemSelected}
                     >
-                      <TableCell padding="checkbox"
-                      onClick={(event) => handleClick(event, row.id as string)}>
-                        <Checkbox
-                          color="primary"
-                          checked={isItemSelected}
-                          inputProps={{
-                            'aria-labelledby': labelId,
-                          }}
-                        />
-                      </TableCell>
                       <TableCell
-                        // onClick={() => {
-                        //   console.log("Detected Title_el Cell Click", row.id);}}
                         onClick={() => router.push('/permission/'+row.id)}
                         component="th"
                         id={labelId}
                         scope="row"
-                        padding="none"
-                        sx={{cursor: 'pointer'}}
+                        sx={{cursor: 'pointer', fontWeight: !owned? 'plain' : 'bold'}}
                       >{row.submitter_email}</TableCell>
-                      <TableCell align="right">{rowDate.toString()}</TableCell>
-                      <TableCell align="right">{row.secretary.first_name} {row.secretary.last_name}</TableCell>
-                      {/* <TableCell
-                      onClick={() => {
-                        console.log("Detected Edit Cell Click");}}><EditIcon /></TableCell> */}
+                      <TableCell
+                        align="right"
+                        sx={{fontWeight: !owned? 'plain' : 'bold'}}
+                        >{rowDate.toString()}</TableCell>
+                      <TableCell
+                        align="right"
+                        sx={{fontWeight: !owned? 'plain' : 'bold'}}
+                        >{row.secretary_fullname}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -479,10 +362,10 @@ function EnhancedTable(rows: any[]) {
 
 export default (({permissions}: {permissions: any[]}) => {
   // Rendered more hooks than during the previous render with custom hook
-  const tableToShow = EnhancedTable(permissions);
   const { user } = useUser({
     // redirectTo: "/login",
   });
+  const tableToShow = EnhancedTable(permissions, user);
 
   
   const getHeadings = () => {
