@@ -82,6 +82,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         department: "Γραμματεία Τμήματος Πληροφορικής και Τηλεματικής",
       }); 
       return;
+    } else if (email === "daneli@hua.gr" && password === "1234") {
+      console.log(`${ip} - [${now}] - success - ${email}`);
+      res.json({          
+        // id: 2,
+        email: "daneli@hua.gr",
+        username: "daneli",
+        first_name: "ΦΩΤΕΙΝΗ",
+        last_name: "ΔΕΝΕΛΗ",
+        title: "Διοικητική Υπάλληλος",
+        department: "Γραμματεία Τμήματος Πληροφορικής και Τηλεματικής",
+      }); 
+      return;
     } else if ( !email || !password ) {
       console.error(`${ip} - [${now}] - failure - - No email and/or password provided`);
       res.status(400).json({ message: "No email and/or password provided." });
