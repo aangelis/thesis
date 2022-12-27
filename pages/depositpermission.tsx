@@ -67,29 +67,57 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 
   const prisma = new PrismaClient()
   // Record<string, any> to solve error - Property 'secretary_fullname' does not exist on type ''
-  const permissions: Record<string, any> = await prisma.permission.findMany({
-    include: {
-      secretary: {
-        select: {
-          first_name: true,
-          last_name: true,
-        }
-      }
-    }
-  })
-
+  // const permissions: Record<string, any> = await prisma.permission.findMany({
+  //   include: {
+  //     secretary: {
+  //       select: {
+  //         first_name: true,
+  //         last_name: true,
+  //       }
+  //     }
+  //   }
+  // })
+          
   // view only your own permissions
   // const permissions = await prisma.permission.findMany({
   //   where: {
   //     secretary_id: user.id
   //   }
   // })
-
+              
   // https://stackoverflow.com/questions/70449092/reason-object-object-date-cannot-be-serialized-as-json-please-only-ret
   // data hooks provided by Next.js do not allow you to transmit Javascript objects like Dates
   // https://github.com/blitz-js/superjson
+  
+  // permissions.map((x: Record<string, any>) => {
+  //   x.secretary_fullname = x.secretary.first_name + ' ' + x.secretary.last_name;
+  //   return x;
+  // })
+                
+  type PermissionType = {
+    id: number;
+    submitter_email: string
+    due_to: Date;
+    secretary_id: number;
+    secretary: {
+      first_name: string | null;
+      last_name: string | null;
+    }
+    secretary_fullname?: string | null;
+  }
+  
+  const permissions: PermissionType[] = await prisma.permission.findMany({
+      include: {
+        secretary: {
+          select: {
+            first_name: true,
+            last_name: true,
+          }
+        }
+      }
+  })
 
-  permissions.map((x: Record<string, any>) => {
+  permissions.map((x) => {
     x.secretary_fullname = x.secretary.first_name + ' ' + x.secretary.last_name;
     return x;
   })
