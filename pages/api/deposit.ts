@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from '@prisma/client'
 import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "lib/session";
+import { User } from "pages/api/user";
 
 export default withIronSessionApiRoute(handler, sessionOptions);
 
@@ -13,33 +14,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(400).json({ message: "Bad HTTP method." });
     return;
   }
-  const user: any = req.session.user;
+  const user: User = req.session.user!;
 
   if (!user?.isLoggedIn) {
     res.status(400).json({ message: "Access refused. User not logged in." });
     return;
   }
-
+  
   // Process a POST request
   const data = await req.body; // deposit
   const { id } = data;
-  // console.log(data);
-
-  if (!user?.isAdmin && data.id) {
-    try {
-      const dbDepositData = await prisma.deposit.findUnique({
-        where: {
-          id: id
-        }
-      })
-      // Check if deposit belongs to user before update
-      if (dbDepositData?.submitter_id !== user.id) {
-        res.status(400).json({ message: "User cannot modify this deposit." });
-      }
-    } catch (error) {
-      res.status(500).json({ message: (error as Error).message });
-    }
-  }
 
   if (!data.title_el ||
       !data.title_en ||
@@ -60,6 +44,54 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(400).json({ message: "Invalid data." });
     return;
   }
+  
+  interface FilteredData {
+    [key: string]: any; 
+  }
+
+  const filteredData: FilteredData = {};
+
+  if (user.isLibrarian) {
+    // filter data and keep only the required three key value pairs
+    const selectedKeys = ["id", "confirmed", "confirmed_timestamp"];
+    Object.entries(data)
+      .filter(([k,v]) => selectedKeys.includes(k))
+      .forEach(([k,v]) => filteredData[k]=v);
+    
+    try {
+      const deposit = await prisma.deposit.update({
+        where: {
+          id
+        },
+        data: filteredData
+      })
+      res.json(deposit);
+      return;
+    } catch (error) {
+      res.status(500).json({ message: (error as Error).message });
+    }
+  }
+
+  if (!user?.isLibrarian && id) {
+
+
+    try {
+      const dbDepositData = await prisma.deposit.findUnique({
+        where: {
+          id
+        }
+      })
+      // Check if deposit belongs to user before update
+      if (!user.isLibrarian && dbDepositData?.submitter_id !== user.id) {
+        res.status(400).json({ message: "User cannot modify this deposit." });
+        return;
+      }
+    } catch (error) {
+      res.status(500).json({ message: (error as Error).message });
+      return;
+    }
+  }
+
 
   try {
     if (data.id) {
