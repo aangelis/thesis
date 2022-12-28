@@ -103,7 +103,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
       submitter_id: user.id || undefined,
     }
   }))
-console.log(deposits)
+
   const unconfirmedCount = (await prisma.deposit.aggregate({
     where: {
       submitter_id: user.id || undefined,
