@@ -67,7 +67,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     return {
       props: {
         user: { id: null, email: null, username: null, isLoggedIn: false } as User,
-        role: {}
+        permission: {}
       },
     };
   }
@@ -110,6 +110,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 
 
   return {
+    user,
     props : { user, permission: JSON.parse(JSON.stringify(permission)) }
   }
 }, sessionOptions);
