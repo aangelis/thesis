@@ -51,7 +51,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   req,
   res,
 }) {
-  const user: any = req.session.user;
+  const user: User = req.session.user!;
 
   // // https://github.com/aralroca/next-translate/issues/694#issuecomment-974717129
   // // Get id property of request data
@@ -74,12 +74,12 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     res.setHeader("location", "/login");
     res.statusCode = 302;
     res.end();
-    return {
-      props: {
-        user: { id: null, email: null, username: null, isLoggedIn: false } as User,
-        deposit: null,
-      },
-    };
+    // return {
+    //   props: {
+    //     user: { id: null, email: null, username: null, isLoggedIn: false } as User,
+    //     deposit: null,
+    //   },
+    // };
   }
 
   if (isNaN(+depositId)) {
@@ -102,7 +102,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     (await prisma.deposit.findFirst({
       where: {
         id: depositId,
-        submitter_id: user.id,
+        submitter_id: user.id!,
       }
     }))
 
@@ -138,17 +138,22 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   }
 }, sessionOptions);
 
-
+// function DepositPage(
+//   { user, deposit }:
+//   {
+//     user: InferGetServerSidePropsType<typeof getServerSideProps>,
+//     deposit: any
+//   }
+//   ) {
 function DepositPage(
-  { user, deposit }:
-  {
-    user: InferGetServerSidePropsType<typeof getServerSideProps>,
-    deposit: any
-  }
+  { user, deposit }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) {
 
-    console.log(user)
-    console.log(deposit)
+  const depositReadOnly = (user.id !== deposit?.submitter_id || deposit.confirmed)?
+    true : false;
+
+  const canConfirm = (user.isLibrarian)?
+    true : false;
 
   const confirmationStatus = [
     {
@@ -162,13 +167,13 @@ function DepositPage(
   ]
   // const [title_el, setTitle_el] = React.useState(deposit.title_el || "");
   // const [title_en, setTitle_en] = React.useState(deposit.title_en || "");
-  const [abstract_el, setAbstract_el] = React.useState(deposit.abstract_el || "");
-  const [abstract_en, setAbstract_en] = React.useState(deposit.abstract_en || "");
-  const [confirmed, setConfirmed] = React.useState(deposit.confirmed || false);
-  const [confirmed_timestamp, setConfirmed_timestamp] = React.useState(deposit.confirmed_timestamp || "");
-  const [license, setLicense] = React.useState(deposit.license || "");
-  const [comments, setComments] = React.useState(deposit.comments || "");
-  const [supervisor, setSupervisor] = React.useState(deposit.supervisor || "");
+  const [abstract_el, setAbstract_el] = React.useState(deposit?.abstract_el || "");
+  const [abstract_en, setAbstract_en] = React.useState(deposit?.abstract_en || "");
+  const [confirmed, setConfirmed] = React.useState(deposit?.confirmed || false);
+  const [confirmed_timestamp, setConfirmed_timestamp] = React.useState(deposit?.confirmed_timestamp || "");
+  const [license, setLicense] = React.useState(deposit?.license || "");
+  const [comments, setComments] = React.useState(deposit?.comments || "");
+  const [supervisor, setSupervisor] = React.useState(deposit?.supervisor || "");
   
   const [loading, setLoading] = React.useState(false);
   const [numFieldsErrors, setNumFieldsErrors] = React.useState(0)
@@ -197,8 +202,8 @@ function DepositPage(
   // }, [pages, pagesError]);
 
   const alphabeticalFields = [
-    {name: "title_el", value: deposit.title_el || "", error: "" },
-    {name: "title_en", value: deposit.title_en || "", error: "" },
+    {name: "title_el", value: deposit?.title_el || "", error: "" },
+    {name: "title_en", value: deposit?.title_en || "", error: "" },
   ]
 
   const [textFields, setTextFields] = React.useState(alphabeticalFields);
@@ -224,12 +229,12 @@ function DepositPage(
   }
 
   const numericalFields = [
-    {name: "pages", value: deposit.pages || 0, error: "" },
-    {name: "images", value: deposit.images || 0, error: "" },
-    {name: "tables", value: deposit.tables || 0, error: "" },
-    {name: "diagrams", value: deposit.diagrams || 0, error: "" },
-    {name: "maps", value: deposit.maps || 0, error: "" },
-    {name: "drawings", value: deposit.drawings || 0, error: "" }
+    {name: "pages", value: deposit?.pages || 0, error: "" },
+    {name: "images", value: deposit?.images || 0, error: "" },
+    {name: "tables", value: deposit?.tables || 0, error: "" },
+    {name: "diagrams", value: deposit?.diagrams || 0, error: "" },
+    {name: "maps", value: deposit?.maps || 0, error: "" },
+    {name: "drawings", value: deposit?.drawings || 0, error: "" }
   ]
 
   const [numFields, setNumFields] = React.useState(numericalFields);
@@ -285,7 +290,7 @@ function DepositPage(
   };
 
   const handleChangeConfirmed = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setConfirmed(event.target.value);
+    setConfirmed(event.target.value.toLowerCase() === 'true');
   };
   
   const [viewData, setViewData] = React.useState(JSON.stringify(deposit, null, 2));
@@ -293,7 +298,7 @@ function DepositPage(
   async function handleClickSave() {
     setLoading(true);
     const body = {
-      id: deposit.id,
+      id: deposit?.id,
       title_el: textFields.find(o => o.name === "title_el")?.value,
       title_en: textFields.find(o => o.name === "title_en")?.value,
       abstract_el,
@@ -346,7 +351,7 @@ function DepositPage(
 
   const [file, setFile] = React.useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
-  const [storedFile, setStoredFile] = React.useState(deposit.original_filename || null);
+  const [storedFile, setStoredFile] = React.useState(deposit?.original_filename || null);
 
   const onFileUploadChange = (e: ChangeEvent<HTMLInputElement>) => {
     const fileInput = e.target;
@@ -403,7 +408,7 @@ function DepositPage(
 
     try {
       var formData = new FormData();
-      formData.append("depositId", deposit.id);
+      formData.append("depositId", deposit?.id as unknown as string);
       formData.append("media", file);
 
       
@@ -444,7 +449,7 @@ function DepositPage(
 
   const onDownloadFile = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    router.push('/api/download_file/' + deposit.id);
+    router.push('/api/download_file/' + deposit?.id);
 
   };
 
@@ -455,6 +460,7 @@ function DepositPage(
           <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-multiline-static"
+              disabled={depositReadOnly}
               error={textFields.find(o => o.name === "title_el")?.error !== ""}
               label="Τίτλος"
               name="title_el"
@@ -471,6 +477,7 @@ function DepositPage(
           <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-multiline-static"
+              disabled={depositReadOnly}
               error={textFields.find(o => o.name === "title_en")?.error !== ""}
               label="Τίτλος (Αγγλικά)"
               name="title_en"
@@ -488,6 +495,7 @@ function DepositPage(
           <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-multiline-static"
+              disabled={depositReadOnly}
               label="Περίληψη"
               multiline
               rows={4}
@@ -500,6 +508,7 @@ function DepositPage(
           <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-multiline-static"
+              disabled={depositReadOnly}
               label="Περίληψη (Αγγλικά)"
               multiline
               rows={4}
@@ -521,6 +530,7 @@ function DepositPage(
             <div>
               <TextField
                 id="outlined-basic"
+                disabled={depositReadOnly}
                 error={numFields.find(o => o.name === "pages")?.error !== ""}
                 label="Σελίδες"
                 name="pages"
@@ -542,6 +552,7 @@ function DepositPage(
               /> */}
               <TextField
                 id="outlined-basic"
+                disabled={depositReadOnly}
                 error={numFields.find(o => o.name === "images")?.error !== ""}
                 label="Εικόνες"
                 name="images"
@@ -554,6 +565,7 @@ function DepositPage(
               />
               <TextField
                 id="outlined-basic"
+                disabled={depositReadOnly}
                 error={numFields.find(o => o.name === "tables")?.error !== ""}
                 label="Πίνακες"
                 name="tables"
@@ -568,6 +580,7 @@ function DepositPage(
             <div>
               <TextField
                 id="outlined-basic"
+                disabled={depositReadOnly}
                 error={numFields.find(o => o.name === "diagrams")?.error !== ""}
                 label="Διαγράμματα"
                 name="diagrams"
@@ -580,6 +593,7 @@ function DepositPage(
               />
               <TextField
                 id="outlined-basic"
+                disabled={depositReadOnly}
                 error={numFields.find(o => o.name === "maps")?.error !== ""}
                 label="Χάρτες"
                 name="maps"
@@ -592,6 +606,7 @@ function DepositPage(
               />
               <TextField
                 id="outlined-basic"
+                disabled={depositReadOnly}
                 error={numFields.find(o => o.name === "drawings")?.error !== ""}
                 label="Σχέδια"
                 variant="outlined"
@@ -616,6 +631,7 @@ function DepositPage(
             <div>
               <TextField
                 id="outlined-select-confirmation"
+                disabled={depositReadOnly || !canConfirm}
                 select
                 label="Επικυρωμένη"
                 value={confirmed}
@@ -640,6 +656,7 @@ function DepositPage(
           <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-multiline-static"
+              disabled={depositReadOnly}
               label="Άδεια"
               multiline
               rows={2}
@@ -652,6 +669,7 @@ function DepositPage(
           <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-multiline-static"
+              disabled={depositReadOnly}
               label="Σχόλια"
               multiline
               rows={3}
@@ -665,6 +683,7 @@ function DepositPage(
           <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-basic"
+              disabled={depositReadOnly}
               label="Επιβλέπων"
               variant="outlined"
               value={supervisor}
@@ -701,6 +720,10 @@ function DepositPage(
           {/* https://kiranvj.com/blog/blog/file-upload-in-material-ui/ */}
           {/* https://codesandbox.io/s/eager-euclid-mo7de?from-embed=&file=/src/index.js:241-271 */}
 
+
+          { !depositReadOnly && (
+            <>
+
           <Box sx={{ m: 2 }} />
           <Box
             component="form"
@@ -712,6 +735,11 @@ function DepositPage(
           >
             <div>
               
+
+
+
+
+
 
               <TextField
                 // disabled
@@ -777,21 +805,25 @@ function DepositPage(
             </div>
           </Box>
 
+
           <Box sx={{ m: 2 }} />
 
           <Box sx={{ '& > button': { m: 1 } }}>
             <LoadingButton
                 color="secondary"
-                disabled={numFieldsErrors > 0 || textFieldsErrors > 0}
+                disabled={numFieldsErrors > 0 || textFieldsErrors > 0 || depositReadOnly}
                 onClick={handleClickSave}
                 loading={loading}
                 loadingPosition="start"
                 startIcon={<SaveIcon />}
                 variant="contained"
-              >
+                >
                 Αποθηκευση
               </LoadingButton>
           </Box>
+
+          </>
+                )}
 
           <Snackbar
             open={openFileError !== ""}
