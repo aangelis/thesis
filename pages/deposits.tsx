@@ -43,18 +43,18 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   req,
   res,
 }) {
-  const user: any = req.session.user;
+  const user: User = req.session.user!;
 
   if (user === undefined) {
     res.setHeader("location", "/login");
     res.statusCode = 302;
     res.end();
-    return {
-      props: {
-        // user: { id: null, email: null, username: null, isLoggedIn: false, }, //as User,
-        deposits: {}, unconfirmedCount: 0, addNewCount: 0
-      },
-    };
+    // return {
+    //   props: {
+    //     // user: { id: null, email: null, username: null, isLoggedIn: false, }, //as User,
+    //     deposits: {}, unconfirmedCount: 0, addNewCount: 0
+    //   },
+    // };
   }
 
   // if (user?.is_superuser) {
@@ -70,7 +70,32 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   
   const prisma = new PrismaClient()
 
-  const deposits = user.is_superuser?
+  interface Deposit {
+    id: number;
+    title: string;
+    title_el: string;
+    title_en: string;
+    content: string | null;
+    abstract_el: string | null;
+    abstract_en: string | null;
+    pages: number;
+    language: string | null;
+    images: number;
+    tables: number;
+    diagrams: number;
+    maps: number;
+    drawings: number;	
+    confirmed: boolean;
+    confirmed_timestamp: Date | null;
+    license: string | null;
+    comments: string | null;
+    submitter_id: number;
+    supervisor: string | null;
+    new_filename: string | null;
+    original_filename: string | null;
+  }
+
+  const deposits: Deposit[] = user.is_superuser?
   (await prisma.deposit.findMany())
   :
   (await prisma.deposit.findMany({
@@ -78,7 +103,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
       submitter_id: user.id || undefined,
     }
   }))
-
+console.log(deposits)
   const unconfirmedCount = (await prisma.deposit.aggregate({
     where: {
       submitter_id: user.id || undefined,
@@ -89,23 +114,24 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     },
   }))._count.confirmed || 0
 
-  // https://github.com/prisma/prisma/discussions/11443
-  const addNewCount = (await prisma.permission.aggregate({
-    where: {
-      submitter_email: user.email,
-      due_to: {
-        gte: new Date(),
-        // gte: new Date('2022-12-26'),
+  const addNewCount = user.email?
+    ((await prisma.permission.aggregate({
+      where: {
+        submitter_email: user.email,
+        due_to: {
+          gte: new Date(),
+          // gte: new Date('2022-12-26'),
+        },
       },
-    },
-    _count: {
-      _all: true
-    }
-  }))._count._all || 0
+      _count: {
+        _all: true
+      }
+    }))._count._all || 0)
+    : 0
 
   return {
     // props : { deposits }
-    props : { deposits, unconfirmedCount, addNewCount }
+    props : { deposits: JSON.parse(JSON.stringify(deposits)), unconfirmedCount, addNewCount }
     // props : { user, deposits }
   }
 }, sessionOptions);
@@ -331,11 +357,12 @@ function EnhancedTable(rows: Data[]) {
                       title={
                         <React.Fragment>
                           {/* https://mui.com/material-ui/react-tooltip/ */}
-                          {row.supervisor !== null ? "Επιβλέπων: " : ""}
+                          {typeof row.supervisor === 'string' && row.supervisor !== "" ? "Επιβλέπων: " : ""}
                           <Typography color="inherit">
-                            {row.supervisor !== null ? row.supervisor : ""}
+                            {typeof row.supervisor === 'string' && row.supervisor !== "" ? row.supervisor : ""}
                           </Typography>
-                          <u>{row.confirmed_timestamp !== null ? "Confirmation timestamp: "+row.confirmed_timestamp : ""}</u>
+                          <u>{row.confirmed_timestamp !== null ? "Confirmation date: "
+                          + new Date(row.confirmed_timestamp).toLocaleDateString('el') + ", " : ""}</u>
                           Εικόνες: {row.images}, Πίνακες: {row.tables},
                           Διαγράμματα: {row.diagrams}, Χάρτες: {row.maps},
                           Σχέδια: {row.drawings}
@@ -400,8 +427,8 @@ function EnhancedTable(rows: Data[]) {
 //   }
 //   ) {
 export default ((
-  {deposits, unconfirmedCount, addNewCount }:
-    {deposits: any[], unconfirmedCount: number, addNewCount: number },
+  {deposits, unconfirmedCount, addNewCount }: InferGetServerSidePropsType<typeof getServerSideProps>,
+    // {deposits: any[], unconfirmedCount: number, addNewCount: number },
   ) => {
   // Rendered more hooks than during the previous render with custom hook
   const tableToShow = EnhancedTable(deposits);
@@ -422,7 +449,6 @@ export default ((
   
   const hasDeposits = deposits && Object.keys(deposits).length > 0
 
-  // console.log(deposits);
   return (
     <Layout>
       { user?.is_superuser && (
