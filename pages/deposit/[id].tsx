@@ -134,7 +134,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   // }
 
   return {
-    props : { user, deposit }
+    props : { user, deposit: JSON.parse(JSON.stringify(deposit)) }
   }
 }, sessionOptions);
 
@@ -169,8 +169,8 @@ function DepositPage(
   // const [title_en, setTitle_en] = React.useState(deposit.title_en || "");
   const [abstract_el, setAbstract_el] = React.useState(deposit?.abstract_el || "");
   const [abstract_en, setAbstract_en] = React.useState(deposit?.abstract_en || "");
-  const [confirmed, setConfirmed] = React.useState(deposit?.confirmed || false);
-  const [confirmed_timestamp, setConfirmed_timestamp] = React.useState(deposit?.confirmed_timestamp || "");
+  const [confirmed, setConfirmed] = React.useState<boolean>(deposit?.confirmed || false);
+  const [confirmedTimestamp, setConfirmedTimestamp] = React.useState(deposit?.confirmed_timestamp || "");
   const [license, setLicense] = React.useState(deposit?.license || "");
   const [comments, setComments] = React.useState(deposit?.comments || "");
   const [supervisor, setSupervisor] = React.useState(deposit?.supervisor || "");
@@ -289,10 +289,15 @@ function DepositPage(
     setOpenFileError("");
   };
 
+  const [confirmedStored, setConfirmedStored] = React.useState<boolean>(false);
+
   const handleChangeConfirmed = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setConfirmed(event.target.value.toLowerCase() === 'true');
+    const confirmation = event.target.value.toLowerCase() === 'true';
+    setConfirmed(confirmation);
+    const timestamp = confirmation? new Date() : ""
+    setConfirmedTimestamp(timestamp);
   };
-  
+
   const [viewData, setViewData] = React.useState(JSON.stringify(deposit, null, 2));
 
   async function handleClickSave() {
@@ -310,7 +315,7 @@ function DepositPage(
       maps: Number(numFields.find(o => o.name === "maps")?.value),
       drawings: Number(numFields.find(o => o.name === "drawings")?.value),
       confirmed,
-      confirmed_timestamp,
+      confirmed_timestamp: confirmedTimestamp,
       license,
       comments,
       supervisor,
@@ -327,6 +332,7 @@ function DepositPage(
     })
     .then((data) => {
       setOpenSuccess(true);
+      setConfirmedStored(data.confirmed);
       setViewData(JSON.stringify(data, null, 2));
     })
     .catch(err => {
@@ -623,7 +629,7 @@ function DepositPage(
           <Box
             component="form"
             sx={{
-              '& .MuiTextField-root': { m: 1, width: '25ch' },
+              '& .MuiTextField-root': { m: 1, width: '40ch' },
             }}
             noValidate
             autoComplete="off"
@@ -631,11 +637,12 @@ function DepositPage(
             <div>
               <TextField
                 id="outlined-select-confirmation"
-                disabled={depositReadOnly || !canConfirm}
+                disabled={depositReadOnly && !canConfirm || deposit?.confirmed}
                 select
                 label="Επικυρωμένη"
                 value={confirmed}
                 onChange={handleChangeConfirmed}
+                sx={{ width: '10ch' }}
               >
                 {confirmationStatus.map((option) => (
                   <MenuItem key={String(option.value)} value={String(option.value)}>
@@ -648,7 +655,8 @@ function DepositPage(
                 id="outlined-disabled"
                 label="Ημερομηνία επικύρωσης"
                 variant="outlined"
-                value={confirmed_timestamp || "Δεν υπάρχει"}
+                value={confirmedTimestamp? new Date(confirmedTimestamp).toLocaleDateString('el') : null || "Δεν υπάρχει"}
+                sx={{ width: '30ch' }}
               />
             </div>
           </Box>
@@ -806,12 +814,20 @@ function DepositPage(
           </Box>
 
 
+
+
+          </>
+                )}
+
+          { ( (!depositReadOnly || canConfirm) && (!deposit?.confirmed || !confirmedStored ) ) && (
+            <>
+
           <Box sx={{ m: 2 }} />
 
           <Box sx={{ '& > button': { m: 1 } }}>
             <LoadingButton
                 color="secondary"
-                disabled={numFieldsErrors > 0 || textFieldsErrors > 0 || depositReadOnly}
+                disabled={numFieldsErrors > 0 || textFieldsErrors > 0}
                 onClick={handleClickSave}
                 loading={loading}
                 loadingPosition="start"
