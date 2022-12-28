@@ -93,16 +93,35 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     supervisor: string | null;
     new_filename: string | null;
     original_filename: string | null;
+    submitter?: {
+      first_name: string | null;
+      last_name: string | null;
+    }
+    submitter_fullname?: string | null;
   }
 
   const deposits: Deposit[] = user.is_superuser?
-  (await prisma.deposit.findMany())
+  (await prisma.deposit.findMany({
+    include: {
+      submitter: {
+        select: {
+          first_name: true,
+          last_name: true,
+        }
+      }
+    }
+  }))
   :
   (await prisma.deposit.findMany({
     where: {
       submitter_id: user.id || undefined,
     }
   }))
+
+  deposits.map((x) => {
+    x.submitter_fullname = x.submitter?.first_name + ' ' + x.submitter?.last_name;
+    return x;
+  })
 
   const unconfirmedCount = (await prisma.deposit.aggregate({
     where: {
@@ -152,6 +171,7 @@ interface Data {
   // confirmed: boolean;
   confirmed: string;
   confirmed_timestamp: string;
+  submitter_fullname: string;
 }
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -369,7 +389,7 @@ function EnhancedTable(rows: Data[], headCells: readonly HeadCell[]) {
                           </Typography>
                           <u>{row.confirmed_timestamp !== null ? "Confirmation date: "
                           + new Date(row.confirmed_timestamp).toLocaleDateString('el') + ", " : ""}</u>
-                          Εικόνες: {row.images}, Πίνακες: {row.tables},
+                          Σελίδες: {row.pages}, Εικόνες: {row.images}, Πίνακες: {row.tables},
                           Διαγράμματα: {row.diagrams}, Χάρτες: {row.maps},
                           Σχέδια: {row.drawings}
                           
@@ -382,12 +402,13 @@ function EnhancedTable(rows: Data[], headCells: readonly HeadCell[]) {
                         sx={{cursor: 'pointer', fontWeight: row.confirmed? 'plain' : 'bold'}}>{row.title_en}</TableCell>
                       { !headCells[2].hide && (
                       <TableCell
-                        align="right"
-                        sx={{fontWeight: row.confirmed? 'plain' : 'bold'}}>{row.pages}</TableCell>
+                        align="left"
+                        sx={{fontWeight: row.confirmed? 'plain' : 'bold'}}>{row.submitter_fullname}</TableCell>
                         )}
                       <TableCell
                         align="right"
-                        sx={{fontWeight: row.confirmed? 'plain' : 'bold'}}>{row.confirmed ? "Ναι" : "Όχι" }</TableCell>
+                        sx={{fontWeight: row.confirmed? 'plain' : 'bold'}}>{row.confirmed ?
+                          new Date(row.confirmed_timestamp).toLocaleDateString('el') : "Όχι" }</TableCell>
                     </TableRow>
                   );
                 })}
@@ -457,10 +478,10 @@ export default ((
       label: 'Τίτλος (Αγγλικά)',
     },
     {
-      id: 'pages',
-      numeric: true,
+      id: 'submitter_fullname',
+      numeric: false,
       disablePadding: false,
-      label: 'Σελίδες',
+      label: 'Χρήστης',
       hide: !user?.is_superuser,
     },
     {
