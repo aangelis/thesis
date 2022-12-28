@@ -197,44 +197,47 @@ interface HeadCell {
   id: keyof Data;
   label: string;
   numeric: boolean;
+  hide?: boolean;
 }
 
-const headCells: readonly HeadCell[] = [
-  {
-    id: 'title_el',
-    numeric: false,
-    disablePadding: false,
-    label: 'Τίτλος',
-  },
-  {
-    id: 'title_en',
-    numeric: false,
-    disablePadding: false,
-    label: 'Τίτλος (Αγγλικά)',
-  },
-  {
-    id: 'pages',
-    numeric: true,
-    disablePadding: false,
-    label: 'Σελίδες',
-  },
-  {
-    id: 'confirmed',
-    numeric: true,
-    disablePadding: false,
-    label: 'Επικυρωμένη',
-  },
-];
+// const headCells: readonly HeadCell[] = [
+//   {
+//     id: 'title_el',
+//     numeric: false,
+//     disablePadding: false,
+//     label: 'Τίτλος',
+//   },
+//   {
+//     id: 'title_en',
+//     numeric: false,
+//     disablePadding: false,
+//     label: 'Τίτλος (Αγγλικά)',
+//   },
+//   {
+//     id: 'pages',
+//     numeric: true,
+//     disablePadding: false,
+//     label: 'Σελίδες',
+//     hide: !user?.is_superuser,
+//   },
+//   {
+//     id: 'confirmed',
+//     numeric: true,
+//     disablePadding: false,
+//     label: 'Επικυρωμένη',
+//   },
+// ];
 
 interface EnhancedTableProps {
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
   order: Order;
   orderBy: string;
   rowCount: number;
+  headCells: readonly HeadCell[];
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const { order, orderBy, rowCount, onRequestSort } =
+  const { order, orderBy, rowCount, onRequestSort, headCells } =
     props;
   const createSortHandler =
     (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
@@ -244,7 +247,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   return (
     <TableHead>
       <TableRow>
-        {headCells.map((headCell) => (
+        {headCells.map((headCell) => !headCell.hide && (
+          
           <TableCell
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
@@ -264,6 +268,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
               ) : null}
             </TableSortLabel>
           </TableCell>
+         
         ))}
       </TableRow>
     </TableHead>
@@ -282,7 +287,7 @@ const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
   },
 }));
 
-function EnhancedTable(rows: Data[]) {
+function EnhancedTable(rows: Data[], headCells: readonly HeadCell[]) {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Data>('confirmed');
   const [selected, setSelected] = React.useState<readonly string[]>([]);
@@ -328,6 +333,7 @@ function EnhancedTable(rows: Data[]) {
               orderBy={orderBy}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
+              headCells={headCells}
             />
             <TableBody>
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:
@@ -374,9 +380,11 @@ function EnhancedTable(rows: Data[]) {
                         onClick={() => router.push('/deposit/'+row.id)}
                         align="left"
                         sx={{cursor: 'pointer', fontWeight: row.confirmed? 'plain' : 'bold'}}>{row.title_en}</TableCell>
+                      { !headCells[2].hide && (
                       <TableCell
                         align="right"
                         sx={{fontWeight: row.confirmed? 'plain' : 'bold'}}>{row.pages}</TableCell>
+                        )}
                       <TableCell
                         align="right"
                         sx={{fontWeight: row.confirmed? 'plain' : 'bold'}}>{row.confirmed ? "Ναι" : "Όχι" }</TableCell>
@@ -430,12 +438,41 @@ export default ((
   {deposits, unconfirmedCount, addNewCount }: InferGetServerSidePropsType<typeof getServerSideProps>,
     // {deposits: any[], unconfirmedCount: number, addNewCount: number },
   ) => {
-  // Rendered more hooks than during the previous render with custom hook
-  const tableToShow = EnhancedTable(deposits);
-
+    
   const { user } = useUser({
     // redirectTo: "/login",
   });
+  
+  const headCells: readonly HeadCell[] = [
+    {
+      id: 'title_el',
+      numeric: false,
+      disablePadding: false,
+      label: 'Τίτλος',
+    },
+    {
+      id: 'title_en',
+      numeric: false,
+      disablePadding: false,
+      label: 'Τίτλος (Αγγλικά)',
+    },
+    {
+      id: 'pages',
+      numeric: true,
+      disablePadding: false,
+      label: 'Σελίδες',
+      hide: !user?.is_superuser,
+    },
+    {
+      id: 'confirmed',
+      numeric: true,
+      disablePadding: false,
+      label: 'Επικυρωμένη',
+    },
+  ];
+
+  // Rendered more hooks than during the previous render with custom hook
+  const tableToShow = EnhancedTable(deposits, headCells);
 
   const canAddNewDeposit = !user?.is_superuser && unconfirmedCount < addNewCount;
 
