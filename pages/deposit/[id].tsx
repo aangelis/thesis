@@ -77,7 +77,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     return {
       props: {
         user: { id: null, email: null, username: null, isLoggedIn: false } as User,
-        deposit: {}
+        deposit: null,
       },
     };
   }
@@ -86,18 +86,25 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     return {
       props: {
         user,
-        deposit: {}
+        deposit: null,
       },
     };
   }
 
   const prisma = new PrismaClient()
-  const deposit: any = await prisma.deposit.findFirst({
-    where: {
-     id: depositId,
-     submitter_id: user.id,
-    }
-  })
+  const deposit = user.is_superuser? 
+    (await prisma.deposit.findFirst({
+      where: {
+        id: depositId,
+      }
+    }))
+    :
+    (await prisma.deposit.findFirst({
+      where: {
+        id: depositId,
+        submitter_id: user.id,
+      }
+    }))
 
   // // Compute and return ecnrypted download file data info
   // if (deposit.new_filename !== (undefined || null)) {
@@ -140,6 +147,9 @@ function DepositPage(
   }
   ) {
 
+    console.log(user)
+    console.log(deposit)
+
   const confirmationStatus = [
     {
       value: true,
@@ -155,7 +165,7 @@ function DepositPage(
   const [abstract_el, setAbstract_el] = React.useState(deposit.abstract_el || "");
   const [abstract_en, setAbstract_en] = React.useState(deposit.abstract_en || "");
   const [confirmed, setConfirmed] = React.useState(deposit.confirmed || false);
-  const [confirmed_timestamp, setConfirmed_timestamp] = React.useState(deposit.confirmed_timestamp);
+  const [confirmed_timestamp, setConfirmed_timestamp] = React.useState(deposit.confirmed_timestamp || "");
   const [license, setLicense] = React.useState(deposit.license || "");
   const [comments, setComments] = React.useState(deposit.comments || "");
   const [supervisor, setSupervisor] = React.useState(deposit.supervisor || "");
@@ -438,7 +448,6 @@ function DepositPage(
 
   };
 
-
   return (
     <Layout>   
       <h1>Στοιχεία απόθεσης</h1>  
@@ -706,11 +715,12 @@ function DepositPage(
 
               <TextField
                 // disabled
-                inputProps={{readOnly: true, disableUnderline: true}}
+                inputProps={{readOnly: true}}
                 id="show-pdf"
                 label="Αρχείο PDF απόθεσης"
                 variant="outlined"
-                value={file?.name || storedFile}
+                // Solved: `value` prop on `input` should not be null in React
+                value={file?.name || storedFile || ""}
               />
 
 
