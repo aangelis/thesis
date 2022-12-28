@@ -637,7 +637,7 @@ function DepositPage(
             <div>
               <TextField
                 id="outlined-select-confirmation"
-                disabled={depositReadOnly && !canConfirm || deposit?.confirmed}
+                disabled={(depositReadOnly && !canConfirm) || deposit?.confirmed || !user.is_superuser}
                 select
                 label="Επικυρωμένη"
                 value={confirmed}
@@ -817,9 +817,9 @@ function DepositPage(
 
 
           </>
-                )}
+                )}        
 
-          { ( (!depositReadOnly || canConfirm) && (!deposit?.confirmed || !confirmedStored ) ) && (
+          { ( !depositReadOnly || (!deposit?.confirmed && canConfirm && !confirmedStored)  ) && (
             <>
 
           <Box sx={{ m: 2 }} />
