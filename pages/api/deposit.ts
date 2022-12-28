@@ -23,7 +23,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   
   // Process a POST request
   const data = await req.body; // deposit
-  const { id } = data;
+  const { id, confirmed, confirmed_timestamp, ...rest } = data;
 
   if (!data.title_el ||
       !data.title_en ||
@@ -45,35 +45,39 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
   
-  interface FilteredData {
-    [key: string]: any; 
-  }
+  // interface FilteredData {
+  //   [key: string]: any; 
+  // }
 
-  const filteredData: FilteredData = {};
+  // const filteredData: FilteredData = {};
 
   if (user.isLibrarian) {
     // filter data and keep only the required three key value pairs
-    const selectedKeys = ["id", "confirmed", "confirmed_timestamp"];
-    Object.entries(data)
-      .filter(([k,v]) => selectedKeys.includes(k))
-      .forEach(([k,v]) => filteredData[k]=v);
+    // const selectedKeys = ["id", "confirmed", "confirmed_timestamp"];
+    // Object.entries(data)
+    //   .filter(([k,v]) => selectedKeys.includes(k))
+    //   .forEach(([k,v]) => filteredData[k]=v);
     
     try {
       const deposit = await prisma.deposit.update({
         where: {
           id
         },
-        data: filteredData
+        // data: filteredData
+        data: {
+          confirmed,
+          confirmed_timestamp,
+        }
       })
       res.json(deposit);
       return;
     } catch (error) {
       res.status(500).json({ message: (error as Error).message });
+      return;
     }
   }
 
   if (!user?.isLibrarian && id) {
-
 
     try {
       const dbDepositData = await prisma.deposit.findUnique({
@@ -93,18 +97,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
 
+  // filter confirmation data before storing
   try {
     if (data.id) {
       const deposit = await prisma.deposit.update({
         where: {
           id,
         },
-        data
+        data: rest
       })
       res.json(deposit);
     } else {
       const deposit = await prisma.deposit.create({
-        data
+        data: rest
       })
       res.json(deposit);
     }
