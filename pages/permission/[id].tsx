@@ -136,7 +136,8 @@ function PermissionPage(
 
   const [email, setEmail] = React.useState(permission.submitter_email || "");
   const [emailError, setEmailError] = React.useState("");
-  const [dueTo, setDueTo] = React.useState<Dayjs | null>(permission?.due_to || null);
+  // const [dueTo, setDueTo] = React.useState<Dayjs | null>(permission?.due_to || null);
+  const [dueTo, setDueTo] = React.useState<Date>(new Date(permission?.due_to) || null);
   const [dateError, setDateError] = React.useState("");
   const [secretary, setSecretary] = React.useState(
     permission?.secretary?.first_name + " " + permission?.secretary?.last_name
@@ -169,11 +170,10 @@ function PermissionPage(
     const body = {
       id: permission.id,
       submitter_email: email,
-      due_to: dueTo.$d,
+      secretary_id: permission.secretary_id,
+      // due_to: dueTo?.$d,
+      due_to: dueTo,
     };
-    console.log(body)
-    console.log(dueTo?.$d)
-    console.log( dueTo?.$d instanceof Date)
     await fetch('/api/permission', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -275,12 +275,13 @@ function PermissionPage(
 
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="el">
             <DatePicker
-              disablePast
+              disablePast={!permissionReadOnly}
               disabled={permissionReadOnly}
               label="Καταληκτική ημερομηνία"
               value={dueTo}
               onChange={(newValue) => {
-                setDueTo(newValue);
+                const dj: Dayjs = newValue;
+                setDueTo(dj.endOf('day').toDate())
               }}
               renderInput={(params) =>
               <TextField
