@@ -23,7 +23,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   
   // Process a POST request
   const data = await req.body; // deposit
-  const { id, confirmed, confirmed_timestamp, ...rest } = data;
+  const { id, confirmed, confirmed_timestamp, comments, ...rest } = data;
 
   if (!data.title_el ||
       !data.title_en ||
@@ -67,6 +67,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         data: {
           confirmed,
           confirmed_timestamp,
+          comments,
         }
       })
       res.json(deposit);

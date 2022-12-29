@@ -677,7 +677,7 @@ function DepositPage(
           <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-multiline-static"
-              disabled={depositReadOnly}
+              disabled={(depositReadOnly && !canConfirm) || deposit?.confirmed || !user.is_superuser}
               label="Σχόλια"
               multiline
               rows={3}
