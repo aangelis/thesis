@@ -64,24 +64,24 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     res.setHeader("location", "/login");
     res.statusCode = 302;
     res.end();
-    return {
-      props: {
-        user: { id: null, email: null, username: null, isLoggedIn: false } as User,
-        permission: {}
-      },
-    };
+    // return {
+    //   props: {
+    //     user: { id: null, email: null, username: null, isLoggedIn: false } as User,
+    //     permission: {}
+    //   },
+    // };
   }
 
   if (!user?.isSecretary) {
     res.setHeader("location", "/profile");
     res.statusCode = 302;
     res.end();
-    return {
-      props: {
-        user,
-        permission: {}
-      },
-    };
+    // return {
+    //   props: {
+    //     user,
+    //     permission: {}
+    //   },
+    // };
   }
 
   if (isNaN(+permissionId)) {
@@ -110,18 +110,17 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 
 
   return {
-    user,
     props : { user, permission: JSON.parse(JSON.stringify(permission)) }
   }
 }, sessionOptions);
 
 
 function PermissionPage(
-  { user, permission }:
-  {
-    user: InferGetServerSidePropsType<typeof getServerSideProps>,
-    permission: any
-  }
+  { user, permission }: InferGetServerSidePropsType<typeof getServerSideProps>,
+  // {
+  //   user: InferGetServerSidePropsType<typeof getServerSideProps>,
+  //   permission: any
+  // }
   ) {
 
   const booleanStatus = [
