@@ -315,7 +315,7 @@ function DepositPage(
       maps: Number(numFields.find(o => o.name === "maps")?.value),
       drawings: Number(numFields.find(o => o.name === "drawings")?.value),
       confirmed,
-      confirmed_timestamp: confirmedTimestamp,
+      confirmed_timestamp: confirmedTimestamp || null,
       license,
       comments,
       supervisor,
