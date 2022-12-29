@@ -249,6 +249,8 @@ function PermissionPage(
       });
   }, [dueTo]);
 
+  const permissionReadOnly = permission.secretary_id !== user?.id || new Date(permission.due_to) < new Date()
+
   return (
     <Layout>   
       <h1>Στοιχεία δικαιώματος αυτοαπόθεσης</h1>
@@ -256,6 +258,7 @@ function PermissionPage(
           <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-multiline-static"
+              disabled={permissionReadOnly}
               error={emailError !== ""}
               label="Ηλεκτρονική διεύθυνση ταχυδρομείου"
               helperText={emailError}
@@ -273,6 +276,7 @@ function PermissionPage(
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="el">
             <DatePicker
               disablePast
+              disabled={permissionReadOnly}
               label="Καταληκτική ημερομηνία"
               value={dueTo}
               onChange={(newValue) => {
@@ -308,21 +312,27 @@ function PermissionPage(
           (<></>)
           }
 
-          <Box sx={{ m: 2 }} />
-          
-          <Box sx={{ '& > button': { m: 1 } }}>
-            <LoadingButton
-                color="secondary"
-                disabled={(emailError !== "") || (dateError !== "")}
-                onClick={handleClickSave}
-                loading={loading}
-                loadingPosition="start"
-                startIcon={<SaveIcon />}
-                variant="contained"
-              >
-                Αποθηκευση
-              </LoadingButton>
-          </Box>
+          { !permissionReadOnly && (
+
+            <>
+              <Box sx={{ m: 2 }} />
+              
+              <Box sx={{ '& > button': { m: 1 } }}>
+                <LoadingButton
+                    color="secondary"
+                    disabled={(emailError !== "") || (dateError !== "")}
+                    onClick={handleClickSave}
+                    loading={loading}
+                    loadingPosition="start"
+                    startIcon={<SaveIcon />}
+                    variant="contained"
+                  >
+                    Αποθηκευση
+                  </LoadingButton>
+              </Box>
+            </>
+
+          )}
 
           <Snackbar
             open={openError}
