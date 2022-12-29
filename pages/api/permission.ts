@@ -33,15 +33,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const data = await req.body; // permission
   const { id } = data;
 
-  if (data.id && user.id !== data.sectretary_id) {
+  if (data.id && user.id !== data.secretary_id) {
     res.status(400).json({ message: "Access refused." });
     return;
   }
 
   const validEmail = validateEmail(data.submitter_email);
-  console.log(data);
+
   // console.log(typeof data.is_secretary);
-  console.log((data.due_to instanceof Date))
+  // console.log((data.due_to instanceof Date))
   if (!data.submitter_email ||
       data.submitter_email === "" ||
       data.submitter_email.split('@')[1] !== 'hua.gr' ||
