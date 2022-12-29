@@ -249,7 +249,7 @@ function PermissionPage(
       });
   }, [dueTo]);
 
-  const permissionReadOnly = permission.secretary_id !== user?.id || new Date(permission.due_to) < new Date()
+  const permissionReadOnly = permission.id && permission.secretary_id !== user?.id || new Date(permission.due_to) < new Date()
 
   return (
     <Layout>   
@@ -280,7 +280,7 @@ function PermissionPage(
               label="Καταληκτική ημερομηνία"
               value={dueTo}
               onChange={(newValue) => {
-                const dj: Dayjs = newValue;
+                const dj: Dayjs = newValue!;
                 setDueTo(dj.endOf('day').toDate())
               }}
               renderInput={(params) =>
