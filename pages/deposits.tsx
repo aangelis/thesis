@@ -37,6 +37,7 @@ import { visuallyHidden } from '@mui/utils';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
+import { TrendingUpTwoTone } from "@mui/icons-material";
 
 // Fetch deposits of current user
 export const getServerSideProps = withIronSessionSsr(async function ({
@@ -94,23 +95,64 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     new_filename: string | null;
     original_filename: string | null;
     submitter?: {
+      id: number;
+      email: string;
       first_name: string | null;
       last_name: string | null;
     }
     submitter_fullname?: string | null;
   }
 
+  // in case of secretary find assigned users
+  const assignedUsers = user.isSecretary?
+    (await prisma.permission.findMany({
+      where: {
+        secretary_id: user!.id!
+      },
+      select: {
+        submitter_email: true,
+      }
+    }))
+    :
+    []
+
+  const emails: string[] = [];
+  assignedUsers.forEach(({submitter_email: v}) => emails.push(v))
+
   const deposits: Deposit[] = user.is_superuser?
-  (await prisma.deposit.findMany({
-    include: {
-      submitter: {
-        select: {
-          first_name: true,
-          last_name: true,
+  (user.isSecretary?
+    // in case of secretary show only deposits of assigned users
+    // find find submitter id, email, first and last name
+    (await prisma.deposit.findMany({
+      include: {
+        submitter: {
+          select: {
+            id: true,
+            email: true,
+            first_name: true,
+            last_name: true,
+          }
+        }
+      },
+      where: {
+        submitter: {
+          email: { in: emails },
         }
       }
-    }
-  }))
+    }))
+    :
+    // in case of superuser find submitter first and last name
+    (await prisma.deposit.findMany({
+      include: {
+        submitter: {
+          select: {
+            first_name: true,
+            last_name: true,
+          }
+        }
+      }
+    }))
+  )
   :
   (await prisma.deposit.findMany({
     where: {
@@ -123,20 +165,22 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     return x;
   })
 
-  const unconfirmedCount = (await prisma.deposit.aggregate({
-    where: {
-      submitter_id: user.id || undefined,
-      confirmed: false,
-    },
-    _count: {
-      confirmed: true,
-    },
-  }))._count.confirmed || 0
+  const unconfirmedCount = !user.is_superuser?
+    ((await prisma.deposit.aggregate({
+      where: {
+        submitter_id: user.id!,
+        confirmed: false,
+      },
+      _count: {
+        confirmed: true,
+      },
+    }))._count.confirmed || 0)
+    : 0
 
-  const addNewCount = user.email?
+  const addNewCount = !user.is_superuser?
     ((await prisma.permission.aggregate({
       where: {
-        submitter_email: user.email,
+        submitter_email: user.email!,
         due_to: {
           gte: new Date(),
           // gte: new Date('2022-12-26'),
@@ -149,9 +193,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     : 0
 
   return {
-    // props : { deposits }
     props : { deposits: JSON.parse(JSON.stringify(deposits)), unconfirmedCount, addNewCount }
-    // props : { user, deposits }
   }
 }, sessionOptions);
 
