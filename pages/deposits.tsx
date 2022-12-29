@@ -428,7 +428,7 @@ function EnhancedTable(rows: Data[], headCells: readonly HeadCell[]) {
         { rows.length > 0 ? 
         (
         <TablePagination
-          rowsPerPageOptions={[10, 25, { value: -1, label: 'Όλα' }]}
+          rowsPerPageOptions={[10, 25, 100]}
           component="div"
           count={rows.length}
           rowsPerPage={rowsPerPage}

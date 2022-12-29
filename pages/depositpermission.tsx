@@ -276,7 +276,7 @@ function EnhancedTable(rows: Data[], user: any) {
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(true);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -367,16 +367,17 @@ function EnhancedTable(rows: Data[], user: any) {
           </Table>
         </TableContainer>
         {/* Show pagging options if rows are greater than n */}
-        { rows.length > 5 ? 
+        { rows.length > 0 ? 
         (
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[10, 25, 100]}
           component="div"
           count={rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Στοιχεία ανά σελίδα"
         />
         )
         :
