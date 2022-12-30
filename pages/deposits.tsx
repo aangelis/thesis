@@ -29,11 +29,13 @@ import {
   GridToolbarDensitySelector,
   GridValueFormatterParams,
   GridRowParams,
+  GridToolbarQuickFilter,
   elGR,
 } from '@mui/x-data-grid';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 // import { elGR as pickersElGR } from '@mui/x-date-pickers';
 import { elGR as coreElGR } from '@mui/material/locale';
+import Grid from "@mui/material/Grid";
 
 // Fetch deposits of current user
 export const getServerSideProps = withIronSessionSsr(async function ({
@@ -78,8 +80,12 @@ export const getServerSideProps = withIronSessionSsr(async function ({
       email: string;
       first_name: string | null;
       last_name: string | null;
+      department: string | null;
+      title: string | null;
     }
     submitter_fullname?: string | null;
+    // submitter_department?: string | null;
+    // submitter_title?: string | null;
   }
 
   // in case of secretary find assigned users
@@ -110,6 +116,8 @@ export const getServerSideProps = withIronSessionSsr(async function ({
             email: true,
             first_name: true,
             last_name: true,
+            department: true,
+            title: true,
           }
         }
       },
@@ -125,8 +133,12 @@ export const getServerSideProps = withIronSessionSsr(async function ({
       include: {
         submitter: {
           select: {
+            id: true,
+            email: true,
             first_name: true,
             last_name: true,
+            department: true,
+            title: true,
           }
         }
       }
@@ -136,11 +148,25 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   (await prisma.deposit.findMany({
     where: {
       submitter_id: user.id || undefined,
+    },
+    include: {
+      submitter: {
+        select: {
+          id: true,
+          email: true,
+          first_name: true,
+          last_name: true,
+          department: true,
+          title: true,
+        }
+      }
     }
   }))
 
   deposits.map((x) => {
     x.submitter_fullname = x.submitter?.first_name + ' ' + x.submitter?.last_name;
+    // x.submitter_department = x.submitter?.department;
+    // x.submitter_title = x.submitter?.title;
     return x;
   })
 
@@ -170,7 +196,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
       }
     }))._count._all || 0)
     : 0
-
+    
   return {
     props : { user, deposits: JSON.parse(JSON.stringify(deposits)), unconfirmedCount, addNewCount }
   }
@@ -193,15 +219,22 @@ interface Data {
   confirmed: string;
   confirmed_timestamp: string;
   submitter_fullname: string;
+  // submitter_department: string;
+  // submitter_title: string;
 }
 
 function CustomToolbar() {
   return (
     <GridToolbarContainer>
-      <GridToolbarColumnsButton nonce={undefined} onResize={undefined} onResizeCapture={undefined} />
-      <GridToolbarFilterButton nonce={undefined} onResize={undefined} onResizeCapture={undefined}  />
-      <GridToolbarDensitySelector nonce={undefined} onResize={undefined} onResizeCapture={undefined} />
-      <GridToolbarExport printOptions={{ disableToolbarButton: true }} />
+      <Grid container item xs>
+        <GridToolbarColumnsButton nonce={undefined} onResize={undefined} onResizeCapture={undefined} />
+        <GridToolbarFilterButton nonce={undefined} onResize={undefined} onResizeCapture={undefined}  />
+        <GridToolbarDensitySelector nonce={undefined} onResize={undefined} onResizeCapture={undefined} />
+        <GridToolbarExport printOptions={{ disableToolbarButton: true }} />
+      </Grid>
+      <Grid>
+        <GridToolbarQuickFilter />
+      </Grid>
     </GridToolbarContainer>
   );
 }
@@ -209,7 +242,7 @@ function CustomToolbar() {
 export default ((
   { user, deposits, unconfirmedCount, addNewCount }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) => {
-
+  
   // https://v4.mui.com/ru/api/data-grid/grid-col-def/
   const columns: GridColumns = [
     {
@@ -243,6 +276,24 @@ export default ((
       width: 250,
       hide: !user?.is_superuser,
       editable: false,
+    },
+    {
+      field: 'department',
+      headerName: 'Τμήμα',
+      headerAlign: 'center',
+      width: 250,
+      hide: true,
+      editable: false,
+      valueGetter: (params) => params.row.submitter.department,
+    },
+    {
+      field: 'title',
+      headerName: 'Τίτλος χρήστη',
+      headerAlign: 'center',
+      width: 250,
+      hide: true,
+      editable: false,
+      valueGetter: (params) => params.row.submitter.title,
     },
     {
       field: 'confirmed',
