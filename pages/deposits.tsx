@@ -32,7 +32,7 @@ import {
   elGR,
 } from '@mui/x-data-grid';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { elGR as pickersElGR } from '@mui/x-date-pickers';
+// import { elGR as pickersElGR } from '@mui/x-date-pickers';
 import { elGR as coreElGR } from '@mui/material/locale';
 
 // Fetch deposits of current user
@@ -250,15 +250,15 @@ export default ((
       headerAlign: 'center',
       width: 120,
       type: 'boolean',
-      editable: true,
+      editable: false,
     },
     {
       field: 'confirmed_timestamp',
       headerName: 'Ημερομηνία Επικύρωσης',
       headerAlign: 'center',
-      width: 200,
+      width: 300,
       type: 'dateTime',
-      editable: true,
+      editable: false,
       valueFormatter: (params: GridValueFormatterParams) => (
         params.value? new Date(params.value) : ""
       ),
@@ -352,7 +352,7 @@ export default ((
       },
     },
     elGR, // x-data-grid translations
-    pickersElGR, // x-date-pickers translations
+    // pickersElGR, // x-date-pickers translations
     coreElGR, // core translations
   );
   
