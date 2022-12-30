@@ -10,34 +10,10 @@ import { PrismaClient } from "@prisma/client"
 import router from 'next/router'
 
 import * as React from 'react';
-import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-//import Tooltip from '@mui/material/Tooltip';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import { visuallyHidden } from '@mui/utils';
-
-import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
-import { TrendingUpTwoTone } from "@mui/icons-material";
 
 import {
   DataGrid,
@@ -51,6 +27,8 @@ import {
   GridToolbarFilterButton,
   GridToolbarExport,
   GridToolbarDensitySelector,
+  GridValueFormatterParams,
+  GridRowParams,
 } from '@mui/x-data-grid';
 import Link from "@mui/material/Link";
 
@@ -230,6 +208,7 @@ export default ((
   { user, deposits, unconfirmedCount, addNewCount }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) => {
 
+  // https://v4.mui.com/ru/api/data-grid/grid-col-def/
   const columns: GridColumns = [
     {
       field: 'title_el',
@@ -275,9 +254,12 @@ export default ((
       field: 'confirmed_timestamp',
       headerName: 'Ημερομηνία Επικύρωσης',
       headerAlign: 'center',
-      width: 180,
+      width: 200,
       type: 'dateTime',
       editable: true,
+      valueFormatter: (params: GridValueFormatterParams) => (
+        params.value? new Date(params.value) : ""
+      ),
     },
     {
       field: 'pages',
@@ -309,8 +291,9 @@ export default ((
     {
       field: 'diagrams',
       headerName: 'Διαγράμματα',
+      description: 'Διαγράμματα',
       headerAlign: 'center',
-      width: 70,
+      width: 80,
       type: 'number',
       hide: true,
       editable: false,
@@ -358,16 +341,28 @@ export default ((
   //   router.push('/deposit/'+params.row.id)
   // };
 
+  const [pageSize, setPageSize] = React.useState<number>(100)
+
   // Rendered more hooks than during the previous render with custom hook
   const tableToShow = (
-    <div style={{ height: 300, width: '100%' }}>
+    <div style={{ height: 500, width: '100%' }}>
     <DataGrid
       rows={deposits}
       columns={columns}
       experimentalFeatures={{ newEditingApi: true }}
       // onRowClick={handleEvent}
       components={{ Toolbar: CustomToolbar }}
+      pageSize={pageSize}
+      onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+      rowsPerPageOptions={[10, 25, 50, 100]}
+      pagination
       autoHeight={true}
+      isRowSelectable={(params: GridRowParams) => false}
+      componentsProps={{
+        pagination: {
+          labelRowsPerPage: "Στοιχεία ανά σελίδα"
+        }
+      }}
     />
     </div> 
   )
