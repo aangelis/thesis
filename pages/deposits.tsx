@@ -39,6 +39,22 @@ import Button from '@mui/material/Button';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import { TrendingUpTwoTone } from "@mui/icons-material";
 
+import {
+  DataGrid,
+  GridToolbar,
+  GridColumns,
+  GridRowsProp,
+  GridEventListener,
+  GridRenderCellParams,
+  GridToolbarContainer,
+  GridToolbarColumnsButton,
+  GridToolbarFilterButton,
+  GridToolbarExport,
+  GridToolbarDensitySelector,
+} from '@mui/x-data-grid';
+import Link from "@mui/material/Link";
+
+
 // Fetch deposits of current user
 export const getServerSideProps = withIronSessionSsr(async function ({
   req,
@@ -50,24 +66,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     res.setHeader("location", "/login");
     res.statusCode = 302;
     res.end();
-    // return {
-    //   props: {
-    //     // user: { id: null, email: null, username: null, isLoggedIn: false, }, //as User,
-    //     deposits: {}, unconfirmedCount: 0, addNewCount: 0
-    //   },
-    // };
   }
-
-  // if (user?.is_superuser) {
-  //   res.setHeader("location", "/deposits");
-  //   res.statusCode = 302;
-  //   res.end();
-  //   return {
-  //     props: {
-  //       deposits: {}
-  //     },
-  //   };
-  // }
   
   const prisma = new PrismaClient()
 
@@ -193,7 +192,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     : 0
 
   return {
-    props : { deposits: JSON.parse(JSON.stringify(deposits)), unconfirmedCount, addNewCount }
+    props : { user, deposits: JSON.parse(JSON.stringify(deposits)), unconfirmedCount, addNewCount }
   }
 }, sessionOptions);
 
@@ -216,337 +215,164 @@ interface Data {
   submitter_fullname: string;
 }
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-type Order = 'asc' | 'desc';
-
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key,
-): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string },
-) => number {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-// This method is created for cross-browser compatibility, if you don't
-// need to support IE11, you can use Array.prototype.sort() directly
-function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
-
-interface HeadCell {
-  disablePadding: boolean;
-  id: keyof Data;
-  label: string;
-  numeric: boolean;
-  hide?: boolean;
-}
-
-// const headCells: readonly HeadCell[] = [
-//   {
-//     id: 'title_el',
-//     numeric: false,
-//     disablePadding: false,
-//     label: 'Τίτλος',
-//   },
-//   {
-//     id: 'title_en',
-//     numeric: false,
-//     disablePadding: false,
-//     label: 'Τίτλος (Αγγλικά)',
-//   },
-//   {
-//     id: 'pages',
-//     numeric: true,
-//     disablePadding: false,
-//     label: 'Σελίδες',
-//     hide: !user?.is_superuser,
-//   },
-//   {
-//     id: 'confirmed',
-//     numeric: true,
-//     disablePadding: false,
-//     label: 'Επικυρωμένη',
-//   },
-// ];
-
-interface EnhancedTableProps {
-  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
-  order: Order;
-  orderBy: string;
-  rowCount: number;
-  headCells: readonly HeadCell[];
-}
-
-function EnhancedTableHead(props: EnhancedTableProps) {
-  const { order, orderBy, rowCount, onRequestSort, headCells } =
-    props;
-  const createSortHandler =
-    (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
-      onRequestSort(event, property);
-    };
-
+function CustomToolbar() {
   return (
-    <TableHead>
-      <TableRow>
-        {headCells.map((headCell) => !headCell.hide && (
-          
-          <TableCell
-            key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
-            sortDirection={orderBy === headCell.id ? order : false}
-          >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </TableSortLabel>
-          </TableCell>
-         
-        ))}
-      </TableRow>
-    </TableHead>
+    <GridToolbarContainer>
+      <GridToolbarColumnsButton nonce={undefined} onResize={undefined} onResizeCapture={undefined} />
+      <GridToolbarFilterButton nonce={undefined} onResize={undefined} onResizeCapture={undefined}  />
+      <GridToolbarDensitySelector nonce={undefined} onResize={undefined} onResizeCapture={undefined} />
+      <GridToolbarExport printOptions={{ disableToolbarButton: true }} />
+    </GridToolbarContainer>
   );
 }
 
-const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: '#f5f5f9',
-    color: 'rgba(0, 0, 0, 0.87)',
-    maxWidth: 220,
-    fontSize: theme.typography.pxToRem(12),
-    border: '1px solid #dadde9',
-  },
-}));
-
-function EnhancedTable(rows: Data[], headCells: readonly HeadCell[]) {
-  const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('confirmed');
-  const [selected, setSelected] = React.useState<readonly string[]>([]);
-  const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(true);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof Data,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const isSelected = (name: string) => selected.indexOf(name) !== -1;
-
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-  return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
-        <TableContainer>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
-            <EnhancedTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length}
-              headCells={headCells}
-            />
-            <TableBody>
-              {/* if you don't need to support IE11, you can replace the `stableSort` call with:
-              rows.sort(getComparator(order, orderBy)).slice() */}
-              {stableSort(rows, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
-                  const isItemSelected = isSelected(row.id as unknown as string);
-                  const labelId = `enhanced-table-checkbox-${index}`;
-
-                  return (
-                    <TableRow
-                      hover
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.id}
-                      selected={isItemSelected}
-                    >
-                      <TableCell
-                        onClick={() => router.push('/deposit/'+row.id)}
-                        component="th"
-                        id={labelId}
-                        scope="row"
-                        sx={{cursor: 'pointer', fontWeight: row.confirmed? 'plain' : 'bold'}}
-                      ><HtmlTooltip
-                      title={
-                        <React.Fragment>
-                          {/* https://mui.com/material-ui/react-tooltip/ */}
-                          {typeof row.supervisor === 'string' && row.supervisor !== "" ? "Επιβλέπων: " : ""}
-                          <Typography color="inherit">
-                            {typeof row.supervisor === 'string' && row.supervisor !== "" ? row.supervisor : ""}
-                          </Typography>
-                          <u>{row.confirmed_timestamp !== null ? "Confirmation date: "
-                          + new Date(row.confirmed_timestamp).toLocaleDateString('el') + ", " : ""}</u>
-                          Σελίδες: {row.pages}, Εικόνες: {row.images}, Πίνακες: {row.tables},
-                          Διαγράμματα: {row.diagrams}, Χάρτες: {row.maps},
-                          Σχέδια: {row.drawings}
-                          
-                        </React.Fragment>
-                      }
-                    ><div>{row.title_el}</div></HtmlTooltip></TableCell>
-                      <TableCell
-                        onClick={() => router.push('/deposit/'+row.id)}
-                        align="left"
-                        sx={{cursor: 'pointer', fontWeight: row.confirmed? 'plain' : 'bold'}}>{row.title_en}</TableCell>
-                      { !headCells[2].hide && (
-                      <TableCell
-                        align="left"
-                        sx={{fontWeight: row.confirmed? 'plain' : 'bold'}}>{row.submitter_fullname}</TableCell>
-                        )}
-                      <TableCell
-                        align="right"
-                        sx={{fontWeight: row.confirmed? 'plain' : 'bold'}}>{row.confirmed ?
-                          new Date(row.confirmed_timestamp).toLocaleDateString('el') : "Όχι" }</TableCell>
-                    </TableRow>
-                  );
-                })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        {/* Show pagging options if rows are greater than n */}
-        { rows.length > 0 ? 
-        (
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Στοιχεία ανά σελίδα"
-        />
-        )
-        :
-        (<></>)
-        }
-        
-      </Paper>
-    </Box>
-  );
-}
-
-
-// Display list of deposits or error message
-// function DepositsPage(
-//   { user, deposits }:
-//   {
-//     user: InferGetServerSidePropsType<typeof getServerSideProps>,
-//     deposits: any[]
-//   }
-//   ) {
 export default ((
-  {deposits, unconfirmedCount, addNewCount }: InferGetServerSidePropsType<typeof getServerSideProps>,
-    // {deposits: any[], unconfirmedCount: number, addNewCount: number },
+  { user, deposits, unconfirmedCount, addNewCount }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) => {
-    
-  const { user } = useUser({
-    // redirectTo: "/login",
-  });
-  
-  const headCells: readonly HeadCell[] = [
+
+  const columns: GridColumns = [
     {
-      id: 'title_el',
-      numeric: false,
-      disablePadding: false,
-      label: 'Τίτλος',
+      field: 'title_el',
+      headerName: 'Τίτλος',
+      headerAlign: 'center',
+      width: 250,
+      renderCell: (params: GridRenderCellParams) => (
+        <Tooltip title={params.value}>
+          <span><Link sx={{cursor: 'pointer'}} color="inherit" onClick={() => router.push('/deposit/'+params.row.id)}>{params.value}</Link></span>
+        </Tooltip>
+      ),
+
     },
     {
-      id: 'title_en',
-      numeric: false,
-      disablePadding: false,
-      label: 'Τίτλος (Αγγλικά)',
+      field: 'title_en',
+      headerName: 'Τίτλος (Αγγλικά)',
+      headerAlign: 'center',
+      width: 250,
+      editable: false,
+      renderCell: (params: GridRenderCellParams) => (
+        <Tooltip title={params.value}>
+          <span>{params.value}</span>
+        </Tooltip>
+      ),
     },
     {
-      id: 'submitter_fullname',
-      numeric: false,
-      disablePadding: false,
-      label: 'Χρήστης',
+      field: 'submitter_fullname',
+      headerName: 'Χρήστης',
+      headerAlign: 'center',
+      width: 250,
       hide: !user?.is_superuser,
+      editable: false,
     },
     {
-      id: 'confirmed',
-      numeric: true,
-      disablePadding: false,
-      label: 'Επικυρωμένη',
+      field: 'confirmed',
+      headerName: 'Επικυρωμένη',
+      headerAlign: 'center',
+      width: 120,
+      type: 'boolean',
+      editable: true,
     },
+    {
+      field: 'confirmed_timestamp',
+      headerName: 'Ημερομηνία Επικύρωσης',
+      headerAlign: 'center',
+      width: 180,
+      type: 'dateTime',
+      editable: true,
+    },
+    {
+      field: 'pages',
+      headerName: 'Σελίδες',
+      headerAlign: 'center',
+      width: 70,
+      type: 'number',
+      hide: true,
+      editable: false,
+    },
+    {
+      field: 'images',
+      headerName: 'Εικόνες',
+      headerAlign: 'center',
+      width: 70,
+      type: 'number',
+      hide: true,
+      editable: false,
+    },
+    {
+      field: 'tables',
+      headerName: 'Πίνακες',
+      headerAlign: 'center',
+      width: 70,
+      type: 'number',
+      hide: true,
+      editable: false,
+    },
+    {
+      field: 'diagrams',
+      headerName: 'Διαγράμματα',
+      headerAlign: 'center',
+      width: 70,
+      type: 'number',
+      hide: true,
+      editable: false,
+    },
+    {
+      field: 'maps',
+      headerName: 'Χάρτες',
+      headerAlign: 'center',
+      width: 70,
+      type: 'number',
+      hide: true,
+      editable: false,
+    },
+    {
+      field: 'drawings',
+      headerName: 'Σχέδια',
+      headerAlign: 'center',
+      width: 70,
+      type: 'number',
+      hide: true,
+      editable: false,
+    },
+    {
+      field: 'supervisor',
+      headerName: 'Επιβλέπων',
+      headerAlign: 'center',
+      width: 250,
+      hide: true,
+      editable: false,
+      renderCell: (params: GridRenderCellParams) => (
+        <Tooltip title={params.value}>
+          <span>{params.value}</span>
+        </Tooltip>
+      ),
+    },
+    
+    
   ];
 
+  // const handleEvent: GridEventListener<'rowClick'> = (
+  //   params, // GridRowParams
+  //   event, // MuiEvent<React.MouseEvent<HTMLElement>>
+  //   details, // GridCallbackDetails
+  // ) => {
+  //   router.push('/deposit/'+params.row.id)
+  // };
+
   // Rendered more hooks than during the previous render with custom hook
-  const tableToShow = EnhancedTable(deposits, headCells);
+  const tableToShow = (
+    <div style={{ height: 300, width: '100%' }}>
+    <DataGrid
+      rows={deposits}
+      columns={columns}
+      experimentalFeatures={{ newEditingApi: true }}
+      // onRowClick={handleEvent}
+      components={{ Toolbar: CustomToolbar }}
+      autoHeight={true}
+    />
+    </div> 
+  )
 
   const canAddNewDeposit = !user?.is_superuser && unconfirmedCount < addNewCount;
-
-  // use deposits page for all user types
-  // if (!user || user.is_superuser)
-  //   return(<></>);
-
-  const getHeadings = () => {
-    return Object.keys(deposits[0]);
-  }
   
   const hasDeposits = deposits && Object.keys(deposits).length > 0
 
