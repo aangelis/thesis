@@ -14,7 +14,7 @@ import Box from '@mui/material/Box';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Button from '@mui/material/Button';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
-
+import Link from "@mui/material/Link";
 import {
   DataGrid,
   GridToolbar,
@@ -29,9 +29,11 @@ import {
   GridToolbarDensitySelector,
   GridValueFormatterParams,
   GridRowParams,
+  elGR,
 } from '@mui/x-data-grid';
-import Link from "@mui/material/Link";
-
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { elGR as pickersElGR } from '@mui/x-date-pickers';
+import { elGR as coreElGR } from '@mui/material/locale';
 
 // Fetch deposits of current user
 export const getServerSideProps = withIronSessionSsr(async function ({
@@ -343,27 +345,39 @@ export default ((
 
   const [pageSize, setPageSize] = React.useState<number>(100)
 
+  const theme = createTheme(
+    {
+      palette: {
+        primary: { main: '#1976d2' },
+      },
+    },
+    elGR, // x-data-grid translations
+    pickersElGR, // x-date-pickers translations
+    coreElGR, // core translations
+  );
+  
   // Rendered more hooks than during the previous render with custom hook
   const tableToShow = (
     <div style={{ height: 500, width: '100%' }}>
-    <DataGrid
-      rows={deposits}
-      columns={columns}
-      experimentalFeatures={{ newEditingApi: true }}
-      // onRowClick={handleEvent}
-      components={{ Toolbar: CustomToolbar }}
-      pageSize={pageSize}
-      onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-      rowsPerPageOptions={[10, 25, 50, 100]}
-      pagination
-      autoHeight={true}
-      isRowSelectable={(params: GridRowParams) => false}
-      componentsProps={{
-        pagination: {
-          labelRowsPerPage: "Στοιχεία ανά σελίδα"
-        }
-      }}
-    />
+    <ThemeProvider theme={theme}>
+      <DataGrid
+        rows={deposits}
+        columns={columns}
+        experimentalFeatures={{ newEditingApi: true }}
+        // onRowClick={handleEvent}
+        components={{ Toolbar: CustomToolbar }}
+        pageSize={pageSize}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        rowsPerPageOptions={[10, 25, 50, 100]}
+        pagination
+        autoHeight={true}
+        isRowSelectable={(params: GridRowParams) => false}
+        // componentsProps={{
+        //   pagination: {
+        //     labelRowsPerPage: "Στοιχεία ανά σελίδα"
+        //   }
+        // }}
+      /></ThemeProvider>
     </div> 
   )
 
