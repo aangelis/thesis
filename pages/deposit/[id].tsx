@@ -68,7 +68,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   // // http://localhost:3000/deposit/9
 
   // https://www.learnbestcoding.com/post/25/nextjs-how-to-use-getserversideprops
-  const depositId = Number(params?.id);
+  const depositId: number = Number(params?.id);
 
   if (user === undefined) {
     res.setHeader("location", "/login");
@@ -82,16 +82,48 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     // };
   }
 
+  const prisma = new PrismaClient()
+
   if (isNaN(+depositId)) {
+
+    const unconfirmedCount = !user.is_superuser?
+      ((await prisma.deposit.aggregate({
+        where: {
+          submitter_id: user.id!,
+          confirmed: false,
+        },
+        _count: {
+          confirmed: true,
+        },
+      }))._count.confirmed || 0)
+      : 0
+
+    const addNewCount = !user.is_superuser?
+      ((await prisma.permission.aggregate({
+        where: {
+          submitter_email: user.email!,
+          due_to: {
+            gte: new Date(),
+            // gte: new Date('2022-12-26'),
+          },
+        },
+        _count: {
+          _all: true
+        }
+      }))._count._all || 0)
+      : 0
+
+    const canAddNewDeposit = !user?.is_superuser && unconfirmedCount < addNewCount;
+
     return {
       props: {
         user,
         deposit: null,
+        canAddNewDeposit,
       },
     };
   }
 
-  const prisma = new PrismaClient()
   const deposit = user.is_superuser? 
     (await prisma.deposit.findFirst({
       where: {
@@ -106,54 +138,19 @@ export const getServerSideProps = withIronSessionSsr(async function ({
       }
     }))
 
-  // // Compute and return ecnrypted download file data info
-  // if (deposit.new_filename !== (undefined || null)) {
-  //   // const iv = randomBytes(16);
-  //   // console.log(iv.toString('hex'));
-  //   const iv = Buffer.from(process.env.ENCRYPTION_RANDOM_BYTES as string || "bafc0c62416f50d567dd198359e79937", 'hex');
-  //   const password: string = process.env.ENCRYPTION_PRIVATE_KEY as string || "mP3LHZRRjRmP3LHZRRjR"
-  //   const key = (await promisify(scrypt)(password, 'salt', 32)) as Buffer;
-  //   const cipher = createCipheriv('aes-256-ctr', key, iv);
-
-  //   const downloadPath = {
-  //     id: deposit.id,
-  //     original_filename: deposit.original_filename,
-  //     new_filename: deposit.new_filename,
-  //   }
-  //   const textToEncrypt = JSON.stringify(downloadPath);
-  //   const encryptedBuffer = Buffer.concat([
-  //     cipher.update(textToEncrypt),
-  //     cipher.final(),
-  //   ]);
-  //   const encryptedText = encryptedBuffer.toString('hex')
-
-  //   return {
-  //     props : { user, deposit: { ...deposit, download_data: encryptedText.toString() } }
-  //   }
-
-  // }
-
   return {
-    props : { user, deposit: JSON.parse(JSON.stringify(deposit)) }
+    props : { user, deposit: JSON.parse(JSON.stringify(deposit)), canAddNewDeposit: false }
   }
 }, sessionOptions);
 
-// function DepositPage(
-//   { user, deposit }:
-//   {
-//     user: InferGetServerSidePropsType<typeof getServerSideProps>,
-//     deposit: any
-//   }
-//   ) {
+
 function DepositPage(
-  { user, deposit }: InferGetServerSidePropsType<typeof getServerSideProps>,
+  { user, deposit, canAddNewDeposit }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) {
 
-  const depositReadOnly = (user.id !== deposit?.submitter_id || deposit.confirmed)?
-    true : false;
+  const depositReadOnly = !canAddNewDeposit && (user.id !== deposit?.submitter_id || deposit.confirmed)
 
-  const canConfirm = (user.isLibrarian)?
-    true : false;
+  const canConfirm = user.isLibrarian
 
   const confirmationStatus = [
     {
@@ -165,6 +162,7 @@ function DepositPage(
       label: 'Όχι',
     },
   ]
+  const [id, setId] = React.useState<number | null>(deposit?.id! || null)
   // const [title_el, setTitle_el] = React.useState(deposit.title_el || "");
   // const [title_en, setTitle_en] = React.useState(deposit.title_en || "");
   const [abstract_el, setAbstract_el] = React.useState(deposit?.abstract_el || "");
@@ -303,7 +301,9 @@ function DepositPage(
   async function handleClickSave() {
     setLoading(true);
     const body = {
-      id: deposit?.id,
+      //id: deposit?.id,
+      id: id,
+      title: textFields.find(o => o.name === "title_el")?.value,
       title_el: textFields.find(o => o.name === "title_el")?.value,
       title_en: textFields.find(o => o.name === "title_en")?.value,
       abstract_el,
@@ -333,6 +333,7 @@ function DepositPage(
     .then((data) => {
       setOpenSuccess(true);
       setConfirmedStored(data.confirmed);
+      setId(data.id);
       setViewData(JSON.stringify(data, null, 2));
     })
     .catch(err => {
