@@ -321,8 +321,8 @@ function DepositPage(
       comments,
       supervisor,
     };
-    await fetch('/api/deposit', {
-      method: 'POST',
+    await fetch('/api/deposit' + (id? ('/' + id) : ""), {
+      method: id? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     }) 
@@ -345,10 +345,10 @@ function DepositPage(
 
   async function handleClickDelete() {
     setLoading(true);
-    await fetch('/api/deposit', {
+    await fetch('/api/deposit/' + id, {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({id}),
+      // headers: { 'Content-Type': 'application/json' },
+      // body: JSON.stringify({id}),
     }) 
     .then(response => {
       setLoading(false);
@@ -357,9 +357,7 @@ function DepositPage(
     })
     .then((data) => {
       setOpenSuccess(true);
-      setConfirmedStored(data.confirmed);
       router.push('/deposits');
-      // setViewData(JSON.stringify(data, null, 2));
     })
     .catch(err => {
       setOpenError(true);
