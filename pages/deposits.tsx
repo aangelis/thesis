@@ -317,6 +317,18 @@ export default ((
       ),
     },
     {
+      field: 'date_created',
+      headerName: 'Ημερομηνία Δημιουργίας',
+      headerAlign: 'center',
+      width: 300,
+      hide: true,
+      type: 'dateTime',
+      editable: false,
+      valueFormatter: (params: GridValueFormatterParams) => (
+        params.value? new Date(params.value) : ""
+      ),
+    },
+    {
       field: 'pages',
       headerName: 'Σελίδες',
       headerAlign: 'center',

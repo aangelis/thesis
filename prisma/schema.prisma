@@ -62,6 +62,7 @@ model Deposit {
   supervisor String?
   new_filename String?
   original_filename String?
+  date_created DateTime @default(now())
 }
 
 model Role {
