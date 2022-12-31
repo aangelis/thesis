@@ -73,7 +73,7 @@ export default function Header() {
           {user?.isLoggedIn === true && user?.isSecretary === true && (
             <>
               <li>
-                <Link href="/depositpermission">
+                <Link href="/depositpermissions">
                   <a>
                     <span
                       style={{
