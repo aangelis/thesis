@@ -25,6 +25,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const data = await req.body; // deposit
   const { id, confirmed, confirmed_timestamp, comments, ...rest } = data;
 
+  if (!id && user.is_superuser) {
+    res.status(400).json({ message: "Adding new deposit is not allowed." });
+    return;
+  }
+
   if (!data.title_el ||
       !data.title_en ||
       data.title_el === "" ||
@@ -50,6 +55,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   // }
 
   // const filteredData: FilteredData = {};
+
+  const dbStoredDepositData = id? 
+    (await prisma.deposit.findUnique({
+      where: {
+        id
+      }
+    }))
+    :
+    {
+      confirmed: false,
+      submitter_id: null,
+    }
+
+  if (user.isLibrarian && dbStoredDepositData?.confirmed) {
+    res.status(400).json({ message: "Deposit confirmation data cannot be updated." });
+    return;
+  }
 
   if (user.isLibrarian) {
     // filter data and keep only the required three key value pairs
@@ -78,25 +100,47 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  if (!user?.isLibrarian && id) {
-
-    try {
-      const dbDepositData = await prisma.deposit.findUnique({
-        where: {
-          id
-        }
-      })
-      // Check if deposit belongs to user before update
-      if (!user.isLibrarian && dbDepositData?.submitter_id !== user.id) {
-        res.status(400).json({ message: "User cannot modify this deposit." });
-        return;
-      }
-    } catch (error) {
-      res.status(500).json({ message: (error as Error).message });
-      return;
-    }
+  // Check if deposit belongs to user before update
+  if (!user?.is_superuser && id && dbStoredDepositData?.submitter_id !== user.id) {
+    res.status(400).json({ message: "User cannot modify this deposit." });
+    return;
   }
 
+  // Check is user can add a new deposit
+  if (!id) {
+
+    const unconfirmedCount = 
+      (await prisma.deposit.aggregate({
+        where: {
+          submitter_id: user.id!,
+          confirmed: false,
+        },
+        _count: {
+          confirmed: true,
+        },
+      }))._count.confirmed || 0
+
+
+    const addNewCount = 
+      (await prisma.permission.aggregate({
+        where: {
+          submitter_email: user.email!,
+          due_to: {
+            gte: new Date(),
+            // gte: new Date('2022-12-26'),
+          },
+        },
+        _count: {
+          _all: true
+        }
+      }))._count._all || 0
+
+    if (unconfirmedCount >= addNewCount) {
+      res.status(400).json({ message: "Adding new deposit is not allowed." });
+      return;
+    }
+
+  }
 
   // filter confirmation data before storing
   try {
@@ -110,7 +154,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       res.json(deposit);
     } else {
       const deposit = await prisma.deposit.create({
-        data: rest
+        data: {
+          ...rest, submitter_id: user.id,
+        },
       })
       res.json(deposit);
     }
