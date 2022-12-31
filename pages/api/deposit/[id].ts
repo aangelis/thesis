@@ -36,9 +36,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }))
     || 
     {
+      id: null,
       confirmed: false,
       submitter_id: null,
     }
+
+  if (!dbStoredDepositData.id) {
+    res.status(400).json({ message: "Deposit data not found." });
+    return;
+  }
 
   if (req.method === 'DELETE') {
 
@@ -67,7 +73,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Process a PATCH request data
     const data = await req.body; // deposit
 
-    const { id, confirmed, confirmed_timestamp, comments, ...rest } = data;
+    const { confirmed, confirmed_timestamp, comments, ...rest } = data;
+
+    if (id !== data.id) {
+      res.status(400).json({ message: "Invalid input data." });
+      return;
+    }
 
     if (
       !data.title_el ||
