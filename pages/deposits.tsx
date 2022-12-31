@@ -280,13 +280,13 @@ export default ((
       editable: false,
     },
     {
-      field: 'department',
+      field: 'submitter_department',
       headerName: 'Τμήμα',
       headerAlign: 'center',
       width: 250,
       hide: true,
       editable: false,
-      valueGetter: (params) => params.row.submitter.department,
+      // valueGetter: (params) => params.row.submitter.department,
     },
     {
       field: 'submitter_title',
@@ -295,7 +295,7 @@ export default ((
       width: 250,
       hide: true,
       editable: false,
-      valueGetter: (params) => params.row.submitter.title,
+      // valueGetter: (params) => params.row.submitter.title,
     },
     {
       field: 'confirmed',

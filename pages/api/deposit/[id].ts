@@ -73,7 +73,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Process a PATCH request data
     const data = await req.body; // deposit
 
-    const { confirmed, confirmed_timestamp, comments, ...rest } = data;
+    const {
+      confirmed,
+      confirmed_timestamp,
+      comments,
+      submitter_department,
+      submitter_title,
+      ...rest
+    } = data;
 
     if (id !== data.id) {
       res.status(400).json({ message: "Invalid input data." });

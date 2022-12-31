@@ -29,17 +29,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Process a POST request data
   const data = await req.body; // deposit
 
-  const { id, confirmed, confirmed_timestamp, comments, ...rest } = data;
+  const {
+    id,
+    confirmed,
+    confirmed_timestamp,
+    comments,
+    submitter_id,
+    submitter_department,
+    submitter_title,
+    ...rest
+  } = data;
 
   if (id) {
     res.status(400).json({ message: "Adding new deposit failed. Provided id input." });
     return;
   }
 
-  if (data.submitter_id !== user.id) {
-    res.status(400).json({ message: "Deposit must be owned by submitter." });
-    return;
-  }
+  // if (data.submitter_id !== user.id) {
+  //   res.status(400).json({ message: "Deposit must be owned by submitter." });
+  //   return;
+  // }
 
   if (
     !data.title_el ||
@@ -109,7 +118,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const deposit = await prisma.deposit.create({
       data: {
-        ...rest, submitter_id: user.id,
+        ...rest,
+        submitter_department: user.department,
+        submitter_title: user.title,
+        submitter_id: user.id,
       },
     })
     res.json(deposit);

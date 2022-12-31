@@ -57,6 +57,8 @@ model Deposit {
   comments String?
   submitter User @relation(fields: [submitter_id], references: [id])
   submitter_id Int
+  submitter_department String?
+  submitter_title String?
   supervisor String?
   new_filename String?
   original_filename String?
