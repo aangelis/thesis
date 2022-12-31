@@ -19,6 +19,7 @@ import React from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import { color } from '@mui/system';
 import SaveIcon from '@mui/icons-material/Save';
+import DeleteIcon from '@mui/icons-material/Delete';
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import Alert from '@mui/material/Alert';
@@ -171,8 +172,8 @@ function PermissionPage(
       // due_to: dueTo?.$d,
       due_to: dueTo,
     };
-    await fetch('/api/permission', {
-      method: 'POST',
+    await fetch('/api/permission' + (id? ('/' + id) : ""), {
+      method: id? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     }) 
@@ -185,6 +186,26 @@ function PermissionPage(
       setOpenSuccess(true);
       setId(data.id);
       setViewData(JSON.stringify(data, null, 2));
+    })
+    .catch(err => {
+      setOpenError(true);
+      console.error(err);
+    });
+  }
+
+  async function handleClickDelete() {
+    setLoading(true);
+    await fetch('/api/permission/' + id, {
+      method: 'DELETE',
+    }) 
+    .then(response => {
+      setLoading(false);
+      if(!response.ok) throw new Error(response.status as unknown as string);
+      return response.json();
+    })
+    .then((data) => {
+      setOpenSuccess(true);
+      router.push('/depositpermissions');
     })
     .catch(err => {
       setOpenError(true);
@@ -248,6 +269,10 @@ function PermissionPage(
   }, [dueTo]);
 
   const permissionReadOnly = permission.id && permission.secretary_id !== user?.id || new Date(permission.due_to) < new Date()
+
+  const deleteButton = {
+    backgroundColor: '#e62e00', '&:hover': { backgroundColor: '#cc0066' }
+  };
 
   return (
     <Layout>   
@@ -327,6 +352,18 @@ function PermissionPage(
                     variant="contained"
                   >
                     Αποθηκευση
+                  </LoadingButton>
+                  <LoadingButton
+                    color="secondary"
+                    disabled={!id}
+                    onClick={handleClickDelete}
+                    loading={loading}
+                    loadingPosition="start"
+                    startIcon={<DeleteIcon />}
+                    variant="contained"
+                    sx={deleteButton}
+                    >
+                    Διαγραφή
                   </LoadingButton>
               </Box>
             </>
