@@ -196,9 +196,11 @@ export const getServerSideProps = withIronSessionSsr(async function ({
       }
     }))._count._all || 0)
     : 0
-    
+
+    const canAddNewDeposit = !user?.is_superuser && unconfirmedCount < addNewCount;
+
   return {
-    props : { user, deposits: JSON.parse(JSON.stringify(deposits)), unconfirmedCount, addNewCount }
+    props : { user, deposits: JSON.parse(JSON.stringify(deposits)), canAddNewDeposit }
   }
 }, sessionOptions);
 
@@ -240,7 +242,7 @@ function CustomToolbar() {
 }
 
 export default ((
-  { user, deposits, unconfirmedCount, addNewCount }: InferGetServerSidePropsType<typeof getServerSideProps>,
+  { user, deposits, canAddNewDeposit }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) => {
   
   // https://v4.mui.com/ru/api/data-grid/grid-col-def/
@@ -287,7 +289,7 @@ export default ((
       valueGetter: (params) => params.row.submitter.department,
     },
     {
-      field: 'title',
+      field: 'submitter_title',
       headerName: 'Τίτλος χρήστη',
       headerAlign: 'center',
       width: 250,
@@ -431,8 +433,6 @@ export default ((
       /></ThemeProvider>
     </div> 
   )
-
-  const canAddNewDeposit = !user?.is_superuser && unconfirmedCount < addNewCount;
   
   const hasDeposits = deposits && Object.keys(deposits).length > 0
 
