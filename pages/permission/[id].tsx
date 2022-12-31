@@ -117,10 +117,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 
 function PermissionPage(
   { user, permission }: InferGetServerSidePropsType<typeof getServerSideProps>,
-  // {
-  //   user: InferGetServerSidePropsType<typeof getServerSideProps>,
-  //   permission: any
-  // }
   ) {
 
   const booleanStatus = [
@@ -134,6 +130,7 @@ function PermissionPage(
     },
   ]
 
+  const [id, setId] = React.useState<number | null>(permission?.id! || null)
   const [email, setEmail] = React.useState(permission.submitter_email || "");
   const [emailError, setEmailError] = React.useState("");
   // const [dueTo, setDueTo] = React.useState<Dayjs | null>(permission?.due_to || null);
@@ -168,7 +165,7 @@ function PermissionPage(
   async function handleClickSave() {
     setLoading(true);
     const body = {
-      id: permission.id,
+      id,
       submitter_email: email,
       secretary_id: permission.secretary_id,
       // due_to: dueTo?.$d,
@@ -186,6 +183,7 @@ function PermissionPage(
     })
     .then((data) => {
       setOpenSuccess(true);
+      setId(data.id);
       setViewData(JSON.stringify(data, null, 2));
     })
     .catch(err => {
