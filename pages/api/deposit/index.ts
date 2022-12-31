@@ -20,7 +20,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(400).json({ message: "Access refused. User not logged in." });
     return;
   }
-  
+
+  if (user.is_superuser) {
+    res.status(400).json({ message: "Adding new deposit is not allowed." });
+    return;
+  }
+
   // Process a POST request data
   const data = await req.body; // deposit
 
@@ -31,8 +36,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  if (user.is_superuser) {
-    res.status(400).json({ message: "Adding new deposit is not allowed." });
+  if (data.submitter_id !== user.id) {
+    res.status(400).json({ message: "Deposit must be owned by submitter." });
     return;
   }
 
