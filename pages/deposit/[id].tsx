@@ -19,6 +19,7 @@ import React from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import { color } from '@mui/system';
 import SaveIcon from '@mui/icons-material/Save';
+import DeleteIcon from '@mui/icons-material/Delete';
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import Alert from '@mui/material/Alert';
@@ -342,6 +343,30 @@ function DepositPage(
     });
   }
 
+  async function handleClickDelete() {
+    setLoading(true);
+    await fetch('/api/deposit', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({id}),
+    }) 
+    .then(response => {
+      setLoading(false);
+      if(!response.ok) throw new Error(response.status as unknown as string);
+      return response.json();
+    })
+    .then((data) => {
+      setOpenSuccess(true);
+      setConfirmedStored(data.confirmed);
+      router.push('/deposits');
+      // setViewData(JSON.stringify(data, null, 2));
+    })
+    .catch(err => {
+      setOpenError(true);
+      console.error(err);
+    });
+  }
+
   React.useEffect(() => {
     handleTextFields(
       {target:
@@ -458,6 +483,10 @@ function DepositPage(
     e.preventDefault()
     router.push('/api/download_file/' + deposit?.id);
 
+  };
+  
+  const deleteButton = {
+    backgroundColor: '#e62e00', '&:hover': { backgroundColor: '#cc0066' }
   };
 
   return (
@@ -836,6 +865,18 @@ function DepositPage(
                 variant="contained"
                 >
                 Αποθηκευση
+              </LoadingButton>
+              <LoadingButton
+                color="secondary"
+                disabled={!id}
+                onClick={handleClickDelete}
+                loading={loading}
+                loadingPosition="start"
+                startIcon={<DeleteIcon />}
+                variant="contained"
+                sx={deleteButton}
+                >
+                Διαγραφή
               </LoadingButton>
           </Box>
 
