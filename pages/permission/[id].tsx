@@ -57,7 +57,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   req,
   res,
 }) {
-  const user: any = req.session.user;
+  const user: User = req.session.user!;
 
   const permissionId = Number(params?.id);
 
