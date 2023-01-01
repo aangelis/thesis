@@ -79,7 +79,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const data = await req.body; // permission
 
     const permissionSchema = yup.object().shape({
-      id: yup.number().required().positive(),
+      id: yup.number().integer().required().positive(),
       submitter_email: yup.string().email().required(),
       // due_to: yup.date().min(new Date()).required(),
       // https://github.com/jquense/yup/issues/1218
