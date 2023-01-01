@@ -19,6 +19,7 @@ import React from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import { color } from '@mui/system';
 import SaveIcon from '@mui/icons-material/Save';
+import DeleteIcon from '@mui/icons-material/Delete';
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import Alert from '@mui/material/Alert';
@@ -51,7 +52,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   req,
   res,
 }) {
-  const user: any = req.session.user;
+  const user: User = req.session.user!;
 
   const roleId = Number(params?.id);
 
@@ -103,11 +104,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 
 
 function RolePage(
-  { user, role }:
-  {
-    user: InferGetServerSidePropsType<typeof getServerSideProps>,
-    role: any
-  }
+  { user, role }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) {
 
   const booleanStatus = [
@@ -121,6 +118,7 @@ function RolePage(
     },
   ]
 
+  const [id, setId] = React.useState<number | null>(role?.id! || null)
   const [email, setEmail] = React.useState(role.email || "");
   const [emailError, setEmailError] = React.useState("");
   const [isAdmin, setIsAdmin] = React.useState(role.is_admin || false);
@@ -149,19 +147,30 @@ function RolePage(
     }
     setOpenError(false);
   };
-  // console.log(role,isAdmin,isSecretary,isLibrarian,isActive);
+
+  interface Body {
+    [key: string]: any;
+    email: string,
+    is_admin: boolean;
+    is_secretary: boolean;
+    is_librarian: boolean;
+    is_active: boolean;
+  }
+
   async function handleClickSave() {
     setLoading(true);
-    const body = {
-      id: role.id,
+    const body: Body = {
+      // id: role.id,
       email,
       is_admin: isAdmin,
       is_secretary: isSecretary,
       is_librarian: isLibrarian,
       is_active: isActive,
     };
-    await fetch('/api/role', {
-      method: 'POST',
+    // add id key only when id is not null or undefined
+    id && (body.id = id);
+    await fetch('/api/role' + (id? ('/' + id) : ""), {
+      method: id? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     }) 
@@ -172,7 +181,28 @@ function RolePage(
     })
     .then((data) => {
       setOpenSuccess(true);
+      setId(data.id);
       setViewData(JSON.stringify(data, null, 2));
+    })
+    .catch(err => {
+      setOpenError(true);
+      console.error(err);
+    });
+  }
+
+  async function handleClickDelete() {
+    setLoading(true);
+    await fetch('/api/role/' + id, {
+      method: 'DELETE',
+    }) 
+    .then(response => {
+      setLoading(false);
+      if(!response.ok) throw new Error(response.status as unknown as string);
+      return response.json();
+    })
+    .then((data) => {
+      setOpenSuccess(true);
+      router.push('/usersroles');
     })
     .catch(err => {
       setOpenError(true);
@@ -217,6 +247,10 @@ function RolePage(
         {name: "email", value: email}
       });
   }, [email]);
+
+  const deleteButton = {
+    backgroundColor: '#e62e00', '&:hover': { backgroundColor: '#cc0066' }
+  };
 
   return (
     <Layout>   
@@ -327,6 +361,18 @@ function RolePage(
                 variant="contained"
               >
                 Αποθηκευση
+              </LoadingButton>
+              <LoadingButton
+                color="secondary"
+                disabled={!id}
+                onClick={handleClickDelete}
+                loading={loading}
+                loadingPosition="start"
+                startIcon={<DeleteIcon />}
+                variant="contained"
+                sx={deleteButton}
+                >
+                Διαγραφή
               </LoadingButton>
           </Box>
 
