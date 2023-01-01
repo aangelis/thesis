@@ -1,10 +1,12 @@
 import React from "react";
 import Layout from "components/Layout";
-import { PrismaClient } from '@prisma/client'
 import { withIronSessionApiRoute } from "iron-session/next";
 import { withIronSessionSsr } from "iron-session/next";
 import { sessionOptions } from "lib/session";
+import { User } from "pages/api/user";
 import useUser from "lib/useUser";
+import { InferGetServerSidePropsType } from "next";
+import { PrismaClient } from '@prisma/client'
 
 import router from 'next/router'
 
@@ -41,28 +43,28 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   req,
   res,
 }) {
-  const user: any = req.session.user;
+  const user: User = req.session.user!;
   
   if (user === undefined) {
     res.setHeader("location", "/login");
     res.statusCode = 302;
     res.end();
-    return {
-      props: {
-        permissions: {}
-      },
-    };
+    // return {
+    //   props: {
+    //     permissions: {}
+    //   },
+    // };
   }
 
   if (!user?.isSecretary) {
     res.setHeader("location", "/profile");
     res.statusCode = 302;
     res.end();
-    return {
-      props: {
-        permissions: {}
-      },
-    };
+    // return {
+    //   props: {
+    //     permissions: {}
+    //   },
+    // };
   }
 
   const prisma = new PrismaClient()
@@ -125,7 +127,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   })
 
   return {
-    props : { permissions: JSON.parse(JSON.stringify(permissions)) }
+    props : { user, permissions: JSON.parse(JSON.stringify(permissions)) }
   }
 
 
@@ -377,7 +379,7 @@ function EnhancedTable(rows: Data[], user: any) {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Στοιχεία ανά σελίδα"
+          labelRowsPerPage="Γραμμές ανά σελίδα"
         />
         )
         :
@@ -391,11 +393,14 @@ function EnhancedTable(rows: Data[], user: any) {
 
 
 
-export default (({permissions}: {permissions: any[]}) => {
+export default ((
+  { user, permissions }: InferGetServerSidePropsType<typeof getServerSideProps>,
+  ) => {
+
   // Rendered more hooks than during the previous render with custom hook
-  const { user } = useUser({
-    // redirectTo: "/login",
-  });
+  // const { user } = useUser({
+  //   // redirectTo: "/login",
+  // });
   const tableToShow = EnhancedTable(permissions, user);
 
   
