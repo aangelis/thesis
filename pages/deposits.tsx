@@ -105,7 +105,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   assignedUsers.forEach(({submitter_email: v}) => emails.push(v))
 
   const deposits: Deposit[] = user.is_superuser?
-  (user.isSecretary?
+  ((user.isSecretary && !user.isAdmin)?
     // in case of secretary show only deposits of assigned users
     // find find submitter id, email, first and last name
     (await prisma.deposit.findMany({
