@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from '@prisma/client'
 import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "lib/session";
+import * as yup from 'yup';
 
 export default withIronSessionApiRoute(handler, sessionOptions);
 
@@ -26,30 +27,46 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const validateEmail = (m: string) => {
-    return String(m)
-      .toLowerCase()
-      .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      );
-  }
+  // const validateEmail = (m: string) => {
+  //   return String(m)
+  //     .toLowerCase()
+  //     .match(
+  //       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  //     );
+  // }
   
   // Process a POST request
   const data = await req.body; // permission
 
-  if (data.id) {
-    res.status(400).json({ message: "Adding new permission failed. Provided id input." });
-    return;
-  }
-
-  if (!data.submitter_email ||
-    data.submitter_email === "" ||
-    data.submitter_email.split('@')[1] !== 'hua.gr' ||
-    validateEmail(data.submitter_email) === null 
-  ) {
+  const permissionSchema = yup.object().shape({
+    submitter_email: yup.string().email().required(),
+    // due_to: yup.date().min(new Date()).required(),
+    // https://github.com/jquense/yup/issues/1218
+    due_to: yup.string().required()
+    .test(dateString => 
+      ((new Date(dateString!).toString() !== 'Invalid Date')
+      && (new Date(dateString!) >= new Date()))
+    ),
+  }).noUnknown();
+  
+  if (!(permissionSchema.isValidSync(data, { abortEarly: true, strict: true, }))) {
     res.status(400).json({ message: "Invalid input data." });
     return;
   }
+
+  // if (data.id) {
+  //   res.status(400).json({ message: "Adding new permission failed. Provided id input." });
+  //   return;
+  // }
+
+  // if (!data.submitter_email ||
+  //   data.submitter_email === "" ||
+  //   data.submitter_email.split('@')[1] !== 'hua.gr' ||
+  //   validateEmail(data.submitter_email) === null 
+  // ) {
+  //   res.status(400).json({ message: "Invalid input data." });
+  //   return;
+  // }
 
   try {
     const permission = await prisma.permission.create({

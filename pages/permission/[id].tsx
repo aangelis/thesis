@@ -162,16 +162,25 @@ function PermissionPage(
     }
     setOpenError(false);
   };
-  // console.log(role,isAdmin,isSecretary,isLibrarian,isActive);
+  
+  interface Body {
+    [key: string]: any;
+    submitter_email: string,
+    // secretary_id: string;
+    due_to: Date;
+  }
+
   async function handleClickSave() {
     setLoading(true);
-    const body = {
-      id,
+    const body: Body = {
+      // id,
       submitter_email: email,
-      secretary_id: permission.secretary_id,
+      // secretary_id: permission.secretary_id,
       // due_to: dueTo?.$d,
       due_to: dueTo,
     };
+    // add id key only when id is not null or undefined
+    id && (body.id = id);
     await fetch('/api/permission' + (id? ('/' + id) : ""), {
       method: id? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' },
