@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client'
 import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "lib/session";
 import { User } from "pages/api/user";
+import * as yup from 'yup';
 
 export default withIronSessionApiRoute(handler, sessionOptions);
 
@@ -39,38 +40,69 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     submitter_title,
     ...rest
   } = data;
+  
+  const depositSchema = yup.object().shape({
+    title: yup.string().required(),
+    title_el: yup.string().required(),
+    title_en: yup.string().required(),
+    abstract_el: yup.string().test((val) => val!.toString().length >= 0),
+    abstract_en: yup.string().test((val) => val!.toString().length >= 0),
+    pages: yup.number().integer().required().min(0),
+    images: yup.number().integer().required().min(0),
+    tables: yup.number().integer().required().min(0),
+    diagrams: yup.number().integer().required().min(0),
+    maps: yup.number().integer().required().min(0),
+    drawings: yup.number().integer().required().min(0),
+    confirmed: yup.boolean().required(),
+    confirmed_timestamp: yup.string().nullable()
+    .test(dateString => 
+      ((dateString === null) ||
+      ((new Date(dateString!).toString() !== 'Invalid Date')
+      && (new Date(dateString!) >= new Date())))
+    ),
+    license: yup.string().test((val) => val!.toString().length >= 0),
+    comments: yup.string().test((val) => val!.toString().length >= 0),
+    supervisor: yup.string().test((val) => val!.toString().length >= 0),
+  }).noUnknown();
 
-  if (id) {
-    res.status(400).json({ message: "Adding new deposit failed. Provided id input." });
+  if (!(depositSchema.isValidSync(data, { abortEarly: true, strict: true, }))) {
+    res.status(400).json({ message: "Invalid input data." });
     return;
   }
+
+  
+
+  // if (id) {
+  //   res.status(400).json({ message: "Adding new deposit failed. Provided id input." });
+  //   return;
+  // }
 
   // if (data.submitter_id !== user.id) {
   //   res.status(400).json({ message: "Deposit must be owned by submitter." });
   //   return;
   // }
 
-  if (
-    !data.title_el ||
-    !data.title_en ||
-    data.title_el === "" ||
-    data.title_en === "" ||
-    isNaN(+data.pages) ||
-    isNaN(+data.images) ||
-    isNaN(+data.tables) ||
-    isNaN(+data.diagrams) ||
-    isNaN(+data.maps) ||
-    isNaN(+data.drawings) ||
-    Number(data.pages) < 0 ||
-    Number(data.images) < 0 ||
-    Number(data.tables) < 0 ||
-    Number(data.diagrams) < 0 ||
-    Number(data.maps) < 0 ||
-    Number(data.drawings
-  ) < 0) {
-    res.status(400).json({ message: "Invalid input data." });
-    return;
-  }
+  // if (
+  //   !data.title_el ||
+  //   !data.title_en ||
+  //   data.title_el === "" ||
+  //   data.title_en === "" ||
+  //   isNaN(+data.pages) ||
+  //   isNaN(+data.images) ||
+  //   isNaN(+data.tables) ||
+  //   isNaN(+data.diagrams) ||
+  //   isNaN(+data.maps) ||
+  //   isNaN(+data.drawings) ||
+  //   Number(data.pages) < 0 ||
+  //   Number(data.images) < 0 ||
+  //   Number(data.tables) < 0 ||
+  //   Number(data.diagrams) < 0 ||
+  //   Number(data.maps) < 0 ||
+  //   Number(data.drawings
+  // ) < 0) {
+  //   res.status(400).json({ message: "Invalid input data." });
+  //   return;
+  // }
   
   // interface FilteredData {
   //   [key: string]: any; 

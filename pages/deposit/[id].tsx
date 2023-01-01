@@ -298,12 +298,32 @@ function DepositPage(
   };
 
   const [viewData, setViewData] = React.useState(JSON.stringify(deposit, null, 2));
+  
+  interface Body {
+    [key: string]: any;
+    title: string;
+    title_el: string;
+    title_en: string;
+    abstract_el: string;
+    abstract_en: string;
+    pages: number;
+    images: number;
+    tables: number;
+    diagrams: number;
+    maps: number;
+    drawings: number;
+    confirmed: boolean;
+    confirmed_timestamp: Date;
+    license: string;
+    comments: string;
+    supervisor: string;
+  }
 
   async function handleClickSave() {
     setLoading(true);
-    const body = {
+    const body: Body = {
       //id: deposit?.id,
-      id: id,
+      // id: id,
       title: textFields.find(o => o.name === "title_el")?.value,
       title_el: textFields.find(o => o.name === "title_el")?.value,
       title_en: textFields.find(o => o.name === "title_en")?.value,
@@ -321,6 +341,7 @@ function DepositPage(
       comments,
       supervisor,
     };
+    id && (body.id = id);
     await fetch('/api/deposit' + (id? ('/' + id) : ""), {
       method: id? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' },
