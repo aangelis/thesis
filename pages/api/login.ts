@@ -67,7 +67,9 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
         return { 
           email: process.env.LOGIN_ADMIN_EMAIL,
           username: process.env.LOGIN_ADMIN_EMAIL?.split('@')[0],
-          title: "Administrator staff",
+          first_name: "Διαχειριστής",
+          last_name: "συστήματος",
+          title: "Προσωπικό διαχείρισης",
           department: "Πληροφορικής και Τηλεματικής",
         }
       }}
