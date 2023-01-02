@@ -153,6 +153,20 @@ function DepositPage(
 
   const canConfirm = user.isLibrarian
 
+  const licenseChoices: string[] = ['']
+
+  process.env.NEXT_PUBLIC_LICENSE_CHOICES?
+    process.env.NEXT_PUBLIC_LICENSE_CHOICES.split(', ')
+    .forEach(choice => {licenseChoices.push(choice)})
+    :
+    null;
+
+  // const licenseChoices: string[] = 
+  //   process.env.NEXT_PUBLIC_LICENSE_CHOICES?
+  //     process.env.NEXT_PUBLIC_LICENSE_CHOICES.split(', ')
+  //     :
+  //     [];
+
   const confirmationStatus = [
     {
       value: true,
@@ -295,6 +309,11 @@ function DepositPage(
     setConfirmed(confirmation);
     const timestamp = confirmation? new Date() : ""
     setConfirmedTimestamp(timestamp);
+  };
+
+  const handleChangeLicense = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const licenseSelection = event.target.value;
+    setLicense(licenseSelection);
   };
 
   const [viewData, setViewData] = React.useState(JSON.stringify(deposit, null, 2));
@@ -710,7 +729,7 @@ function DepositPage(
             </div>
           </Box>
           <Box sx={{ m: 2 }} />
-          <FormControl fullWidth sx={{ m: 1 }}>
+          {/* <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-multiline-static"
               disabled={depositReadOnly}
@@ -722,7 +741,37 @@ function DepositPage(
                 setLicense(v.target.value);
               }}
             />
+          </FormControl> */}
+
+          <FormControl fullWidth sx={{ m: 1 }}>
+          {/* <Box
+            component="form"
+            sx={{
+              '& .MuiTextField-root': { m: 1, width: '40ch' },
+            }}
+            noValidate
+            autoComplete="off"
+          > */}
+            <div>
+              <TextField
+                id="outlined-select-confirmation"
+                disabled={depositReadOnly}
+                select
+                label="Άδεια"
+                value={license}
+                onChange={handleChangeLicense}
+                sx={{ width: '100%' }}
+              >
+                {licenseChoices.map((option) => (
+                  <MenuItem key={String(option)} value={String(option)}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </div>
+          {/* </Box> */}
           </FormControl>
+
           <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-multiline-static"
