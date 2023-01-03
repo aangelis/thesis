@@ -347,13 +347,17 @@ function DepositPage(
   };
 
   const handleChangeKeywordsEl = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setKeywordsElValid(isKeywordsElValid(event.target.value));
-    setKeywords_el(event.target.value);
+    const str: string = event.target.value
+      .replace(/,(?=[^\s])/g, ", ").replace(/  +/g, ' ').replace(/, ,+/g, ',');
+    setKeywordsElValid(isKeywordsElValid(str));
+    setKeywords_el(str);
   };
 
   const handleChangeKeywordsEn = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setKeywordsEnValid(isKeywordsEnValid(event.target.value));
-    setKeywords_en(event.target.value);
+    const str: string = event.target.value
+      .replace(/,(?=[^\s])/g, ", ").replace(/  +/g, ' ').replace(/, ,+/g, ',').replace(/,\s*$/, "");
+    setKeywordsEnValid(isKeywordsEnValid(str));
+    setKeywords_en(str);
   };
 
   const [viewData, setViewData] = React.useState(JSON.stringify(deposit, null, 2));
@@ -386,8 +390,8 @@ function DepositPage(
       title: textFields.find(o => o.name === "title_el")?.value,
       title_el: textFields.find(o => o.name === "title_el")?.value,
       title_en: textFields.find(o => o.name === "title_en")?.value,
-      abstract_el,
-      keywords_en,
+      abstract_el: keywords_el.replace(/^[,\s]+|[,\s]+$/g, ''), // Remove spaces and commas at the end and beginning
+      keywords_en: keywords_en.replace(/^[,\s]+|[,\s]+$/g, ''), // Remove spaces and commas at the end and beginning
       keywords_el,
       abstract_en,
       pages: Number(numFields.find(o => o.name === "pages")?.value),
