@@ -129,6 +129,14 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     (await prisma.deposit.findFirst({
       where: {
         id: depositId,
+      },
+      include: {
+        submitter: {
+          select: {
+            first_name: true,
+            last_name: true,
+          }
+        }
       }
     }))
     :
@@ -586,6 +594,22 @@ function DepositPage(
     <Layout>   
       <h1>Στοιχεία απόθεσης</h1>  
         <div>
+          { user?.is_superuser && (
+            <>
+              <FormControl fullWidth sx={{ m: 1 }}>
+                <TextField
+                  id="outlined-multiline-static"
+                  disabled
+                  label="Δημιουργός"
+                  name="submitter_fullname"
+                  value={deposit?.submitter.first_name + ' ' + deposit?.submitter.last_name}
+                />
+              </FormControl>
+
+              <Box sx={{ m: 3 }} />
+           </>
+          )}
+
           <FormControl fullWidth sx={{ m: 1 }}>
             <TextField
               id="outlined-multiline-static"
