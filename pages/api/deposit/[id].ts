@@ -96,6 +96,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       abstract_el: yup.string().test((val) => val!.toString().length >= 0),
       abstract_en: yup.string().test((val) => val!.toString().length >= 0),
       pages: yup.number().integer().required().min(0),
+      language: yup.string().test((val) => val!.toString().length > 0),
       images: yup.number().integer().required().min(0),
       tables: yup.number().integer().required().min(0),
       diagrams: yup.number().integer().required().min(0),
@@ -108,7 +109,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         ((new Date(dateString!).toString() !== 'Invalid Date')
         && (new Date(dateString!) >= new Date())))
       ),
-      license: yup.string().test((val) => val!.toString().length >= 0),
+      license: yup.string().test((val) => val!.toString().length > 0),
       comments: yup.string().test((val) => val!.toString().length >= 0),
       supervisor: yup.string().test((val) => val!.toString().length >= 0),
     }).noUnknown();

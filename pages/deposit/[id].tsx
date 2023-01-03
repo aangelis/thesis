@@ -158,14 +158,19 @@ function DepositPage(
   // first entry in array is empty string
   // const licenseChoices: string[] = ['']
 
-  process.env.NEXT_PUBLIC_LICENSE_CHOICES?
-    process.env.NEXT_PUBLIC_LICENSE_CHOICES.split(', ')
+  process.env.NEXT_PUBLIC_DEPOSIT_LICENSE_CHOICES?
+    process.env.NEXT_PUBLIC_DEPOSIT_LICENSE_CHOICES.split(', ')
     .forEach(choice => {licenseChoices.push(choice)})
     :
     null;
-// console.log(licenseChoices)
-// console.log(process.env.NEXT_PUBLIC_LICENSE_DEFAULT)
-// console.log(licenseChoices.indexOf(process.env.NEXT_PUBLIC_LICENSE_DEFAULT))
+
+  const languageChoices: string[] = []
+
+  process.env.NEXT_PUBLIC_DEPOSIT_LANGUAGE_CHOICES?
+    process.env.NEXT_PUBLIC_DEPOSIT_LANGUAGE_CHOICES.split(', ')
+    .forEach(choice => {languageChoices.push(choice)})
+    :
+    null;
 
   const confirmationStatus = [
     {
@@ -184,7 +189,8 @@ function DepositPage(
   const [abstract_en, setAbstract_en] = React.useState(deposit?.abstract_en || "");
   const [confirmed, setConfirmed] = React.useState<boolean>(deposit?.confirmed || false);
   const [confirmedTimestamp, setConfirmedTimestamp] = React.useState(deposit?.confirmed_timestamp || "");
-  const [license, setLicense] = React.useState(deposit?.license || (!id? process.env.NEXT_PUBLIC_LICENSE_DEFAULT : "") || "");
+  const [license, setLicense] = React.useState(deposit?.license || (!id? process.env.NEXT_PUBLIC_DEPOSIT_LICENSE_DEFAULT : "") || "");
+  const [language, setLanguage] = React.useState(deposit?.language || (!id? process.env.NEXT_PUBLIC_DEPOSIT_LANGUAGE_DEFAULT : "") || "");
   const [comments, setComments] = React.useState(deposit?.comments || "");
   const [supervisor, setSupervisor] = React.useState(deposit?.supervisor || "");
   
@@ -316,6 +322,11 @@ function DepositPage(
     setLicense(licenseSelection);
   };
 
+  const handleChangeLanguage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const languageSelection = event.target.value;
+    setLicense(languageSelection);
+  };
+
   const [viewData, setViewData] = React.useState(JSON.stringify(deposit, null, 2));
   
   interface Body {
@@ -349,6 +360,11 @@ function DepositPage(
       abstract_el,
       abstract_en,
       pages: Number(numFields.find(o => o.name === "pages")?.value),
+      language: (
+        (language === '')?
+          (process.env.NEXT_PUBLIC_DEPOSIT_LANGUAGE_DEFAULT?
+            process.env.NEXT_PUBLIC_DEPOSIT_LAGUAGE_DEFAULT : "")
+          : language),
       images: Number(numFields.find(o => o.name === "images")?.value),
       tables: Number(numFields.find(o => o.name === "tables")?.value),
       diagrams: Number(numFields.find(o => o.name === "diagrams")?.value),
@@ -358,9 +374,9 @@ function DepositPage(
       confirmed_timestamp: confirmedTimestamp || null,
       license: (
         (license === '')?
-          (process.env.NEXT_PUBLIC_LICENSE_DEFAULT?
-            process.env.NEXT_PUBLIC_LICENSE_DEFAULT : "")
-          : ""),
+          (process.env.NEXT_PUBLIC_DEPOSIT_LICENSE_DEFAULT?
+            process.env.NEXT_PUBLIC_DEPOSIT_LICENSE_DEFAULT : "")
+          : license),
       comments,
       supervisor,
     };
@@ -697,6 +713,30 @@ function DepositPage(
               />
             </div>
           </Box>
+
+          <FormControl fullWidth sx={{ m: 1 }}>
+            <div>
+              <TextField
+                id="outlined-select-confirmation"
+                disabled={depositReadOnly}
+                select
+                label="Γλώσσα"
+                value={language}
+                onChange={handleChangeLanguage}
+                sx={{ width: '40%' }}
+              >
+                {languageChoices.map((option) => (
+                  <MenuItem
+                    key={String(option)}
+                    value={String(option)}
+                  >
+                    {option}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </div>
+          </FormControl>
+
           <Box sx={{ m: 2 }} />
           <Box
             component="form"
@@ -711,7 +751,7 @@ function DepositPage(
                 id="outlined-select-confirmation"
                 disabled={(depositReadOnly && !canConfirm) || deposit?.confirmed || !user.is_superuser}
                 select
-                label="Επικυρωμένη"
+                label="Επιβεβαιωμένη από Βιβλιοθηκονόμο"
                 value={confirmed}
                 onChange={handleChangeConfirmed}
                 sx={{ width: '10ch' }}
@@ -725,7 +765,7 @@ function DepositPage(
               <TextField
                 disabled
                 id="outlined-disabled"
-                label="Ημερομηνία επικύρωσης"
+                label="Ημερομηνία Επιβεβαίωσης"
                 variant="outlined"
                 value={confirmedTimestamp? new Date(confirmedTimestamp).toLocaleDateString('el') : null || "Δεν υπάρχει"}
                 sx={{ width: '30ch' }}
