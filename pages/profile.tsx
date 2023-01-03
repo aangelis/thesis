@@ -10,6 +10,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Snackbar from '@mui/material/Snackbar';
+import Button from "@mui/material/Button";
 
 // info on how to use layouts
 // https://nextjs.org/docs/basic-features/layouts
@@ -85,6 +86,29 @@ export default function Profile() {
     <Layout>
       <h1>Προφίλ</h1>
 
+      <Box sx={{ '& > button': { m: 1 } }}>
+        { !user.is_superuser && (
+          <Button sx={{ m: 1 }} variant="contained" href="#contained-buttons">
+            Τελικος χρηστης
+          </Button>
+        )}
+        { user.isSecretary && (
+          <Button sx={{ m: 1 }} variant="contained" href="#contained-buttons">
+            Προσωπικο Γραμματειας
+          </Button>
+        )}
+        { user.isLibrarian && (
+          <Button sx={{ m: 1 }} variant="contained" href="#contained-buttons">
+            Βιβλιοθηκονομος
+          </Button>
+        )}
+        { user.isAdmin && (
+          <Button sx={{ m: 1 }} variant="contained" href="#contained-buttons">
+            Διαχειριστης
+          </Button>
+        )}
+      </Box>
+
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           disabled
@@ -96,7 +120,7 @@ export default function Profile() {
       </FormControl>
 
       <Box sx={{ m: 2 }} />
-      
+        
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           disabled
@@ -106,6 +130,7 @@ export default function Profile() {
           sx={{ width: 400 }}
         />
       </FormControl>
+      
 
       <Box sx={{ m: 2 }} />
       
