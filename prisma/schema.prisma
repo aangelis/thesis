@@ -45,7 +45,7 @@ model Deposit {
   abstract_el String?
   abstract_en String?
   pages Int @default(0)
-  language String?
+  language String
   images Int @default(0)
   tables Int @default(0)
   diagrams Int @default(0)
@@ -53,7 +53,7 @@ model Deposit {
   drawings Int @default(0)	
   confirmed Boolean @default(false)
   confirmed_timestamp DateTime?
-  license String?
+  license String
   comments String?
   submitter User @relation(fields: [submitter_id], references: [id])
   submitter_id Int
