@@ -44,6 +44,8 @@ model Deposit {
   content String?
   abstract_el String?
   abstract_en String?
+  keywords_el String?
+  keywords_en String?
   pages Int @default(0)
   language String
   images Int @default(0)
