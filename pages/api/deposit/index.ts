@@ -41,14 +41,40 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     ...rest
   } = data;
   
+  const isKeywordsElValid = (str: string | null | undefined): boolean => {
+    if (!str) {
+      return true;
+    }
+    if (str.length === 0) {
+      return true;
+    }
+    return (/^[, \u0370-\u03FF\u1F00-\u1FFF]*$/.test(str));
+  }
+
+  const isKeywordsEnValid = (str: string | null | undefined): boolean => {
+    if (!str) {
+      return true;
+    }
+    if (str.length === 0) {
+      return true;
+    }
+    return (/^[, A-Za-z]*$/.test(str));
+  }
+
   const depositSchema = yup.object().shape({
     title: yup.string().required(),
     title_el: yup.string().required(),
     title_en: yup.string().required(),
-    abstract_el: yup.string().test((val) => val!.toString().length >= 0),
-    abstract_en: yup.string().test((val) => val!.toString().length >= 0),
+    abstract_el: yup.string().test(val => val!.toString().length >= 0),
+    abstract_en: yup.string().test(val => val!.toString().length >= 0),
+    keywords_el: yup.string().test(val => {
+      return (val!.toString().length >= 0 && isKeywordsElValid(val))
+    }),
+    keywords_en: yup.string().test(val => {
+      return (val!.toString().length >= 0 && isKeywordsEnValid(val))
+    }),
     pages: yup.number().integer().required().min(0),
-    language: yup.string().test((val) => val!.toString().length > 0),
+    language: yup.string().test(val => val!.toString().length > 0),
     images: yup.number().integer().required().min(0),
     tables: yup.number().integer().required().min(0),
     diagrams: yup.number().integer().required().min(0),

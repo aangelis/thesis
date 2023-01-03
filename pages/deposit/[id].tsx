@@ -182,11 +182,30 @@ function DepositPage(
       label: 'Όχι',
     },
   ]
+
+  const isKeywordsElValid = (str: string): boolean => {
+    if (str.length === 0) {
+      return true;
+    }
+    return (/^[, \u0370-\u03FF\u1F00-\u1FFF]*$/.test(str));
+  }
+
+  const isKeywordsEnValid = (str: string): boolean => {
+    if (str.length === 0) {
+      return true;
+    }
+    return (/^[, A-Za-z]*$/.test(str));
+  }
+  
   const [id, setId] = React.useState<number | null>(deposit?.id! || null)
   // const [title_el, setTitle_el] = React.useState(deposit.title_el || "");
   // const [title_en, setTitle_en] = React.useState(deposit.title_en || "");
   const [abstract_el, setAbstract_el] = React.useState(deposit?.abstract_el || "");
   const [abstract_en, setAbstract_en] = React.useState(deposit?.abstract_en || "");
+  const [keywords_el, setKeywords_el] = React.useState(deposit?.keywords_el || "");
+  const [keywords_en, setKeywords_en] = React.useState(deposit?.keywords_en || "");
+  const [keywordsElValid ,setKeywordsElValid] = React.useState(isKeywordsElValid(deposit?.keywords_el || ""));
+  const [keywordsEnValid ,setKeywordsEnValid] = React.useState(isKeywordsEnValid(deposit?.keywords_en || ""));
   const [confirmed, setConfirmed] = React.useState<boolean>(deposit?.confirmed || false);
   const [confirmedTimestamp, setConfirmedTimestamp] = React.useState(deposit?.confirmed_timestamp || "");
   const [license, setLicense] = React.useState(deposit?.license || (!id? process.env.NEXT_PUBLIC_DEPOSIT_LICENSE_DEFAULT : "") || "");
@@ -327,6 +346,16 @@ function DepositPage(
     setLicense(languageSelection);
   };
 
+  const handleChangeKeywordsEl = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setKeywordsElValid(isKeywordsElValid(event.target.value));
+    setKeywords_el(event.target.value);
+  };
+
+  const handleChangeKeywordsEn = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setKeywordsEnValid(isKeywordsEnValid(event.target.value));
+    setKeywords_en(event.target.value);
+  };
+
   const [viewData, setViewData] = React.useState(JSON.stringify(deposit, null, 2));
   
   interface Body {
@@ -358,6 +387,8 @@ function DepositPage(
       title_el: textFields.find(o => o.name === "title_el")?.value,
       title_en: textFields.find(o => o.name === "title_en")?.value,
       abstract_el,
+      keywords_en,
+      keywords_el,
       abstract_en,
       pages: Number(numFields.find(o => o.name === "pages")?.value),
       language: (
@@ -610,6 +641,33 @@ function DepositPage(
               onChange={(v) => {
                 setAbstract_en(v.target.value);
               }}
+            />
+          </FormControl>
+          <Box sx={{ m: 2 }} />
+          <FormControl fullWidth sx={{ m: 1 }}>
+            <TextField
+              id="outlined-multiline-static"
+              disabled={depositReadOnly}
+              error={!keywordsElValid}
+              label="Λέξεις κλειδιά"
+              helperText={!keywordsElValid && "Επιτρέπονται μόνο χαρακτήρες και το κόμμα"}
+              multiline
+              rows={3}
+              value={keywords_el}
+              onChange={handleChangeKeywordsEl}
+            />
+          </FormControl>
+          <FormControl fullWidth sx={{ m: 1 }}>
+            <TextField
+              id="outlined-multiline-static"
+              disabled={depositReadOnly}
+              error={!keywordsEnValid}
+              label="Λεξεις κλειδιά (Αγγλικά)"
+              helperText={!keywordsEnValid && "Επιτρέπονται μόνο χαρακτήρες και το κόμμα"}
+              multiline
+              rows={3}
+              value={keywords_en}
+              onChange={handleChangeKeywordsEn}
             />
           </FormControl>
           <Box sx={{ m: 2 }} />
@@ -972,7 +1030,7 @@ function DepositPage(
           <Box sx={{ '& > button': { m: 1 } }}>
             <LoadingButton
                 color="secondary"
-                disabled={numFieldsErrors > 0 || textFieldsErrors > 0}
+                disabled={!keywordsElValid || !keywordsEnValid || numFieldsErrors > 0 || textFieldsErrors > 0}
                 onClick={handleClickSave}
                 loading={loading}
                 loadingPosition="start"
