@@ -1069,7 +1069,7 @@ function DepositPage(
               </LoadingButton>
               <LoadingButton
                 color="secondary"
-                disabled={!id}
+                disabled={!id || user?.is_superuser}
                 onClick={handleClickDelete}
                 loading={loading}
                 loadingPosition="start"
