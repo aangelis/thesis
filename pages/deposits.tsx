@@ -299,6 +299,14 @@ export default ((
       // valueGetter: (params) => params.row.submitter.title,
     },
     {
+      field: 'language',
+      headerName: 'Γλώσσα',
+      headerAlign: 'center',
+      width: 120,
+      hide: true,
+      editable: false,
+    },
+    {
       field: 'confirmed',
       headerName: 'Επιβεβαιωμένη',
       headerAlign: 'center',
