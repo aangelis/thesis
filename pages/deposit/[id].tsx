@@ -153,19 +153,19 @@ function DepositPage(
 
   const canConfirm = user.isLibrarian
 
-  const licenseChoices: string[] = ['']
+  // no entry in array
+  const licenseChoices: string[] = []
+  // first entry in array is empty string
+  // const licenseChoices: string[] = ['']
 
   process.env.NEXT_PUBLIC_LICENSE_CHOICES?
     process.env.NEXT_PUBLIC_LICENSE_CHOICES.split(', ')
     .forEach(choice => {licenseChoices.push(choice)})
     :
     null;
-
-  // const licenseChoices: string[] = 
-  //   process.env.NEXT_PUBLIC_LICENSE_CHOICES?
-  //     process.env.NEXT_PUBLIC_LICENSE_CHOICES.split(', ')
-  //     :
-  //     [];
+// console.log(licenseChoices)
+// console.log(process.env.NEXT_PUBLIC_LICENSE_DEFAULT)
+// console.log(licenseChoices.indexOf(process.env.NEXT_PUBLIC_LICENSE_DEFAULT))
 
   const confirmationStatus = [
     {
@@ -184,7 +184,7 @@ function DepositPage(
   const [abstract_en, setAbstract_en] = React.useState(deposit?.abstract_en || "");
   const [confirmed, setConfirmed] = React.useState<boolean>(deposit?.confirmed || false);
   const [confirmedTimestamp, setConfirmedTimestamp] = React.useState(deposit?.confirmed_timestamp || "");
-  const [license, setLicense] = React.useState(deposit?.license || "");
+  const [license, setLicense] = React.useState(deposit?.license || (!id? process.env.NEXT_PUBLIC_LICENSE_DEFAULT : "") || "");
   const [comments, setComments] = React.useState(deposit?.comments || "");
   const [supervisor, setSupervisor] = React.useState(deposit?.supervisor || "");
   
@@ -356,7 +356,11 @@ function DepositPage(
       drawings: Number(numFields.find(o => o.name === "drawings")?.value),
       confirmed,
       confirmed_timestamp: confirmedTimestamp || null,
-      license,
+      license: (
+        (license === '')?
+          (process.env.NEXT_PUBLIC_LICENSE_DEFAULT?
+            process.env.NEXT_PUBLIC_LICENSE_DEFAULT : "")
+          : ""),
       comments,
       supervisor,
     };
@@ -763,7 +767,10 @@ function DepositPage(
                 sx={{ width: '100%' }}
               >
                 {licenseChoices.map((option) => (
-                  <MenuItem key={String(option)} value={String(option)}>
+                  <MenuItem
+                    key={String(option)}
+                    value={String(option)}
+                  >
                     {option}
                   </MenuItem>
                 ))}
