@@ -220,6 +220,7 @@ interface Data {
   // confirmed: boolean;
   confirmed: string;
   confirmed_timestamp: string;
+  license: string;
   submitter_fullname: string;
   // submitter_department: string;
   // submitter_title: string;
@@ -299,7 +300,7 @@ export default ((
     },
     {
       field: 'confirmed',
-      headerName: 'Επικυρωμένη',
+      headerName: 'Επιβεβαιωμένη',
       headerAlign: 'center',
       width: 120,
       type: 'boolean',
@@ -307,7 +308,7 @@ export default ((
     },
     {
       field: 'confirmed_timestamp',
-      headerName: 'Ημερομηνία Επικύρωσης',
+      headerName: 'Ημερομηνία Επιβεβαίωσης',
       headerAlign: 'center',
       width: 300,
       type: 'dateTime',
@@ -316,6 +317,19 @@ export default ((
         params.value? new Date(params.value) : ""
       ),
     },
+    {
+      field: 'license',
+      headerName: 'Άδεια',
+      headerAlign: 'center',
+      width: 250,
+      hide: true,
+      editable: false,
+      renderCell: (params: GridRenderCellParams) => (
+        <Tooltip title={params.value}>
+          <span>{params.value}</span>
+        </Tooltip>
+      ),
+    },  
     {
       field: 'date_created',
       headerName: 'Ημερομηνία Δημιουργίας',
