@@ -1067,18 +1067,20 @@ function DepositPage(
                 >
                 Αποθηκευση
               </LoadingButton>
-              <LoadingButton
-                color="secondary"
-                disabled={!id || user?.is_superuser}
-                onClick={handleClickDelete}
-                loading={loading}
-                loadingPosition="start"
-                startIcon={<DeleteIcon />}
-                variant="contained"
-                sx={deleteButton}
-                >
-                Διαγραφή
-              </LoadingButton>
+              { !user.is_superuser && (
+                <LoadingButton
+                  color="secondary"
+                  disabled={!id}
+                  onClick={handleClickDelete}
+                  loading={loading}
+                  loadingPosition="start"
+                  startIcon={<DeleteIcon />}
+                  variant="contained"
+                  sx={deleteButton}
+                  >
+                  Διαγραφή
+                </LoadingButton>
+              )}
           </Box>
 
           </>
