@@ -75,7 +75,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const roleSchema = yup.object().shape({
       id: yup.number().integer().required().positive(),
-      email: yup.string().email().required(),
+      email: yup.string().email().required()
+      .test(m => m?.split('@')[1] === 'hua.gr'),
       is_admin: yup.boolean().required(),
       is_secretary: yup.boolean().required(),
       is_librarian: yup.boolean().required(),

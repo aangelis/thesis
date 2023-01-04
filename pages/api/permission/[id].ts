@@ -80,7 +80,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const permissionSchema = yup.object().shape({
       id: yup.number().integer().required().positive(),
-      submitter_email: yup.string().email().required(),
+      submitter_email: yup.string().email().required()
+        .test(m => m?.split('@')[1] === 'hua.gr'),
       // due_to: yup.date().min(new Date()).required(),
       // https://github.com/jquense/yup/issues/1218
       due_to: yup.string().required()
