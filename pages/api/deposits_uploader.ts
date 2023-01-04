@@ -18,7 +18,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(400).json({ message: "Bad HTTP method." });
     return;
   }
-  const ip = req.socket.remoteAddress
+  const ip = req.socket.remoteAddress;
 
   const depositsToUpload = await prisma.deposit.findMany(
     {
@@ -35,16 +35,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // https://stackoverflow.com/questions/53377774/fetch-multiple-links-inside-foreach-loop
     Promise.all(depositsToUpload.map(x =>
       fetch(
-        '/api/upload_deposit_data_external_system',
+        'http://localhost:3000/api/upload_deposit_data_external_system',
         {
           method: 'POST',
           mode: 'no-cors',
           body: JSON.stringify({deposit_id: x.id}),
         }
       )
-      .then(() =>
+      .then(() => {
         console.log(`${ip} - [${new Date()}] - deposits uploader - deposit with id ${x.id} uploaded.`)
-      )
+        prisma.deposit.update(
+          {
+            where: {
+              id: x.id,
+            },
+            data: {
+              date_uploaded: new Date(),
+            },
+          }
+        )
+      })
     ))
     .then(() => {
       console.log(`${ip} - [${new Date()}] - deposits uploader - ${depositsToUpload.length} ${depositsToUpload.length>1? 'deposits' : 'deposit'} uploaded successfully.`)
