@@ -3,15 +3,19 @@ import { PrismaClient } from '@prisma/client'
 import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "lib/session";
 import permission from "./permission";
+import { response } from "express";
+import { pipeline } from "stream/promises";
+import { minioClient } from "lib/mc";
 
 export default withIronSessionApiRoute(handler, sessionOptions);
 
 const prisma = new PrismaClient()
 
 const settings = {
-  username: process.env.MDS_username || "",
-  password: process.env.MDS_password || "",
-  BURL: process.env.MDS_endpoint || "",
+  username: process.env.MDS_USERNAME || "",
+  password: process.env.MDS_PASSWORD || "",
+  BURL: process.env.MDS_ENDPOINT || "",
+  token: null,
 };
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -21,35 +25,124 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
+  if (settings.username === "" || settings.password === "" || settings.BURL === "") {
+    res.status(500).json({ message: "API iternal error." });
+    return;
+  }
+
   interface Data {
-    user_id: number;
     deposit_id: number;
   };
 
   const data: Data = await req.body;
 
-  // TODO: validate db and input data
-  // 
+  if (isNaN(+data.deposit_id)) {
+    res.status(400).json({ message: "Invalid input data." });
+    return;
+  }
 
-  const dbStoredUserData =
-    (await prisma.user.findUnique({
-      where: {
-        id: data.user_id,
+  try {
+
+    const dbStoredDepositData =
+      (await prisma.deposit.findUnique({
+        where: {
+          id: data.deposit_id,
+        }
+      }))
+
+    if (!dbStoredDepositData) {
+      res.status(400).json({ message: "Invalid input data." });
+      return;
+    }
+
+    if (!dbStoredDepositData.confirmed) {
+      res.status(400).json({ message: "Unconfirmed deposit cannot be uploaded."});
+      return;
+    }
+
+    const dbStoredUserData = 
+      (await prisma.user.findUnique({
+        where: {
+          id: dbStoredDepositData.submitter_id,
+        }
+      }))
+
+    const depositData = deposit(dbStoredUserData, dbStoredDepositData);
+
+    if (depositData.id) {
+      if (depositData.uploaded_file) {
+        res.json({ message: "Η απόθεση ολοκληρώθηκε."});
+      } else {
+        res.json({ message: "Η απόθεση ολοκληρώθηκε αλλά το αρχείο δεν ανέβηκε."});
       }
-    }))
+    } else {
+      res.status(400).json({ message: "Η απόθεση δεν πραγματοποιήθηκε."});
+    }
+    return;
 
-  const dbStoredDepositData =
-    (await prisma.deposit.findUnique({
-      where: {
-        id: data.deposit_id,
-      }
-    }))
+  } catch (error) {
+    const errorCode = isNaN(+parseInt((error as ClassError).code))?
+    500
+    :
+    parseInt((error as ClassError).code);
 
-  deposit(dbStoredUserData, dbStoredDepositData);
+    isNaN(+parseInt((error as ClassError).code))?
+      500
+      :
+      parseInt((error as ClassError).code)
+    
+    if ((error as ClassError).name === "AbortError") {
+      res.status(errorCode).json({ message: 'Request timeout.' });
+      return;
+    }
+    res.status(errorCode).json({ message: (error as Error).message });
+    return;
+  }
 
-  // res.json({ message: "All good." });
-  return;
+}
 
+// https://dmitripavlutin.com/timeout-fetch-request/
+interface NewRequestInit extends RequestInit {
+  timeout?: number;
+}
+
+async function fetchTimeout(resource: string, options: NewRequestInit) {
+  const { timeout = 2000 } = options;
+  
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  const response = await fetch(resource, {
+    ...options,
+    signal: controller.signal  
+  });
+  clearTimeout(id);
+  return response;
+}
+
+
+// https://stackoverflow.com/questions/38235715/fetch-reject-promise-and-catch-the-error-if-status-is-not-ok
+
+class ClassError extends Error {
+  public readonly code: string;
+  public readonly message: string;
+  private mainString: string;
+
+
+  constructor(mainString: string, {message = mainString, code = ''}) {
+    super(mainString);
+    this.mainString = mainString;
+    this.message = message;
+    this.code = code;
+  }
+
+}
+
+const handleErrors = (response: any) => {
+  if (!response.ok) {
+    // response.status
+    throw new ClassError(response.statusText, {message: response.statusText, code: response.status});
+  }
+  return response;
 }
 
 const get_token : any = async () => {
@@ -61,16 +154,15 @@ const get_token_ : any = async (username: string, password: string, url: string)
     'Content-Type': 'application/x-www-form-urlencoded',
   };
   const payload = { username, password, };
-  return await fetch(url + '/authenticate', {
+  const controller = new AbortController();
+  return await fetchTimeout(url + '/authenticate', {
     method: 'POST',
     headers,
     body: JSON.stringify(payload),
   })
+  .then(handleErrors)
   .then(response => response.json())
-  .then(response => {
-    return response.token
-  })
-  .catch(err => {console.error(err); return null;});
+  .then(response => response.token);
 }
 
 const get_person: any = async (person_el: any) => {
@@ -78,25 +170,28 @@ const get_person: any = async (person_el: any) => {
 }
 
 const get_person_ : any = async (person_el: any, url: string) => {
-  var token = get_token();
+  if (!settings.token) {
+    settings.token = get_token();
+  }
+  const token = settings.token;
   const headers = {
-    'x-butterfly-session-token': token,
+    'x-butterfly-session-token': token!,
   };
   const payload = {
     'proto': '/butterfly/backie/term_person',
     'text': person_el,
     'count': 1,
   };
-  return await fetch(url + '/authenticate', {
+  return await fetchTimeout(url + '/authenticate', {
     method: 'POST',
     headers, 
     body: JSON.stringify(payload),
   })
+  .then(handleErrors)
   .then(response => response.json())
   .then(response => {
     return response['results'][0]['id'] as unknown as number;
-  })
-  .catch(err => {console.error(err); return null;});
+  });
 }
 
 const add_person : any = async (person_el: string, person_en: string) => {
@@ -104,9 +199,12 @@ const add_person : any = async (person_el: string, person_en: string) => {
 }
 
 const add_person_ = async (person_el: string, person_en: string, url: string) => {
-  const token = get_token();
+  if (!settings.token) {
+    settings.token = get_token();
+  }
+  const token = settings.token;
   const headers = {
-    'x-butterfly-session-token': token,
+    'x-butterfly-session-token': token!,
   };
   const payload = {
     'proto': '/butterfly/backie/term_person',
@@ -117,7 +215,7 @@ const add_person_ = async (person_el: string, person_en: string, url: string) =>
     'term.en': person_en,
     'term.el': person_el,
   };
-  return await fetch(url + '/items', {
+  return await fetchTimeout(url + '/items', {
       method: 'POST',
       headers, 
       body: JSON.stringify(payload),
@@ -128,8 +226,7 @@ const add_person_ = async (person_el: string, person_en: string, url: string) =>
       response['results'][0]['id']?
       response['results'][0]['id'] : response['id']
     ) as unknown as number;
-  })
-  .catch(err => {console.error(err); return null;});
+  });
 }
 
 const get_language: any = async (language: string) => {
@@ -137,9 +234,12 @@ const get_language: any = async (language: string) => {
 }
 
 const get_language_: any = async (language: string, url: string) => {
-  const token = get_token();
+  if (!settings.token) {
+    settings.token = get_token();
+  }
+  const token = settings.token;
   const headers = {
-    'x-butterfly-session-token': token,
+    'x-butterfly-session-token': token!,
   };
   const payload = {
     'proto': '/butterfly/backie/term',
@@ -147,7 +247,7 @@ const get_language_: any = async (language: string, url: string) => {
     'parentRefPath': '/lib/default/data/thes_language',
     'count': 1,
   };
-  return await fetch(url + '/search', {
+  return await fetchTimeout(url + '/search', {
     method: 'POST',
     headers, 
     body: JSON.stringify(payload),
@@ -155,8 +255,7 @@ const get_language_: any = async (language: string, url: string) => {
   .then(response => response.json())
   .then(response => {
     return response['results'][0]['id'] as unknown as number;
-  })
-  .catch(err => {console.error(err); return null;});
+  });
 }
 
 const get_root_path_id: any = async () => {
@@ -164,16 +263,19 @@ const get_root_path_id: any = async () => {
 }
 
 const get_root_path_id_: any = async (url: string) => {
-  const token = get_token();
+  if (!settings.token) {
+    settings.token = get_token();
+  }
+  const token = settings.token;
   const headers = {
-    'x-butterfly-session-token': token,
+    'x-butterfly-session-token': token!,
   };
   const payload = {
     'proto': '/butterfly/backie/collection',
     'text': 'Γκρίζα Βιβλιογραφία Χαροκοπείου Πανεπιστημίου',
     'isRoot': 'true',
   };
-  return await fetch(url + '/search', {
+  return await fetchTimeout(url + '/search', {
     method: 'POST',
     headers, 
     body: JSON.stringify(payload),
@@ -181,8 +283,7 @@ const get_root_path_id_: any = async (url: string) => {
   .then(response => response.json())
   .then(response => {
     return response['results'][0]['id'] as unknown as number;
-  })
-  .catch(err => {console.error(err); return null;});
+  });
 }
 
 const get_department_id: any = async (department: string, root_col_id: number) => {
@@ -190,7 +291,10 @@ const get_department_id: any = async (department: string, root_col_id: number) =
 }
 
 const get_department_id_: any = async (department: string, root_col_id: number, url: string) => {
-  const token = get_token();
+  if (!settings.token) {
+    settings.token = get_token();
+  }
+  const token = settings.token;
   const payloadDepartment =
     department.search('Διαιτολογίας') >= 0? 
      "Τμήμα Επιστήμης Διαιτολογίας-Διατροφής"
@@ -198,14 +302,14 @@ const get_department_id_: any = async (department: string, root_col_id: number, 
         "Τμήμα  Οικονομίας και Βιώσιμης Ανάπτυξης"
         : ""
   const headers = {
-    'x-butterfly-session-token': token,
+    'x-butterfly-session-token': token!,
   };
   const payload = {
     'proto': '/butterfly/backie/collection',
     'parentRefPath': '/lib/default/data/' + root_col_id.toString(),
     'searchField.title.el': payloadDepartment,
   };
-  return await fetch(url + '/search', {
+  return await fetchTimeout(url + '/search', {
     method: 'POST',
     headers, 
     body: JSON.stringify(payload),
@@ -213,8 +317,7 @@ const get_department_id_: any = async (department: string, root_col_id: number, 
   .then(response => response.json())
   .then(response => {
     return response['results'][0]['id'] as unknown as number;
-  })
-  .catch(err => {console.error(err); return null;});
+  });
 }
 
 const get_deposit_col_id: any = async (dep_col_id: number, type: string) => {
@@ -222,16 +325,19 @@ const get_deposit_col_id: any = async (dep_col_id: number, type: string) => {
 }
 
 const get_deposit_col_id_: any = async (dep_col_id: number, type: string, url: string) => {
-  const token = get_token();
+  if (!settings.token) {
+    settings.token = get_token();
+  }
+  const token = settings.token;
   const headers = {
-    'x-butterfly-session-token': token,
+    'x-butterfly-session-token': token!,
   };
   const payload = {
     'proto': '/butterfly/backie/collection',
     'parentRefPath': '/lib/default/data/' + dep_col_id.toString(),
     'searchField.title.el': type,
   };
-  return await fetch(url + '/search', {
+  return await fetchTimeout(url + '/search', {
     method: 'POST',
     headers, 
     body: JSON.stringify(payload),
@@ -239,8 +345,7 @@ const get_deposit_col_id_: any = async (dep_col_id: number, type: string, url: s
   .then(response => response.json())
   .then(response => {
     return response['results'][0]['id'] as unknown as number;
-  })
-  .catch(err => {console.error(err); return null;});
+  });
 }
 
 const get_licenses: any = async () => {
@@ -248,16 +353,19 @@ const get_licenses: any = async () => {
 }
 
 const get_licenses_: any = async (url: string) => {
-  const token = get_token();
+  if (!settings.token) {
+    settings.token = get_token();
+  }
+  const token = settings.token;
   const headers = {
-    'x-butterfly-session-token': token,
+    'x-butterfly-session-token': token!,
   };
   const payload = {
     'proto': '/butterfly/backie/term_license',
     'rootRefPath': '/lib/default/data/thes_license',
     'sortFields': 'term_el|ASC',
   };
-  return await fetch(url + '/search', {
+  return await fetchTimeout(url + '/search', {
     method: 'POST',
     headers, 
     body: JSON.stringify(payload),
@@ -265,8 +373,7 @@ const get_licenses_: any = async (url: string) => {
   .then(response => response.json())
   .then(response => {
     return response['results']
-  })
-  .catch(err => {console.error(err); return null;});
+  });
 }
 
 const get_license: any = async (license: string) => {
@@ -274,9 +381,12 @@ const get_license: any = async (license: string) => {
 }
 
 const get_license_: any = async (license: string, url: string) => {
-  const token = get_token();
+  if (!settings.token) {
+    settings.token = get_token();
+  }
+  const token = settings.token;
   const headers = {
-    'x-butterfly-session-token': token,
+    'x-butterfly-session-token': token!,
   };
   const payload = {
     'proto': '/butterfly/backie/term_license',
@@ -355,9 +465,12 @@ const deposit_metadata_: any = async (
   notes_en: string, 
   url: string,
 ) => {
-  const token = get_token();
+  if (!settings.token) {
+    settings.token = get_token();
+  }
+  const token = settings.token;
   const headers = {
-    'x-butterfly-session-token': token,
+    'x-butterfly-session-token': token!,
   };
   const payload = {
     's': '/lib/default/data',
@@ -382,7 +495,7 @@ const deposit_metadata_: any = async (
     'notes.en': notes_en,
     'license': '/lib/default/data/' + license_id.toString(),         
   };
-  return await fetch(url + '/items', {
+  return await fetchTimeout(url + '/items', {
     method: 'POST',
     headers, 
     body: JSON.stringify(payload),
@@ -390,36 +503,62 @@ const deposit_metadata_: any = async (
   .then(response => response.json())
   .then(response => {
     return response['id'] as unknown as number
+  });
+}
+
+async function getObjectContents(objectName: string) {
+
+  const promise = new Promise((resolve, reject) => {
+
+    var buff:any = [];
+    var size = 0;
+    minioClient.getObject(
+      process.env.MINIO_BUCKET || "thesis",
+      objectName).then(function(dataStream) {
+      dataStream.on('data', async function(chunk) {
+        buff.push(chunk)
+        size += chunk.length
+      })
+      dataStream.on('end', function() {
+        console.log('End. Total size = ' + size)
+        // console.log("End Buffer : " + buff)
+        resolve(buff)
+      })
+      dataStream.on('error', function(err) {
+        console.log(err)
+        reject(err)
+      })
+    }).catch(reject);
+
   })
-  .catch(err => {console.error(err); return null;});
+  return promise
 }
 
-const upload_file: any = async (deposit_id: number, file: any, file_type: string) => {
-  return upload_file_(deposit_id, file, file_type, settings.BURL);
-}
+const upload_file: any = async (deposit_returned_id: number, instance: any) => {
+  if (!settings.token) {
+    settings.token = get_token();
+  }
+  const url = settings.BURL
+  const token = settings.token;
+  const objectName = instance.id + '/' + instance.new_filename;
+  const fileContents = await getObjectContents(objectName)
+  const formData = new FormData();
+  formData.append('objectId', '/lib/default/data/' + deposit_returned_id as unknown as string);
+  formData.append('theFile', fileContents);
 
-const upload_file_: any = async (deposit_id: number, file: any, file_type: string, url: string) => {
-  const token = get_token();
-  // TODO: file upload
-  const m = { content_type: "22" };
   const headers = {
-    'x-butterfly-session-token': token,
-    'Content-Type': m.content_type,
-  };
-  const payload = {
-    'x-butterfly-session-token': token,
-    'Content-Type': m.content_type,
+    'x-butterfly-session-token': token!,
+    'Content-Type': 'Multipart/form-data',
   };
   return await fetch(url + '/attachments/upload', {
-    method: 'POST',
-    headers, 
-    body: JSON.stringify(payload),
+    method: "POST",
+    headers,
+    body: formData,
   })
   .then(response => response.json())
   .then(response => {
-    return response['message'] === 'OK';
-  })
-  .catch(err => {console.error(err); return null;});
+    return response.message === 'OK';
+  });
 }
 
 const deposit: any = async (gauser: any, instance: any) => {
@@ -468,9 +607,7 @@ const deposit_: any = async (gauser: any, instance: any, url: string) => {
     :
     add_person(instance.supervisor, instance.supervisor);
   const keywords_el = instance.keywords_el;
-  const keywords_el_str = keywords_el.all().join(', ');
   const keywords_en = instance.keywords_en;
-  const keywords_en_str = keywords_en.join(', ');
 
   const description_el: string[] = [];
   const description_en: string[] = [];
@@ -502,8 +639,6 @@ const deposit_: any = async (gauser: any, instance: any, url: string) => {
   const description_en_str = description_en.join(', ');
   const language_id = get_language(instance.language);
 
-
-  const the_file = {document: 'gg', file_type: 'gfgf'}
   const license_id = get_license(instance.license)
 
   const d = new Date();
@@ -523,24 +658,16 @@ const deposit_: any = async (gauser: any, instance: any, url: string) => {
     professor_id,
     deposit_date,
     language_id,
-    keywords_el_str,
-    keywords_en_str,
+    keywords_el,
+    keywords_en,
     description_el_str,
     description_en_str,
     license_id,
     );
 
-  const uploaded_file = upload_file(deposit_returned_id, the_file.document.toString(), the_file.file_type);
+  const uploaded_file = upload_file(deposit_returned_id, instance);
 
-  if (deposit_returned_id) {
-    if (uploaded_file) {
-      console.log('Η απόθεση ολοκληρώθηκε');
-    } else {
-      console.error('Η απόθεση ολοκληρώθηκε αλλά το αρχείο δεν ανέβηκε');
-    }
-  } else {
-    console.error('Η απόθεση δεν πραγματοποιήθηκε');
-  }
+  return {id: deposit_returned_id, uploaded_file};
   
 }
 
