@@ -65,6 +65,7 @@ model Deposit {
   new_filename String?
   original_filename String?
   date_created DateTime @default(now())
+  date_uploaded DateTime?
 }
 
 model Role {
