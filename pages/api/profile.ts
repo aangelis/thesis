@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from '@prisma/client'
 import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "lib/session";
+import * as yup from 'yup';
 
 export default withIronSessionApiRoute(handler, sessionOptions);
 
@@ -25,12 +26,40 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   // Process a POST request
   const data = await req.body; // profile
+
+  const isFieldElValid = (str: string | null | undefined): boolean => {
+    if (!str) {
+      return true;
+    }
+    if (str.length === 0) {
+      return true;
+    }
+    return (/^[\u0370-\u03FF\u1F00-\u1FFF]*$/.test(str));
+  }
+
+  const isFieldEnValid = (str: string | null | undefined): boolean => {
+    if (!str) {
+      return true;
+    }
+    if (str.length === 0) {
+      return true;
+    }
+    return (/^[A-Za-z]*$/.test(str));
+  }
+
+  const permissionSchema = yup.object().shape({
+    father_name_el: yup.string().test((val) => val!.toString().length > 0 && isFieldElValid(val)),
+    father_name_en: yup.string().test((val) => val!.toString().length > 0 && isFieldEnValid(val)),
+    name_el: yup.string().test((val) => val!.toString().length > 0 && isFieldElValid(val)),
+    name_en: yup.string().test((val) => val!.toString().length > 0 && isFieldEnValid(val)),
+    surname_el: yup.string().test((val) => val!.toString().length > 0 && isFieldElValid(val)),
+    surname_en: yup.string().test((val) => val!.toString().length > 0 && isFieldEnValid(val)),
+  }).noUnknown();
   
-  // TODO: object validation
-  // if () {
-  //   res.status(400).json({ message: "Invalid data." });
-  //   return;
-  // }
+  if (!(permissionSchema.isValidSync(data, { abortEarly: true, strict: true, }))) {
+    res.status(400).json({ message: "Invalid input data." });
+    return;
+  }
 
   try {
     const profile = await prisma.user.update({
