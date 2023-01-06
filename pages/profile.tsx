@@ -113,7 +113,7 @@ export default function Profile() {
         )}
       </Box>
 
-      { profileNotCompleted && ( 
+      { !user.is_superuser && profileNotCompleted && ( 
 
         <Alert severity="warning" sx={{ m: 1 }}>
           <AlertTitle>Προσοχή!</AlertTitle>
