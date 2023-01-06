@@ -308,7 +308,7 @@ export default ((
     },
     {
       field: 'submitter_fullname',
-      headerName: 'Χρήστης',
+      headerName: 'Δημιουργός',
       headerAlign: 'center',
       width: 250,
       hide: !user?.is_superuser,
