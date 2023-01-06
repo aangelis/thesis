@@ -19,7 +19,7 @@ const settings = {
 };
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "GET") {
+  if (req.method !== "POST") {
     // Handle any other HTTP methods
     res.status(400).json({ message: "Bad HTTP method." });
     return;
