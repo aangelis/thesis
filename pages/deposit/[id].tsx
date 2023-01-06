@@ -120,6 +120,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
       props: {
         user,
         deposit: null,
+        submitterUser: null,
         canAddNewDeposit,
       },
     };
@@ -147,14 +148,33 @@ export const getServerSideProps = withIronSessionSsr(async function ({
       }
     }))
 
+    const submitterUser = user.is_superuser?
+      await prisma.user.findUnique(
+        {
+          where: {
+            id: deposit?.submitter_id!,
+          },
+          select: {
+            name_el: true,
+            name_en: true,
+            surname_el: true,
+            surname_en: true,
+            father_name_el: true,
+            father_name_en: true,
+          }
+        }
+      )
+      :
+      null;
+
   return {
-    props : { user, deposit: JSON.parse(JSON.stringify(deposit)), canAddNewDeposit: false }
+    props : { user, deposit: JSON.parse(JSON.stringify(deposit)), submitterUser, canAddNewDeposit: false }
   }
 }, sessionOptions);
 
 
 function DepositPage(
-  { user, deposit, canAddNewDeposit }: InferGetServerSidePropsType<typeof getServerSideProps>,
+  { user, deposit, submitterUser, canAddNewDeposit }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) {
 
   const depositReadOnly = !canAddNewDeposit && (user.id !== deposit?.submitter_id || deposit.confirmed)
@@ -590,10 +610,31 @@ function DepositPage(
     backgroundColor: '#e62e00', '&:hover': { backgroundColor: '#cc0066' }
   };
 
+  const profileNotCompleted = !submitterUser?.name_el || !submitterUser.name_en ||
+    !submitterUser.surname_el || !submitterUser.surname_en ||
+    !submitterUser.father_name_el || !submitterUser.father_name_en;
+
   return (
     <Layout>   
       <h1>Στοιχεία απόθεσης</h1>  
         <div>
+
+          { user.is_superuser && !deposit.confirmed && profileNotCompleted && ( 
+            <Alert severity="warning" sx={{ m: 1 }}>
+              <AlertTitle>Προσοχή!</AlertTitle>
+                Ο δημιουργός της απόθεσης δεν έχει συμπληρώσει <strong>όλα 
+                τα πεδία</strong> που περιλαμβάνει το προφίλ.
+            </Alert>
+          )}
+
+          { user.is_superuser && !deposit.confirmed && !deposit.original_filename && ( 
+            <Alert severity="warning" sx={{ m: 1 }}>
+              <AlertTitle>Προσοχή!</AlertTitle>
+                Η απόθεση <strong>δεν περιλαμβάνει αποθηκευμένο 
+                </strong> αρχείο.
+            </Alert>
+          )}
+
           { user?.is_superuser && (
             <>
               <FormControl fullWidth sx={{ m: 1 }}>
