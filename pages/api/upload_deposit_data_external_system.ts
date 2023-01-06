@@ -2,10 +2,10 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from '@prisma/client'
 import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "lib/session";
-import permission from "./permission";
-import { response } from "express";
-import { pipeline } from "stream/promises";
 import { minioClient } from "lib/mc";
+import fetch from 'node-fetch'
+import FormData from 'form-data';
+import fs from 'fs';
 
 export default withIronSessionApiRoute(handler, sessionOptions);
 
@@ -19,7 +19,7 @@ const settings = {
 };
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") {
+  if (req.method !== "GET") {
     // Handle any other HTTP methods
     res.status(400).json({ message: "Bad HTTP method." });
     return;
@@ -40,6 +40,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(400).json({ message: "Invalid input data." });
     return;
   }
+
+  const ip = req.socket.remoteAddress;
 
   try {
 
@@ -67,6 +69,53 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         }
       }))
 
+    // Test runs:
+    // 01
+    // const person = await get_person("Σοφία, Αγραφιώτη");
+    // res.json({person})
+    // success. output:
+    // {"person":"15266"}
+    // 02
+    // const language_id = await get_language('Ελληνικά');
+    // res.json({language_id})
+    // success. output:
+    // {"language_id":"67"}
+    // 03
+    // const root_col_id = await get_root_path_id();
+    // res.json({root_col_id})
+    // success. output:
+    // {"root_col_id":"31"}
+    // 04
+    // const department_id = await get_department_id('Τμήμα ' + 'Πληροφορικής και Τηλεματικής', 31);
+    // res.json({department_id})
+    // success. output:
+    // {"department_id":"44"}
+    // 05
+    // const deposit_col_id = await get_deposit_col_id(44, 'Μεταπτυχιακές Εργασίες');
+    // res.json({deposit_col_id})
+    // success. output:
+    // {"deposit_col_id":"46"}
+    // 06
+    // const licenses = await get_licenses();
+    // res.json({licenses})
+    // success. output:
+    // {"licenses":[{"id":"19424","prototype":"/butte ...
+    // 07
+    // const license_id = await get_license('Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0');
+    // res.json({license_id})
+    // success. output:
+    // {"license_id":"19429"}
+    // 08
+    // const item_data = await get_item_data(1228);
+    // res.json({item_data});
+    // success. output:
+    // {"item_data":{"id":"1228","prototype":"/butterfly/backie/gr ...
+    // 09
+    // const uploaded_file = await upload_file(1228, dbStoredDepositData)
+    // res.json({uploaded_file});
+    // success. output:
+    // {"uploaded_file":true}
+
     const depositData = deposit(dbStoredUserData, dbStoredDepositData);
 
     if (depositData.id) {
@@ -80,98 +129,90 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
     return;
 
-  } catch (error) {
-    const errorCode = isNaN(+parseInt((error as ClassError).code))?
-    500
-    :
-    parseInt((error as ClassError).code);
-
-    isNaN(+parseInt((error as ClassError).code))?
-      500
-      :
-      parseInt((error as ClassError).code)
-    
-    if ((error as ClassError).name === "AbortError") {
-      res.status(errorCode).json({ message: 'Request timeout.' });
+  }
+  catch (error) {
+    console.log("main catch ")
+    console.log(error);
+    if ((error as Error).name === "AbortError") {
+      res.status(500).json({ message: 'Request timeout.' });
       return;
     }
-    res.status(errorCode).json({ message: (error as Error).message });
+    res.status(500).json({ message: (error as Error).message });
     return;
   }
 
 }
 
-// https://dmitripavlutin.com/timeout-fetch-request/
-interface NewRequestInit extends RequestInit {
-  timeout?: number;
-}
-
-async function fetchTimeout(resource: string, options: NewRequestInit) {
+async function fetchJson(resource: string, options: any) {
   const { timeout = 2000 } = options;
-  
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
   const response = await fetch(resource, {
     ...options,
     signal: controller.signal  
-  });
+  })
+  .then(handleErrors)
+  .then(r => r.text())
+  .then(r => {
+    if (r.length === 0) {
+      throw new Error('No server response data.')
+    }
+    return r;
+  })
+  .then(r => {return tryParseJSONObject(r)});
+  
   clearTimeout(id);
   return response;
-}
-
-
-// https://stackoverflow.com/questions/38235715/fetch-reject-promise-and-catch-the-error-if-status-is-not-ok
-
-class ClassError extends Error {
-  public readonly code: string;
-  public readonly message: string;
-  private mainString: string;
-
-
-  constructor(mainString: string, {message = mainString, code = ''}) {
-    super(mainString);
-    this.mainString = mainString;
-    this.message = message;
-    this.code = code;
-  }
-
 }
 
 const handleErrors = (response: any) => {
   if (!response.ok) {
     // response.status
-    throw new ClassError(response.statusText, {message: response.statusText, code: response.status});
+    throw new Error('Server response error.');
   }
   return response;
 }
 
-const get_token : any = async () => {
+const tryParseJSONObject: any = (jsonString: any) => {
+  try {
+      const o = JSON.parse(jsonString);
+      if (o && typeof o === "object") {
+          return o;
+      }
+  }
+  catch (e) {
+    throw new Error('Invalid JSON formatted server response data.')
+  }
+
+  throw new Error('Invalid JSON formatted server response data.')
+  // return null;
+};
+
+const get_token: any = async () => {
   return await get_token_(settings.username, settings.password, settings.BURL)
 }
 
-const get_token_ : any = async (username: string, password: string, url: string) => {
+const get_token_: any = async (username: string, password: string, url: string) => {
   const headers = {
-    'Content-Type': 'application/x-www-form-urlencoded',
+    // 'Content-Type': 'application/x-www-form-urlencoded',
   };
   const payload = { username, password, };
-  const controller = new AbortController();
-  return await fetchTimeout(url + '/authenticate', {
+  return await fetchJson(url + '/authenticate', {
     method: 'POST',
     headers,
-    body: JSON.stringify(payload),
+    body: new URLSearchParams(payload),
   })
-  .then(handleErrors)
-  .then(response => response.json())
-  .then(response => response.token);
+  .then(response => response.token)
+
 }
 
-const get_person: any = async (person_el: any) => {
+const get_person: any = async (person_el: string) => {
   return get_person_(person_el, settings.BURL);
 }
 
-const get_person_ : any = async (person_el: any, url: string) => {
+const get_person_ : any = async (person_el: string, url: string) => {
   if (!settings.token) {
-    settings.token = get_token();
+    settings.token = await get_token();
   }
   const token = settings.token;
   const headers = {
@@ -180,18 +221,17 @@ const get_person_ : any = async (person_el: any, url: string) => {
   const payload = {
     'proto': '/butterfly/backie/term_person',
     'text': person_el,
-    'count': 1,
+    'count': '1',
   };
-  return await fetchTimeout(url + '/authenticate', {
+  console.log(headers,payload)
+  return await fetchJson(url + '/search', {
     method: 'POST',
     headers, 
-    body: JSON.stringify(payload),
+    body: new URLSearchParams(payload),
   })
-  .then(handleErrors)
-  .then(response => response.json())
   .then(response => {
     return response['results'][0]['id'] as unknown as number;
-  });
+  })
 }
 
 const add_person : any = async (person_el: string, person_en: string) => {
@@ -200,7 +240,7 @@ const add_person : any = async (person_el: string, person_en: string) => {
 
 const add_person_ = async (person_el: string, person_en: string, url: string) => {
   if (!settings.token) {
-    settings.token = get_token();
+    settings.token = await get_token();
   }
   const token = settings.token;
   const headers = {
@@ -215,12 +255,11 @@ const add_person_ = async (person_el: string, person_en: string, url: string) =>
     'term.en': person_en,
     'term.el': person_el,
   };
-  return await fetchTimeout(url + '/items', {
+  return await fetchJson(url + '/items', {
       method: 'POST',
       headers, 
-      body: JSON.stringify(payload),
+      body: new URLSearchParams(payload),
   })
-  .then(response => response.json())
   .then(response => {
     return (
       response['results'][0]['id']?
@@ -235,7 +274,7 @@ const get_language: any = async (language: string) => {
 
 const get_language_: any = async (language: string, url: string) => {
   if (!settings.token) {
-    settings.token = get_token();
+    settings.token = await get_token();
   }
   const token = settings.token;
   const headers = {
@@ -245,14 +284,13 @@ const get_language_: any = async (language: string, url: string) => {
     'proto': '/butterfly/backie/term',
     'text': language,
     'parentRefPath': '/lib/default/data/thes_language',
-    'count': 1,
+    'count': '1',
   };
-  return await fetchTimeout(url + '/search', {
+  return await fetchJson(url + '/search', {
     method: 'POST',
     headers, 
-    body: JSON.stringify(payload),
+    body: new URLSearchParams(payload),
   })
-  .then(response => response.json())
   .then(response => {
     return response['results'][0]['id'] as unknown as number;
   });
@@ -264,9 +302,9 @@ const get_root_path_id: any = async () => {
 
 const get_root_path_id_: any = async (url: string) => {
   if (!settings.token) {
-    settings.token = get_token();
+    settings.token = await get_token();
   }
-  const token = settings.token;
+  const token = await settings.token;
   const headers = {
     'x-butterfly-session-token': token!,
   };
@@ -275,16 +313,37 @@ const get_root_path_id_: any = async (url: string) => {
     'text': 'Γκρίζα Βιβλιογραφία Χαροκοπείου Πανεπιστημίου',
     'isRoot': 'true',
   };
-  return await fetchTimeout(url + '/search', {
+  return await fetchJson(url + '/search', {
     method: 'POST',
     headers, 
-    body: JSON.stringify(payload),
+    body: new URLSearchParams(payload),
   })
-  .then(response => response.json())
   .then(response => {
     return response['results'][0]['id'] as unknown as number;
   });
 }
+
+const get_item_data = async (item_id: number) => {
+  return get_item_data_(item_id, settings.BURL);
+}
+
+const get_item_data_ = async (item_id: number, url: string) => {
+  if (!settings.token) {
+    settings.token = await get_token();
+  }
+  const token = settings.token;
+  const headers = {
+    'x-butterfly-session-token': token!,
+  };
+  return await fetchJson(url + '/items/lib/default/data/' + item_id as string, {
+    method: 'GET',
+    headers, 
+  })
+  .then(response => {
+    return response['results'][0]['id'] as unknown as number;
+  });
+}
+
 
 const get_department_id: any = async (department: string, root_col_id: number) => {
   return get_department_id_(department, root_col_id, settings.BURL);
@@ -292,7 +351,7 @@ const get_department_id: any = async (department: string, root_col_id: number) =
 
 const get_department_id_: any = async (department: string, root_col_id: number, url: string) => {
   if (!settings.token) {
-    settings.token = get_token();
+    settings.token = await get_token();
   }
   const token = settings.token;
   const payloadDepartment =
@@ -300,7 +359,7 @@ const get_department_id_: any = async (department: string, root_col_id: number, 
      "Τμήμα Επιστήμης Διαιτολογίας-Διατροφής"
      : department.search('Οικονομίας') >= 0?
         "Τμήμα  Οικονομίας και Βιώσιμης Ανάπτυξης"
-        : ""
+        : department
   const headers = {
     'x-butterfly-session-token': token!,
   };
@@ -309,12 +368,11 @@ const get_department_id_: any = async (department: string, root_col_id: number, 
     'parentRefPath': '/lib/default/data/' + root_col_id.toString(),
     'searchField.title.el': payloadDepartment,
   };
-  return await fetchTimeout(url + '/search', {
+  return await fetchJson(url + '/search', {
     method: 'POST',
     headers, 
-    body: JSON.stringify(payload),
+    body: new URLSearchParams(payload),
   })
-  .then(response => response.json())
   .then(response => {
     return response['results'][0]['id'] as unknown as number;
   });
@@ -326,7 +384,7 @@ const get_deposit_col_id: any = async (dep_col_id: number, type: string) => {
 
 const get_deposit_col_id_: any = async (dep_col_id: number, type: string, url: string) => {
   if (!settings.token) {
-    settings.token = get_token();
+    settings.token = await get_token();
   }
   const token = settings.token;
   const headers = {
@@ -337,12 +395,11 @@ const get_deposit_col_id_: any = async (dep_col_id: number, type: string, url: s
     'parentRefPath': '/lib/default/data/' + dep_col_id.toString(),
     'searchField.title.el': type,
   };
-  return await fetchTimeout(url + '/search', {
+  return await fetchJson(url + '/search', {
     method: 'POST',
     headers, 
-    body: JSON.stringify(payload),
+    body: new URLSearchParams(payload),
   })
-  .then(response => response.json())
   .then(response => {
     return response['results'][0]['id'] as unknown as number;
   });
@@ -354,7 +411,7 @@ const get_licenses: any = async () => {
 
 const get_licenses_: any = async (url: string) => {
   if (!settings.token) {
-    settings.token = get_token();
+    settings.token = await get_token();
   }
   const token = settings.token;
   const headers = {
@@ -365,12 +422,11 @@ const get_licenses_: any = async (url: string) => {
     'rootRefPath': '/lib/default/data/thes_license',
     'sortFields': 'term_el|ASC',
   };
-  return await fetchTimeout(url + '/search', {
+  return await fetchJson(url + '/search', {
     method: 'POST',
     headers, 
-    body: JSON.stringify(payload),
+    body: new URLSearchParams(payload),
   })
-  .then(response => response.json())
   .then(response => {
     return response['results']
   });
@@ -382,7 +438,7 @@ const get_license: any = async (license: string) => {
 
 const get_license_: any = async (license: string, url: string) => {
   if (!settings.token) {
-    settings.token = get_token();
+    settings.token = await get_token();
   }
   const token = settings.token;
   const headers = {
@@ -394,13 +450,12 @@ const get_license_: any = async (license: string, url: string) => {
     'sortFields': 'term_el|ASC',
     'searchField.term_el': license,
   };
-  return await fetch(url + '/search', {
+  return await fetchJson(url + '/search', {
     method: 'POST',
     headers, 
-    body: JSON.stringify(payload),
+    body: new URLSearchParams(payload),
   })
-  .then(response => response.json())
-  .then(response => {
+  .then(response => { console.log(response);
     return response['results'][0]['id'] as unknown as number;
   })
   .catch(err => {console.error(err); return null;});
@@ -466,7 +521,7 @@ const deposit_metadata_: any = async (
   url: string,
 ) => {
   if (!settings.token) {
-    settings.token = get_token();
+    settings.token = await get_token();
   }
   const token = settings.token;
   const headers = {
@@ -474,8 +529,8 @@ const deposit_metadata_: any = async (
   };
   const payload = {
     's': '/lib/default/data',
-    'p': '/butterfly/backie/'+col_type,
-    'parentRefPath': '/lib/default/data/'+col_id.toString(),
+    'p': '/butterfly/backie/' + col_type,
+    'parentRefPath': '/lib/default/data/' + col_id.toString(),
     'creator': '/lib/default/data/' + person_id.toString(),
     'professors': '/lib/default/data/' + professor_id.toString(),
     'isRoot': 'false',
@@ -495,12 +550,11 @@ const deposit_metadata_: any = async (
     'notes.en': notes_en,
     'license': '/lib/default/data/' + license_id.toString(),         
   };
-  return await fetchTimeout(url + '/items', {
+  return await fetchJson(url + '/items', {
     method: 'POST',
     headers, 
-    body: JSON.stringify(payload),
+    body: new URLSearchParams(payload),
   })
-  .then(response => response.json())
   .then(response => {
     return response['id'] as unknown as number
   });
@@ -535,28 +589,45 @@ async function getObjectContents(objectName: string) {
 }
 
 const upload_file: any = async (deposit_returned_id: number, instance: any) => {
+  return upload_file_(deposit_returned_id, instance, settings.BURL);
+}
+
+const upload_file_: any = async (deposit_returned_id: number, instance: any, url: string) => {
   if (!settings.token) {
-    settings.token = get_token();
+    settings.token = await get_token();
   }
-  const url = settings.BURL
   const token = settings.token;
   const objectName = instance.id + '/' + instance.new_filename;
-  const fileContents = await getObjectContents(objectName)
-  const formData = new FormData();
-  formData.append('objectId', '/lib/default/data/' + deposit_returned_id as unknown as string);
-  formData.append('theFile', fileContents);
-
+  const fileContents: any = await getObjectContents(objectName)
+  const filePath = '/home/aangelis/dev/nextjs/thesis/uploads/sample-1.pdf';
+  const fileName = 'sample-1.pdf';
+  // https://stackoverflow.com/questions/60620160/uploading-file-via-api-using-nodejs-fetch
+  const form = new FormData();
+  const buffer = fs.readFileSync(filePath);
+  form.append('objectId', '/lib/default/data/' + deposit_returned_id as string);
+  console.log("file contents ", fileContents)
+  form.append('theFile', await fileContents[0], {
+    contentType: 'application/pdf',
+    filename: fileName,
+  });
   const headers = {
     'x-butterfly-session-token': token!,
-    'Content-Type': 'Multipart/form-data',
   };
   return await fetch(url + '/attachments/upload', {
     method: "POST",
     headers,
-    body: formData,
+    body: form,
   })
-  .then(response => response.json())
-  .then(response => {
+  .then(handleErrors)
+  .then(r => r.text())
+  .then(r => {
+    if (r.length === 0) {
+      throw new Error('No server response data.')
+    }
+    return r;
+  })
+  .then(r => {return tryParseJSONObject(r)})
+  .then(response => { console.log(response)
     return response.message === 'OK';
   });
 }
@@ -566,7 +637,7 @@ const deposit: any = async (gauser: any, instance: any) => {
 }
 
 const deposit_: any = async (gauser: any, instance: any, url: string) => {
-  const department = 'Τμήμα ' + gauser.department;
+  const department = 'Τμήμα ' + instance.submitter_department;
   const root_col_id = get_root_path_id();
   const dep_col_id = get_department_id(department, root_col_id);
   interface ReturnData {
@@ -582,7 +653,7 @@ const deposit_: any = async (gauser: any, instance: any, url: string) => {
   }
   const {type, col_type} =
     returnData(
-      gauser.title,
+      instance.submitter_title,
       [
         'Προπτυχιακός Φοιτητής',
         'Μεταπτυχιακός Φοιτητής',
@@ -594,7 +665,6 @@ const deposit_: any = async (gauser: any, instance: any, url: string) => {
         {type: 'Διδακτορικές Διατριβές', col_type: 'thesis'},
       ]
     );
-  // const license_id = get_license(license);
   const deposit_col_id = get_deposit_col_id(dep_col_id, type)
   const person_id_temp = get_person(gauser.name_el + ', ' + gauser.surname_el)
   const person_id = person_id_temp?
@@ -670,23 +740,3 @@ const deposit_: any = async (gauser: any, instance: any, url: string) => {
   return {id: deposit_returned_id, uploaded_file};
   
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
