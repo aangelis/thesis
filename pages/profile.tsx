@@ -82,6 +82,10 @@ export default function Profile() {
   if (!user?.isLoggedIn)
     return(<></>)
 
+  const profileNotCompleted = !user.name_el || !user.name_en ||
+  !user.surname_el || !user.surname_en ||
+  !user.father_name_el || !user.father_name_en;
+
   return (
     <Layout>
       <h1>Προφίλ</h1>
@@ -109,6 +113,16 @@ export default function Profile() {
         )}
       </Box>
 
+      { profileNotCompleted && ( 
+
+        <Alert severity="warning" sx={{ m: 1 }}>
+          <AlertTitle>Προσοχή!</AlertTitle>
+            Για να έχετε δικαίωμα δημιουργίας νέας απόθεσης
+            απαιτείται η συμπλήρωση <strong>όλων των πεδίων</strong> που περιλαμβάνει το προφίλ.
+        </Alert>
+
+      )}
+ 
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           disabled

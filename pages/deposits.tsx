@@ -15,6 +15,8 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Button from '@mui/material/Button';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import Link from "@mui/material/Link";
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 import {
   DataGrid,
   GridToolbar,
@@ -502,6 +504,10 @@ export default ((
   
   const hasDeposits = deposits && Object.keys(deposits).length > 0
 
+  const profileNotCompleted = !user.name_el || !user.name_en ||
+    !user.surname_el || !user.surname_en ||
+    !user.father_name_el || !user.father_name_en;
+
   return (
     <Layout>
       { user?.is_superuser && (
@@ -518,7 +524,14 @@ export default ((
           <h3>Δεν έχετε δικαιώματα δημιουργίας απόθεσης</h3>
         </Box>
       )}
-      { !user?.is_superuser && canAddNewDeposit && (
+      { !user.is_superuser && profileNotCompleted && ( 
+        <Alert severity="warning" sx={{ m: 1 }}>
+          <AlertTitle>Προσοχή!</AlertTitle>
+            Για να έχετε δικαίωμα δημιουργίας νέας απόθεσης
+            απαιτείται η συμπλήρωση <strong>όλων των πεδίων</strong> που περιλαμβάνει το προφίλ.
+        </Alert>
+      )}
+      { !user?.is_superuser && canAddNewDeposit && !profileNotCompleted && (
         <Box sx={{ '& > button': { m: 1 } }}>
           <Button
               color="secondary"
