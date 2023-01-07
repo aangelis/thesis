@@ -93,7 +93,7 @@ export default function Profile() {
       <Box sx={{ '& > button': { m: 1 } }}>
         { !user.is_superuser && (
           <Button sx={{ m: 1 }} variant="contained" href="#contained-buttons">
-            Τελικος χρηστης
+            δημιουργος
           </Button>
         )}
         { user.isSecretary && (
