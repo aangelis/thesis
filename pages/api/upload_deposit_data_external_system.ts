@@ -120,19 +120,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     if (depositData.id) {
       if (depositData.uploaded_file) {
+        console.log(`${ip} - [${new Date()}] - deposits uploader - Η απόθεση ολοκληρώθηκε.`)
         res.json({ message: "Η απόθεση ολοκληρώθηκε."});
       } else {
+        console.log(`${ip} - [${new Date()}] - deposits uploader - Η απόθεση ολοκληρώθηκε αλλά το αρχείο δεν ανέβηκε.`)
         res.json({ message: "Η απόθεση ολοκληρώθηκε αλλά το αρχείο δεν ανέβηκε."});
       }
     } else {
+      console.log(`${ip} - [${new Date()}] - deposits uploader - Error: Η απόθεση δεν πραγματοποιήθηκε.`)
       res.status(400).json({ message: "Η απόθεση δεν πραγματοποιήθηκε."});
     }
     return;
 
   }
   catch (error) {
-    console.log("main catch ")
-    console.log(error);
+    console.log(`${ip} - [${new Date()}] - deposit uploader - Error: ${(error as Error).message}.`)
     if ((error as Error).name === "AbortError") {
       res.status(500).json({ message: 'Request timeout.' });
       return;
@@ -597,18 +599,18 @@ const upload_file_: any = async (deposit_returned_id: number, instance: any, url
     settings.token = await get_token();
   }
   const token = settings.token;
+  if (!instance.new_filename || !instance.original_filename) {
+    throw new Error("Deposit does not have uploaded file.")
+  }
   const objectName = instance.id + '/' + instance.new_filename;
   const fileContents: any = await getObjectContents(objectName)
-  const filePath = '/home/aangelis/dev/nextjs/thesis/uploads/sample-1.pdf';
-  const fileName = 'sample-1.pdf';
   // https://stackoverflow.com/questions/60620160/uploading-file-via-api-using-nodejs-fetch
   const form = new FormData();
-  const buffer = fs.readFileSync(filePath);
   form.append('objectId', '/lib/default/data/' + deposit_returned_id as string);
   console.log("file contents ", fileContents)
   form.append('theFile', await fileContents[0], {
     contentType: 'application/pdf',
-    filename: fileName,
+    filename: instance.original_filename,
   });
   const headers = {
     'x-butterfly-session-token': token!,
