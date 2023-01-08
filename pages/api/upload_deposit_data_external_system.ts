@@ -683,29 +683,29 @@ const deposit_: any = async (gauser: any, instance: any, url: string) => {
 
   const description_el: string[] = [];
   const description_en: string[] = [];
-  if (instance.pages) {
+  if (instance.pages && instance.pages > 0) {
     description_el.push(instance.pages.toString() + ' σ.');
     description_en.push(instance.pages.toString() + ' p.');
   }
-  if (instance.images) {
-    description_el.push('εικ.');
-    description_en.push('img.');
+  if (instance.images && instance.images > 0) {
+    description_el.push(instance.images.toString() + ' εικ.');
+    description_en.push(instance.images.toString() + ' img.');
   }
-  if (instance.tables) {
-    description_el.push('πίν.');
-    description_en.push('tabl.');
+  if (instance.tables && instance.tables > 0) {
+    description_el.push(instance.tables.toString() + ' πίν.');
+    description_en.push(instance.tables.toString() + ' tabl.');
   }
-  if (instance.diagrams) {
-    description_el.push('διαγρ.');
-    description_en.push('diag.');
+  if (instance.diagrams && instance.diagrams > 0) {
+    description_el.push(instance.diagrams.toString() + ' διαγρ.');
+    description_en.push(instance.diagrams.toString() + ' diag.');
   }
-  if (instance.maps) {
-    description_el.push('χάρτες');
-    description_en.push('maps');
+  if (instance.maps && instance.maps > 0) {
+    description_el.push(instance.maps.toString() + ' χάρτες');
+    description_en.push(instance.maps.toString() + ' maps');
   }
-  if (instance.drawings) {
-    description_el.push('σχ.');
-    description_en.push('draw.');
+  if (instance.drawings && instance.drawings > 0) {
+    description_el.push(instance.drawings.toString() + ' σχ.');
+    description_en.push(instance.drawings.toString() + ' draw.');
   }
   const description_el_str = description_el.join(', ');
   const description_en_str = description_en.join(', ');
