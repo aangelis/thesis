@@ -39,6 +39,10 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { elGR as coreElGR } from '@mui/material/locale';
 import Grid from "@mui/material/Grid";
 
+const stringToBoolean = (s: string | null | undefined): boolean => {
+  return !!s
+}
+
 // Fetch deposits of current user
 export const getServerSideProps = withIronSessionSsr(async function ({
   req,
@@ -80,12 +84,15 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     submitter?: {
       id: number;
       email: string;
+      first_name: string | null;
+      last_name: string | null;
       name_el: string | null;
       surname_el: string | null;
       department: string | null;
       title: string | null;
     }
     submitter_fullname?: string | null;
+    submitter_fullname_ldap?: string | null;
     // submitter_department?: string | null;
     // submitter_title?: string | null;
   }
@@ -116,6 +123,8 @@ export const getServerSideProps = withIronSessionSsr(async function ({
           select: {
             id: true,
             email: true,
+            first_name: true,
+            last_name: true,
             name_el: true,
             surname_el: true,
             department: true,
@@ -137,6 +146,8 @@ export const getServerSideProps = withIronSessionSsr(async function ({
           select: {
             id: true,
             email: true,
+            first_name: true,
+            last_name: true,
             name_el: true,
             surname_el: true,
             department: true,
@@ -156,6 +167,8 @@ export const getServerSideProps = withIronSessionSsr(async function ({
         select: {
           id: true,
           email: true,
+          first_name: true,
+          last_name: true,
           name_el: true,
           surname_el: true,
           department: true,
@@ -166,7 +179,11 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   }))
 
   deposits.map((x) => {
-    x.submitter_fullname = x.submitter?.surname_el + ' ' + x.submitter?.name_el;
+    x.submitter_fullname =
+      (stringToBoolean(x.submitter?.surname_el)? x.submitter?.surname_el : "(κενό επίθετο)")
+      + ' '
+      + (stringToBoolean(x.submitter?.name_el)? x.submitter?.name_el : "(κενό όνομα)");
+    x.submitter_fullname_ldap = x.submitter?.first_name + ' ' + x.submitter?.last_name;
     // x.submitter_department = x.submitter?.department;
     // x.submitter_title = x.submitter?.title;
     return x;
@@ -201,8 +218,14 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 
     const canAddNewDeposit = !user?.is_superuser && unconfirmedCount < addNewCount;
 
+    const depositMeta = {
+      unconfirmedCount,
+      addNewCount,
+      canAddNewDeposit
+    }
+
   return {
-    props : { user, deposits: JSON.parse(JSON.stringify(deposits)), canAddNewDeposit }
+    props : { user, deposits: JSON.parse(JSON.stringify(deposits)), depositMeta }
   }
 }, sessionOptions);
 
@@ -245,7 +268,7 @@ function CustomToolbar() {
 }
 
 export default ((
-  { user, deposits, canAddNewDeposit }: InferGetServerSidePropsType<typeof getServerSideProps>,
+  { user, deposits, depositMeta }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) => {
   
   // https://v4.mui.com/ru/api/data-grid/grid-col-def/
@@ -313,6 +336,23 @@ export default ((
       width: 250,
       hide: !user?.is_superuser,
       editable: false,
+    },
+    {
+      field: 'submitter_fullname_ldap',
+      headerName: 'Δημιουργός (LDAP)',
+      headerAlign: 'center',
+      width: 250,
+      hide: true,
+      editable: false,
+    },
+    {
+      field: 'submitter.email',
+      headerName: 'Email Δημιουργού',
+      headerAlign: 'center',
+      width: 250,
+      hide: true,
+      editable: false,
+      valueGetter: (params) => params.row.submitter.email
     },
     {
       field: 'submitter_department',
@@ -519,14 +559,24 @@ export default ((
       { !hasDeposits && (
         <h3>Δεν βρέθηκαν αποθέσεις</h3>
       )}
-      { !user?.is_superuser && !canAddNewDeposit && (
+      { !user?.is_superuser &&
+        !depositMeta.canAddNewDeposit &&
+        depositMeta.unconfirmedCount === 0 && (
         <Alert severity="warning" sx={{ m: 1 }}>
           <AlertTitle>Προσοχή!</AlertTitle>
           Σύμφωνα με τη Γραμματεία του τμήματός σας δεν έχετε δικαίωμα υποβολής εργασίας.
           Επικοινωνήστε μαζί της ώστε να επιλύσετε το θέμα.
         </Alert>
       )}
-      { !user.is_superuser && profileNotCompleted && ( 
+      { !user?.is_superuser &&
+        depositMeta.unconfirmedCount > 0 && (
+        <Alert severity="warning" sx={{ m: 1 }}>
+          <AlertTitle>Προσοχή!</AlertTitle>
+          Υπάρχει μη επιβεβαιωμένη απόθεση που μπορείτε να επεξεργαστείτε.
+        </Alert>
+      )}    
+      { !user.is_superuser && profileNotCompleted &&
+        depositMeta.unconfirmedCount === 0 && ( 
         <Alert severity="warning" sx={{ m: 1 }}>
           <AlertTitle>Δεν έχετε ολοκληρωμένο προφίλ!</AlertTitle>
             Η δημιουργία απόθεσης
@@ -534,7 +584,16 @@ export default ((
             περιλαμβάνει το προφίλ σας.
         </Alert>
       )}
-      { !user?.is_superuser && canAddNewDeposit && !profileNotCompleted && (
+      { !user.is_superuser && profileNotCompleted &&
+        depositMeta.unconfirmedCount > 0 && (  
+        <Alert severity="warning" sx={{ m: 1 }}>
+          <AlertTitle>Δεν έχετε ολοκληρωμένο προφίλ!</AlertTitle>
+            Η επιβεβαίωση της απόθεσης
+            προϋποθέτει τη συμπλήρωση <strong>όλων των πεδίων</strong> που
+            περιλαμβάνει το προφίλ σας.
+        </Alert>
+      )}
+      { !user?.is_superuser && depositMeta.canAddNewDeposit && !profileNotCompleted && (
         <Box sx={{ '& > button': { m: 1 } }}>
           <Button
               color="secondary"
