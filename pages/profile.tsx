@@ -19,6 +19,11 @@ export default function Profile() {
     redirectTo: "/login",
   });
 
+  // Remove spaces and commas at the end and beginning
+  const stripEnds = (text: string): string => {
+    return text.replace(/^[,\s]+|[,\s]+$/g, '');
+  }
+
   const isValueElValid = (str: string): boolean => {
     if (str.length === 0) {
       return true;
@@ -83,24 +88,24 @@ export default function Profile() {
     }
     setOpenError(false);
   };
-  
+
   async function handleClickSave() {
     setLoading(true);
     // Remove spaces and commas at the end and beginning
-    setNameEl(nameEl.replace(/^[,\s]+|[,\s]+$/g, ''));
-    setNameEn(nameEn.replace(/^[,\s]+|[,\s]+$/g, ''));
-    setSurnameEl(surnameEl.replace(/^[,\s]+|[,\s]+$/g, ''));
-    setSurnameEn(surnameEn.replace(/^[,\s]+|[,\s]+$/g, ''));
-    setFatherNameEl(fatherNameEl.replace(/^[,\s]+|[,\s]+$/g, ''));
-    setFatherNameEn(fatherNameEn.replace(/^[,\s]+|[,\s]+$/g, ''));
+    setNameEl(stripEnds(nameEl));
+    setNameEn(stripEnds(nameEn));
+    setSurnameEl(stripEnds(surnameEl));
+    setSurnameEn(stripEnds(surnameEn));
+    setFatherNameEl(stripEnds(fatherNameEl));
+    setFatherNameEn(stripEnds(fatherNameEn));
     const body = {
       // Remove spaces and commas at the end and beginning (async useState)
-      name_el: nameEl.replace(/^[,\s]+|[,\s]+$/g, ''),
-      name_en: nameEn.replace(/^[,\s]+|[,\s]+$/g, ''),
-      surname_el: surnameEl.replace(/^[,\s]+|[,\s]+$/g, ''),
-      surname_en: surnameEn.replace(/^[,\s]+|[,\s]+$/g, ''),
-      father_name_el: fatherNameEl.replace(/^[,\s]+|[,\s]+$/g, ''),
-      father_name_en: fatherNameEn.replace(/^[,\s]+|[,\s]+$/g, ''),
+      name_el: stripEnds(nameEl),
+      name_en: stripEnds(nameEn),
+      surname_el: stripEnds(surnameEl),
+      surname_en: stripEnds(surnameEn),
+      father_name_el: stripEnds(fatherNameEl),
+      father_name_en: stripEnds(fatherNameEn),
     };
     await fetch('/api/profile', {
       method: 'POST',
@@ -297,9 +302,12 @@ export default function Profile() {
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           id="outlined-multiline-static"
-          error={!nameElValid}
+          error={!nameElValid || !stringToBoolean(nameEl)}
           label="Όνομα (Ελληνικά)"
-          helperText={!nameElValid && "Επιτρέπονται μόνο ελληνικοί χαρακτήρες"}
+          helperText={
+            (!nameElValid && "Επιτρέπονται μόνο ελληνικοί χαρακτήρες") ||
+            (!stringToBoolean(nameEl) && "Κενό πεδίο")
+          }
           value={nameEl}
           onChange={
             v => { 
@@ -321,9 +329,12 @@ export default function Profile() {
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           id="outlined-multiline-static"
-          error={!nameEnValid}
+          error={!nameEnValid || !stringToBoolean(nameEn)}
           label="Όνομα (Αγγλικά)"
-          helperText={!nameEnValid && "Επιτρέπονται μόνο λατινικοί χαρακτήρες"}
+          helperText={
+            (!nameEnValid && "Επιτρέπονται μόνο λατινικοί χαρακτήρες") ||
+            (!stringToBoolean(nameEn) && "Κενό πεδίο")
+          }
           value={nameEn}
           onChange={
             v => { 
@@ -345,9 +356,12 @@ export default function Profile() {
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           id="outlined-multiline-static"
-          error={!surnameElValid}
+          error={!surnameElValid || !stringToBoolean(surnameEl)}
           label="Επίθετο (Ελληνικά)"
-          helperText={!surnameElValid && "Επιτρέπονται μόνο ελληνικοί χαρακτήρες"}
+          helperText={
+            (!surnameElValid && "Επιτρέπονται μόνο ελληνικοί χαρακτήρες") ||
+            (!stringToBoolean(surnameEl) && "Κενό πεδίο")
+          }
           value={surnameEl}
           onChange={
             v => { 
@@ -369,9 +383,12 @@ export default function Profile() {
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           id="outlined-multiline-static"
-          error={!surnameEnValid}
+          error={!surnameEnValid || !stringToBoolean(surnameEn)}
           label="Επίθετο (Αγγλικά)"
-          helperText={!surnameEnValid && "Επιτρέπονται μόνο λατινικοί χαρακτήρες"}
+          helperText={
+            (!surnameEnValid && "Επιτρέπονται μόνο λατινικοί χαρακτήρες") ||
+            (!stringToBoolean(surnameEn) && "Κενό πεδίο")
+          }
           value={surnameEn}
           onChange={
             v => { 
@@ -393,9 +410,12 @@ export default function Profile() {
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           id="outlined-multiline-static"
-          error={!fatherNameElValid}
+          error={!fatherNameElValid || !stringToBoolean(fatherNameEl)}
           label="Όνομα πατέρα (Ελληνικά)"
-          helperText={!fatherNameElValid && "Επιτρέπονται μόνο ελληνικοί χαρακτήρες"}
+          helperText={
+            (!fatherNameElValid && "Επιτρέπονται μόνο ελληνικοί χαρακτήρες") ||
+            (!stringToBoolean(fatherNameEl) && "Κενό πεδίο")
+          }
           value={fatherNameEl}
           onChange={
             v => { 
@@ -417,9 +437,12 @@ export default function Profile() {
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           id="outlined-multiline-static"
-          error={!fatherNameEnValid}
+          error={!fatherNameEnValid || !stringToBoolean(fatherNameEn)}
           label="Όνομα πατέρα (Αγγλικά)"
-          helperText={!fatherNameEnValid && "Επιτρέπονται μόνο λατινικοί χαρακτήρες"}
+          helperText={
+            (!fatherNameEnValid && "Επιτρέπονται μόνο λατινικοί χαρακτήρες") ||
+            (!stringToBoolean(fatherNameEn) && "Κενό πεδίο")
+          }
           value={fatherNameEn}
           onChange={
             v => { 
