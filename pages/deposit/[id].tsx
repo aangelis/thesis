@@ -93,8 +93,8 @@ export const getServerSideProps = withIronSessionSsr(async function ({
       include: {
         submitter: {
           select: {
-            first_name: true,
-            last_name: true,
+            name_el: true,
+            surname_el: true,
           }
         }
       }
@@ -606,7 +606,7 @@ function DepositPage(
                   disabled
                   label="Δημιουργός"
                   name="submitter_fullname"
-                  value={deposit?.submitter.first_name + ' ' + deposit?.submitter.last_name}
+                  value={deposit?.submitter.name_el + ' ' + deposit?.submitter.name_en}
                 />
               </FormControl>
 

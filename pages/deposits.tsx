@@ -80,8 +80,8 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     submitter?: {
       id: number;
       email: string;
-      first_name: string | null;
-      last_name: string | null;
+      name_el: string | null;
+      surname_el: string | null;
       department: string | null;
       title: string | null;
     }
@@ -116,8 +116,8 @@ export const getServerSideProps = withIronSessionSsr(async function ({
           select: {
             id: true,
             email: true,
-            first_name: true,
-            last_name: true,
+            name_el: true,
+            surname_el: true,
             department: true,
             title: true,
           }
@@ -137,8 +137,8 @@ export const getServerSideProps = withIronSessionSsr(async function ({
           select: {
             id: true,
             email: true,
-            first_name: true,
-            last_name: true,
+            name_el: true,
+            surname_el: true,
             department: true,
             title: true,
           }
@@ -156,8 +156,8 @@ export const getServerSideProps = withIronSessionSsr(async function ({
         select: {
           id: true,
           email: true,
-          first_name: true,
-          last_name: true,
+          name_el: true,
+          surname_el: true,
           department: true,
           title: true,
         }
@@ -166,7 +166,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   }))
 
   deposits.map((x) => {
-    x.submitter_fullname = x.submitter?.first_name + ' ' + x.submitter?.last_name;
+    x.submitter_fullname = x.submitter?.name_el + ' ' + x.submitter?.surname_el;
     // x.submitter_department = x.submitter?.department;
     // x.submitter_title = x.submitter?.title;
     return x;
