@@ -123,19 +123,41 @@ export default function Profile() {
     });
   }
   
-  function normalizeText(text: string) {
+  // validate and alter greek letters σ, ς
+  const changeFinalLetter = (text: string): string => {
+    return text.slice(0, -1).replace(/[ς]/g, 'σ') + text.slice(-1).replace(/[σ]/g, 'ς')
+  }
+
+  const normalizeText = (text: string): string => {
+    return normalizeTextGeneric(text, false);
+  }
+
+  const normalizeTextFinal = (text: string): string => {
+    return normalizeTextGeneric(text, true);
+  }
+
+  const normalizeTextGeneric = (text: string, checkLast: boolean): string => {
     const words = text.split(" ");
     const wordsCount = words.length;
     
-    for (let i = 0; i <wordsCount; i++) {
-      if (words[i]) {
-        words[i] = words[i][0].toUpperCase() + words[i].substring(1).toLowerCase();
+    if (checkLast) {
+      words[wordsCount - 1] = stringToBoolean(words[wordsCount - 1])?
+      changeFinalLetter(words[wordsCount - 1])
+      :
+      words[wordsCount - 1];
+    } else {
+      for (let i = 0; i <wordsCount; i++) {
+        if (words[i]) {
+          words[i] = words[i][0].toUpperCase() + words[i].substring(1).toLowerCase();
+        }
       }
+
+      if (wordsCount > 1 && words[wordsCount - 1] === '') {
+        words[wordsCount - 2] = changeFinalLetter(words[wordsCount - 2]);
+      }
+
     }
-    
-    if (wordsCount > 1 && words[wordsCount - 1] === '') {
-      words[wordsCount - 2] = words[wordsCount - 2].slice(0, -1).replace(/[ς]/g, 'σ') + words[wordsCount - 2].slice(-1).replace(/[σ]/g, 'ς')
-    }
+
     return words.join(' ');
   }
 
@@ -191,9 +213,10 @@ export default function Profile() {
       { !user.is_superuser && !profileCompleted && ( 
 
         <Alert severity="warning" sx={{ m: 1 }}>
-          <AlertTitle>Προσοχή!</AlertTitle>
-            Για να έχετε δικαίωμα δημιουργίας νέας απόθεσης
-            απαιτείται η συμπλήρωση <strong>όλων των πεδίων</strong> που περιλαμβάνει το προφίλ.
+          <AlertTitle>Δεν έχετε ολοκληρωμένο προφίλ!</AlertTitle>
+            Η δημιουργία απόθεσης
+            προϋποθέτει τη συμπλήρωση <strong>όλων των πεδίων</strong> που
+            περιλαμβάνει το προφίλ σας.
         </Alert>
 
       )}
@@ -279,9 +302,14 @@ export default function Profile() {
           helperText={!nameElValid && "Επιτρέπονται μόνο ελληνικοί χαρακτήρες"}
           value={nameEl}
           onChange={
-            (v) => { 
+            v => { 
               setNameElValid(isValueElValid(v.target.value));
               setNameEl(normalizeText(v.target.value));
+            }
+          }
+          onBlur={
+            v => {
+              setNameEl(normalizeTextFinal(v.target.value));
             }
           }
           sx={{ width: 400 }}
@@ -298,9 +326,14 @@ export default function Profile() {
           helperText={!nameEnValid && "Επιτρέπονται μόνο λατινικοί χαρακτήρες"}
           value={nameEn}
           onChange={
-            (v) => { 
+            v => { 
               setNameEnValid(isValueEnValid(v.target.value));
               setNameEn(normalizeText(v.target.value));
+            }
+          }
+          onBlur={
+            v => {
+              setNameEn(normalizeTextFinal(v.target.value));
             }
           }
           sx={{ width: 400 }}
@@ -317,9 +350,14 @@ export default function Profile() {
           helperText={!surnameElValid && "Επιτρέπονται μόνο ελληνικοί χαρακτήρες"}
           value={surnameEl}
           onChange={
-            (v) => { 
+            v => { 
               setSurnameElValid(isValueElValid(v.target.value));
               setSurnameEl(normalizeText(v.target.value));
+            }
+          }
+          onBlur={
+            v => {
+              setSurnameEl(normalizeTextFinal(v.target.value));
             }
           }
           sx={{ width: 400 }}
@@ -336,9 +374,14 @@ export default function Profile() {
           helperText={!surnameEnValid && "Επιτρέπονται μόνο λατινικοί χαρακτήρες"}
           value={surnameEn}
           onChange={
-            (v) => { 
+            v => { 
               setSurnameEnValid(isValueEnValid(v.target.value));
               setSurnameEn(normalizeText(v.target.value)); 
+            }
+          }
+          onBlur={
+            v => {
+              setSurnameEn(normalizeTextFinal(v.target.value));
             }
           }
           sx={{ width: 400 }}
@@ -355,9 +398,14 @@ export default function Profile() {
           helperText={!fatherNameElValid && "Επιτρέπονται μόνο ελληνικοί χαρακτήρες"}
           value={fatherNameEl}
           onChange={
-            (v) => { 
+            v => { 
               setFatherNameElValid(isValueElValid(v.target.value));
               setFatherNameEl(normalizeText(v.target.value)); 
+            }
+          }
+          onBlur={
+            v => {
+              setFatherNameEl(normalizeTextFinal(v.target.value));
             }
           }
           sx={{ width: 400 }}
@@ -374,9 +422,14 @@ export default function Profile() {
           helperText={!fatherNameEnValid && "Επιτρέπονται μόνο λατινικοί χαρακτήρες"}
           value={fatherNameEn}
           onChange={
-            (v) => { 
+            v => { 
               setFatherNameEnValid(isValueEnValid(v.target.value));
               setFatherNameEn(normalizeText(v.target.value)); 
+            }
+          }
+          onBlur={
+            v => {
+              setFatherNameEn(normalizeTextFinal(v.target.value));
             }
           }
           sx={{ width: 400 }}
