@@ -560,8 +560,7 @@ export default ((
         <h3>Δεν βρέθηκαν αποθέσεις</h3>
       )}
       { !user?.is_superuser &&
-        !depositMeta.canAddNewDeposit &&
-        depositMeta.unconfirmedCount === 0 && (
+        depositMeta.addNewCount === 0 && (
         <Alert severity="warning" sx={{ m: 1 }}>
           <AlertTitle>Προσοχή!</AlertTitle>
           Σύμφωνα με τη Γραμματεία του τμήματός σας δεν έχετε δικαίωμα υποβολής εργασίας.
