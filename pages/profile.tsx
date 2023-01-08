@@ -114,14 +114,7 @@ export default function Profile() {
     })
     .then((data) => {
       setOpenSuccess(true);
-      setProfileCompleted(
-        stringToBoolean(data.name_el) && 
-        stringToBoolean(data.name_en) && 
-        stringToBoolean(data.surname_el) && 
-        stringToBoolean(data.surname_en) && 
-        stringToBoolean(data.father_name_el) &&
-        stringToBoolean(data.father_name_en)
-      );
+      setProfileCompleted(true);
       // setViewData(JSON.stringify(data, null, 2));
     })
     .catch(err => {
