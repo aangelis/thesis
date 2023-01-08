@@ -34,7 +34,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (str.length === 0) {
       return true;
     }
-    return (/^[\u0370-\u03FF\u1F00-\u1FFF]*$/.test(str));
+    return (/^[ \u0370-\u03FF\u1F00-\u1FFF]*$/.test(str));
   }
 
   const isFieldEnValid = (str: string | null | undefined): boolean => {
@@ -44,16 +44,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (str.length === 0) {
       return true;
     }
-    return (/^[A-Za-z]*$/.test(str));
+    return (/^[ A-Za-z]*$/.test(str));
+  }
+  // Remove spaces and commas at the end and beginning of all key values
+  for (const key in data) {
+    data[key] = data[key].replace(/^[,\s]+|[,\s]+$/g, '')
   }
 
   const permissionSchema = yup.object().shape({
-    father_name_el: yup.string().test((val) => val!.toString().length > 0 && isFieldElValid(val)),
-    father_name_en: yup.string().test((val) => val!.toString().length > 0 && isFieldEnValid(val)),
     name_el: yup.string().test((val) => val!.toString().length > 0 && isFieldElValid(val)),
     name_en: yup.string().test((val) => val!.toString().length > 0 && isFieldEnValid(val)),
     surname_el: yup.string().test((val) => val!.toString().length > 0 && isFieldElValid(val)),
     surname_en: yup.string().test((val) => val!.toString().length > 0 && isFieldEnValid(val)),
+    father_name_el: yup.string().test((val) => val!.toString().length > 0 && isFieldElValid(val)),
+    father_name_en: yup.string().test((val) => val!.toString().length > 0 && isFieldEnValid(val)),
   }).noUnknown();
   
   if (!(permissionSchema.isValidSync(data, { abortEarly: true, strict: true, }))) {
@@ -66,7 +70,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       where: {
         id,
       },
-      data
+      data: {
+        name_el: data.name_el!.replace(/^[,\s]+|[,\s]+$/g, ''),
+        name_en: data.name_en!.replace(/^[,\s]+|[,\s]+$/g, ''),
+        surname_el: data.surname_el!.replace(/^[,\s]+|[,\s]+$/g, ''),
+        surname_en: data.surname_en!.replace(/^[,\s]+|[,\s]+$/g, ''),
+        father_name_el: data.father_name_el!.replace(/^[,\s]+|[,\s]+$/g, ''),
+        father_name_en: data.father_name_en!.replace(/^[,\s]+|[,\s]+$/g, ''),
+      }
     })
     // store new user data to session
     req.session.user = {...user, ...data};

@@ -18,14 +18,46 @@ export default function Profile() {
   const { user } = useUser({
     redirectTo: "/login",
   });
-  
-  const [nameEl, setNameEl] = React.useState(user?.name_el)
-  const [nameEn, setNameEn] = React.useState(user?.name_en)
-  const [surnameEl, setSurnameEl] = React.useState(user?.surname_el)
-  const [surnameEn, setSurnameEn] = React.useState(user?.surname_en)
-  const [fatherNameEl, setFatherNameEl] = React.useState(user?.father_name_el)
-  const [fatherNameEn, setFatherNameEn] = React.useState(user?.father_name_en)
 
+  const isValueElValid = (str: string): boolean => {
+    if (str.length === 0) {
+      return true;
+    }
+    return (/^[ \u0370-\u03FF\u1F00-\u1FFF]*$/.test(str));
+  }
+
+  const isValueEnValid = (str: string): boolean => {
+    if (str.length === 0) {
+      return true;
+    }
+    return (/^[ A-Za-z]*$/.test(str));
+  }
+
+  const stringToBoolean = (s: string | null | undefined): boolean => {
+    return !!s
+  }
+
+  const [nameEl, setNameEl] = React.useState(user?.name_el || "")
+  const [nameEn, setNameEn] = React.useState(user?.name_en || "")
+  const [surnameEl, setSurnameEl] = React.useState(user?.surname_el || "")
+  const [surnameEn, setSurnameEn] = React.useState(user?.surname_en || "")
+  const [fatherNameEl, setFatherNameEl] = React.useState(user?.father_name_el || "")
+  const [fatherNameEn, setFatherNameEn] = React.useState(user?.father_name_en || "")
+
+  const [nameElValid, setNameElValid] = React.useState(isValueElValid(user?.name_el || ""));
+  const [nameEnValid, setNameEnValid] = React.useState(isValueEnValid(user?.name_en || ""));
+  const [surnameElValid, setSurnameElValid] = React.useState(isValueElValid(user?.surname_el || ""));
+  const [surnameEnValid, setSurnameEnValid] = React.useState(isValueEnValid(user?.surname_en || ""));
+  const [fatherNameElValid, setFatherNameElValid] = React.useState(isValueElValid(user?.father_name_el || ""));
+  const [fatherNameEnValid, setFatherNameEnValid] = React.useState(isValueEnValid(user?.father_name_en || ""));
+  const [fieldsValid, setFieldsValid] = React.useState<boolean>(
+    stringToBoolean(user?.name_el) && 
+    stringToBoolean(user?.name_en) && 
+    stringToBoolean(user?.surname_el) && 
+    stringToBoolean(user?.surname_en) && 
+    stringToBoolean(user?.father_name_el) &&
+    stringToBoolean(user?.father_name_en)
+  );
   const [loading, setLoading] = React.useState(false);
   const [openSuccess, setOpenSuccess] = React.useState(false);
   const [openError, setOpenError] = React.useState(false);
@@ -46,13 +78,21 @@ export default function Profile() {
   
   async function handleClickSave() {
     setLoading(true);
+    // Remove spaces and commas at the end and beginning
+    setNameEl(nameEl.replace(/^[,\s]+|[,\s]+$/g, ''));
+    setNameEn(nameEn.replace(/^[,\s]+|[,\s]+$/g, ''));
+    setSurnameEl(surnameEl.replace(/^[,\s]+|[,\s]+$/g, ''));
+    setSurnameEn(surnameEn.replace(/^[,\s]+|[,\s]+$/g, ''));
+    setFatherNameEl(fatherNameEl.replace(/^[,\s]+|[,\s]+$/g, ''));
+    setFatherNameEn(fatherNameEn.replace(/^[,\s]+|[,\s]+$/g, ''));
     const body = {
-      name_el: nameEl,
-      name_en: nameEn,
-      surname_el: surnameEl,
-      surname_en: surnameEn,
-      father_name_el: fatherNameEl,
-      father_name_en: fatherNameEn,
+      // Remove spaces and commas at the end and beginning (async useState)
+      name_el: nameEl.replace(/^[,\s]+|[,\s]+$/g, ''),
+      name_en: nameEn.replace(/^[,\s]+|[,\s]+$/g, ''),
+      surname_el: surnameEl.replace(/^[,\s]+|[,\s]+$/g, ''),
+      surname_en: surnameEn.replace(/^[,\s]+|[,\s]+$/g, ''),
+      father_name_el: fatherNameEl.replace(/^[,\s]+|[,\s]+$/g, ''),
+      father_name_en: fatherNameEn.replace(/^[,\s]+|[,\s]+$/g, ''),
     };
     await fetch('/api/profile', {
       method: 'POST',
@@ -74,10 +114,38 @@ export default function Profile() {
     });
   }
   
-  // https://stackoverflow.com/questions/23346506/javascript-normalize-accented-greek-characters
-  function normalizeGreek(text: string) {
-    return text.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+  function normalizeText(text: string) {
+    const words = text.split(" ");
+    const wordsCount = words.length;
+    
+    for (let i = 0; i <wordsCount; i++) {
+      if (words[i]) {
+        words[i] = words[i][0].toUpperCase() + words[i].substring(1).toLowerCase();
+      }
+    }
+    
+    if (wordsCount > 1 && words[wordsCount - 1] === '') {
+      words[wordsCount - 2] = words[wordsCount - 2].slice(0, -1).replace(/[ς]/g, 'σ') + words[wordsCount - 2].slice(-1).replace(/[σ]/g, 'ς')
+    }
+    return words.join(' ');
   }
+
+  React.useEffect(() => {
+    setFieldsValid(
+      isValueElValid(nameEl) && 
+      isValueEnValid(nameEn) && 
+      isValueElValid(surnameEl) && 
+      isValueEnValid(surnameEn) && 
+      isValueElValid(fatherNameEl) &&
+      isValueEnValid(fatherNameEn) &&
+      stringToBoolean(nameEl) && 
+      stringToBoolean(nameEn) && 
+      stringToBoolean(surnameEl) && 
+      stringToBoolean(surnameEn) && 
+      stringToBoolean(fatherNameEl) &&
+      stringToBoolean(fatherNameEn)
+    );
+  }, [nameEl, nameEl, surnameEl, surnameEn, fatherNameEl, fatherNameEn])
 
   if (!user?.isLoggedIn)
     return(<></>)
@@ -199,10 +267,15 @@ export default function Profile() {
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           id="outlined-multiline-static"
+          error={!nameElValid}
           label="Όνομα (Ελληνικά)"
+          helperText={!nameElValid && "Επιτρέπονται μόνο ελληνικοί χαρακτήρες"}
           value={nameEl}
           onChange={
-            (v) => { setNameEl(normalizeGreek(v.target.value).toUpperCase()); }
+            (v) => { 
+              setNameElValid(isValueElValid(v.target.value));
+              setNameEl(normalizeText(v.target.value));
+            }
           }
           sx={{ width: 400 }}
         />
@@ -213,10 +286,15 @@ export default function Profile() {
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           id="outlined-multiline-static"
+          error={!nameEnValid}
           label="Όνομα (Αγγλικά)"
+          helperText={!nameEnValid && "Επιτρέπονται μόνο λατινικοί χαρακτήρες"}
           value={nameEn}
           onChange={
-            (v) => { setNameEn(normalizeGreek(v.target.value).toUpperCase()); }
+            (v) => { 
+              setNameEnValid(isValueEnValid(v.target.value));
+              setNameEn(normalizeText(v.target.value));
+            }
           }
           sx={{ width: 400 }}
         />
@@ -227,10 +305,15 @@ export default function Profile() {
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           id="outlined-multiline-static"
+          error={!surnameElValid}
           label="Επίθετο (Ελληνικά)"
+          helperText={!surnameElValid && "Επιτρέπονται μόνο ελληνικοί χαρακτήρες"}
           value={surnameEl}
           onChange={
-            (v) => { setSurnameEl(normalizeGreek(v.target.value).toUpperCase()); }
+            (v) => { 
+              setSurnameElValid(isValueElValid(v.target.value));
+              setSurnameEl(normalizeText(v.target.value));
+            }
           }
           sx={{ width: 400 }}
         />
@@ -241,10 +324,15 @@ export default function Profile() {
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           id="outlined-multiline-static"
+          error={!surnameEnValid}
           label="Επίθετο (Αγγλικά)"
+          helperText={!surnameEnValid && "Επιτρέπονται μόνο λατινικοί χαρακτήρες"}
           value={surnameEn}
           onChange={
-            (v) => { setSurnameEn(normalizeGreek(v.target.value).toUpperCase()); }
+            (v) => { 
+              setSurnameEnValid(isValueEnValid(v.target.value));
+              setSurnameEn(normalizeText(v.target.value)); 
+            }
           }
           sx={{ width: 400 }}
         />
@@ -255,10 +343,15 @@ export default function Profile() {
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           id="outlined-multiline-static"
+          error={!fatherNameElValid}
           label="Όνομα πατέρα (Ελληνικά)"
+          helperText={!fatherNameElValid && "Επιτρέπονται μόνο ελληνικοί χαρακτήρες"}
           value={fatherNameEl}
           onChange={
-            (v) => { setFatherNameEl(normalizeGreek(v.target.value).toUpperCase()); }
+            (v) => { 
+              setFatherNameElValid(isValueElValid(v.target.value));
+              setFatherNameEl(normalizeText(v.target.value)); 
+            }
           }
           sx={{ width: 400 }}
         />
@@ -269,10 +362,15 @@ export default function Profile() {
       <FormControl fullWidth sx={{ m: 1 }}>
         <TextField
           id="outlined-multiline-static"
+          error={!fatherNameEnValid}
           label="Όνομα πατέρα (Αγγλικά)"
+          helperText={!fatherNameEnValid && "Επιτρέπονται μόνο λατινικοί χαρακτήρες"}
           value={fatherNameEn}
           onChange={
-            (v) => { setFatherNameEn(normalizeGreek(v.target.value).toUpperCase()); }
+            (v) => { 
+              setFatherNameEnValid(isValueEnValid(v.target.value));
+              setFatherNameEn(normalizeText(v.target.value)); 
+            }
           }
           sx={{ width: 400 }}
         />
@@ -283,6 +381,7 @@ export default function Profile() {
       <Box sx={{ '& > button': { m: 1 } }}>
         <LoadingButton
           color="secondary"
+          disabled={!fieldsValid}
           onClick={handleClickSave}
           loading={loading}
           loadingPosition="start"
