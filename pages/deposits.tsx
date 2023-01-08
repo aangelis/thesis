@@ -166,7 +166,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   }))
 
   deposits.map((x) => {
-    x.submitter_fullname = x.submitter?.name_el + ' ' + x.submitter?.surname_el;
+    x.submitter_fullname = x.submitter?.surname_el + ' ' + x.submitter?.name_el;
     // x.submitter_department = x.submitter?.department;
     // x.submitter_title = x.submitter?.title;
     return x;
@@ -520,15 +520,18 @@ export default ((
         <h3>Δεν βρέθηκαν αποθέσεις</h3>
       )}
       { !user?.is_superuser && !canAddNewDeposit && (
-        <Box sx={{ '& > button': { m: 1 }, color: 'red' }}>
-          <h3>Δεν έχετε δικαιώματα δημιουργίας απόθεσης</h3>
-        </Box>
+        <Alert severity="warning" sx={{ m: 1 }}>
+          <AlertTitle>Προσοχή!</AlertTitle>
+          Σύμφωνα με τη Γραμματεία του τμήματός σας δεν έχετε δικαίωμα υποβολής εργασίας.
+          Επικοινωνήστε μαζί της ώστε να επιλύσετε το θέμα.
+        </Alert>
       )}
       { !user.is_superuser && profileNotCompleted && ( 
         <Alert severity="warning" sx={{ m: 1 }}>
-          <AlertTitle>Προσοχή!</AlertTitle>
-            Για να έχετε δικαίωμα δημιουργίας νέας απόθεσης
-            απαιτείται η συμπλήρωση <strong>όλων των πεδίων</strong> που περιλαμβάνει το προφίλ.
+          <AlertTitle>Δεν έχετε ολοκληρωμένο προφίλ!</AlertTitle>
+            Η δημιουργία απόθεσης
+            προϋποθέτει τη συμπλήρωση <strong>όλων των πεδίων</strong> που
+            περιλαμβάνει το προφίλ σας.
         </Alert>
       )}
       { !user?.is_superuser && canAddNewDeposit && !profileNotCompleted && (
