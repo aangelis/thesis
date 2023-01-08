@@ -7,43 +7,22 @@ import { User } from "pages/api/user";
 import { InferGetServerSidePropsType } from "next";
 import useUser from "lib/useUser";
 import { PrismaClient } from '@prisma/client'
-import { IncomingMessage } from "http";
-import { join } from "path";
 
 import TextField from '@mui/material/TextField';
-import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
-import Divider from '@mui/material/Divider';
 import React from 'react';
 import MenuItem from '@mui/material/MenuItem';
-import { color } from '@mui/system';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LoadingButton from '@mui/lab/LoadingButton';
-
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
-import Stack from '@mui/material/Stack';
-
 import Snackbar from '@mui/material/Snackbar';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
-
-import Script from 'next/script'
-
-import type { NextPage } from "next";
-import Head from "next/head";
-import Image from "next/image";
 import { ChangeEvent, MouseEvent, useState } from "react";
-import Button from '@mui/material/Button';
-import InputLabel from '@mui/material/InputLabel';
-import { Input } from '@mui/icons-material';
 import Fab from '@mui/material/Fab';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
-import { promisify } from 'util';
 
 
 // Fetch deposit data
@@ -54,20 +33,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 }) {
   const user: User = req.session.user!;
 
-  // // https://github.com/aralroca/next-translate/issues/694#issuecomment-974717129
-  // // Get id property of request data
-  // const NextRequestMetaSymbol = Reflect.ownKeys(req).find(key => key.toString() === 'Symbol(NextRequestMeta)');
-  // // const params = NextRequestMetaSymbol && req[NextRequestMetaSymbol].__NEXT_INIT_QUERY ? req[NextRequestMetaSymbol].__NEXT_INIT_QUERY : undefined
-  // // const depositId = Number(params.id);
-  // const params_ = NextRequestMetaSymbol && req[NextRequestMetaSymbol].__NEXT_INIT_URL ? req[NextRequestMetaSymbol].__NEXT_INIT_URL : undefined
-  // const split = params_.split('/')[params_.split('/').length-1];
-  // const depositId = Number(split.split('.')[0]);
-
-  // // on link
-  // // http://localhost:3000/_next/data/development/deposit/9.json?id=9
-  // // on refresh
-  // // http://localhost:3000/deposit/9
-
   // https://www.learnbestcoding.com/post/25/nextjs-how-to-use-getserversideprops
   const depositId: number = Number(params?.id);
 
@@ -75,12 +40,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     res.setHeader("location", "/login");
     res.statusCode = 302;
     res.end();
-    // return {
-    //   props: {
-    //     user: { id: null, email: null, username: null, isLoggedIn: false } as User,
-    //     deposit: null,
-    //   },
-    // };
   }
 
   const prisma = new PrismaClient()
@@ -412,16 +371,20 @@ function DepositPage(
 
   async function handleClickSave() {
     setLoading(true);
+    // Remove spaces and commas at the end and beginning
+    setKeywords_el(keywords_el.replace(/^[,\s]+|[,\s]+$/g, ''));
+    setKeywords_en(keywords_en.replace(/^[,\s]+|[,\s]+$/g, ''));
     const body: Body = {
       //id: deposit?.id,
       // id: id,
       title: textFields.find(o => o.name === "title_el")?.value,
       title_el: textFields.find(o => o.name === "title_el")?.value,
       title_en: textFields.find(o => o.name === "title_en")?.value,
-      abstract_el: keywords_el.replace(/^[,\s]+|[,\s]+$/g, ''), // Remove spaces and commas at the end and beginning
-      keywords_en: keywords_en.replace(/^[,\s]+|[,\s]+$/g, ''), // Remove spaces and commas at the end and beginning
-      keywords_el,
+      abstract_el,
       abstract_en,
+      // Remove spaces and commas at the end and beginning (async useState)
+      keywords_el: keywords_el.replace(/^[,\s]+|[,\s]+$/g, ''),
+      keywords_en: keywords_en.replace(/^[,\s]+|[,\s]+$/g, ''),
       pages: Number(numFields.find(o => o.name === "pages")?.value),
       language: (
         (language === '')?
