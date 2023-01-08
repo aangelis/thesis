@@ -606,7 +606,7 @@ function DepositPage(
                   disabled
                   label="Δημιουργός"
                   name="submitter_fullname"
-                  value={deposit?.submitter.name_el + ' ' + deposit?.submitter.name_en}
+                  value={deposit?.submitter.surname_el + ' ' + deposit?.submitter.name_el}
                 />
               </FormControl>
 
