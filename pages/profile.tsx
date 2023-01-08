@@ -58,6 +58,14 @@ export default function Profile() {
     stringToBoolean(user?.father_name_el) &&
     stringToBoolean(user?.father_name_en)
   );
+  const [profileCompleted, setProfileCompleted] = React.useState<boolean>(
+    stringToBoolean(user?.name_el) && 
+    stringToBoolean(user?.name_en) && 
+    stringToBoolean(user?.surname_el) && 
+    stringToBoolean(user?.surname_en) && 
+    stringToBoolean(user?.father_name_el) &&
+    stringToBoolean(user?.father_name_en)
+  );
   const [loading, setLoading] = React.useState(false);
   const [openSuccess, setOpenSuccess] = React.useState(false);
   const [openError, setOpenError] = React.useState(false);
@@ -106,6 +114,14 @@ export default function Profile() {
     })
     .then((data) => {
       setOpenSuccess(true);
+      setProfileCompleted(
+        stringToBoolean(data.name_el) && 
+        stringToBoolean(data.name_en) && 
+        stringToBoolean(data.surname_el) && 
+        stringToBoolean(data.surname_en) && 
+        stringToBoolean(data.father_name_el) &&
+        stringToBoolean(data.father_name_en)
+      );
       // setViewData(JSON.stringify(data, null, 2));
     })
     .catch(err => {
@@ -150,9 +166,7 @@ export default function Profile() {
   if (!user?.isLoggedIn)
     return(<></>)
 
-  const profileNotCompleted = !user.name_el || !user.name_en ||
-  !user.surname_el || !user.surname_en ||
-  !user.father_name_el || !user.father_name_en;
+
 
   return (
     <Layout>
@@ -181,7 +195,7 @@ export default function Profile() {
         )}
       </Box>
 
-      { !user.is_superuser && profileNotCompleted && ( 
+      { !user.is_superuser && !profileCompleted && ( 
 
         <Alert severity="warning" sx={{ m: 1 }}>
           <AlertTitle>Προσοχή!</AlertTitle>
