@@ -357,7 +357,7 @@ function DepositPage(
     maps: number;
     drawings: number;
     confirmed: boolean;
-    confirmed_timestamp: Date;
+    // confirmed_timestamp: Date;
     license: string;
     comments: string;
     supervisor: string;
@@ -391,7 +391,7 @@ function DepositPage(
       maps: Number(numFields.find(o => o.name === "maps")?.value),
       drawings: Number(numFields.find(o => o.name === "drawings")?.value),
       confirmed,
-      confirmed_timestamp: confirmedTimestamp || null,
+      // confirmed_timestamp: confirmedTimestamp || null,
       license: (
         (license === '')?
           (process.env.NEXT_PUBLIC_DEPOSIT_LICENSE_DEFAULT?
@@ -838,7 +838,7 @@ function DepositPage(
             <div>
               <TextField
                 id="outlined-select-confirmation"
-                disabled={(depositReadOnly && !canConfirm) || deposit?.confirmed || !user.is_superuser}
+                disabled={(depositReadOnly && !canConfirm) || confirmedStored || deposit?.confirmed || !user.is_superuser}
                 select
                 label="Επιβεβαιωμένη από Βιβλιοθηκονόμο"
                 value={confirmed}

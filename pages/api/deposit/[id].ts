@@ -16,6 +16,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
   const user: User = req.session.user!;
+  const ip = req.socket.remoteAddress;
 
   if (!user?.isLoggedIn) {
     res.status(400).json({ message: "Access refused. User not logged in." });
@@ -76,7 +77,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const {
       confirmed,
-      confirmed_timestamp,
+      // confirmed_timestamp,
       comments,
       submitter_department,
       submitter_title,
@@ -129,12 +130,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       maps: yup.number().integer().required().min(0),
       drawings: yup.number().integer().required().min(0),
       confirmed: yup.boolean().required(),
-      confirmed_timestamp: yup.string().nullable()
-      .test(dateString => 
-        ((dateString === null) ||
-        ((new Date(dateString!).toString() !== 'Invalid Date')
-        && (new Date(dateString!) >= new Date())))
-      ),
+      // confirmed_timestamp: yup.string().nullable()
+      // .test(dateString => 
+      //   ((dateString === null) ||
+      //   ((new Date(dateString!).toString() !== 'Invalid Date')
+      //   && (new Date(dateString!) >= new Date())))
+      // ),
       license: yup.string().test((val) => val!.toString().length > 0),
       comments: yup.string().test((val) => val!.toString().length >= 0),
       supervisor: yup.string().test((val) => val!.toString().length >= 0),
@@ -144,28 +145,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       res.status(400).json({ message: "Invalid input data." });
       return;
     }
-
-    // if (
-    //   !data.title_el ||
-    //   !data.title_en ||
-    //   data.title_el === "" ||
-    //   data.title_en === "" ||
-    //   isNaN(+data.pages) ||
-    //   isNaN(+data.images) ||
-    //   isNaN(+data.tables) ||
-    //   isNaN(+data.diagrams) ||
-    //   isNaN(+data.maps) ||
-    //   isNaN(+data.drawings) ||
-    //   Number(data.pages) < 0 ||
-    //   Number(data.images) < 0 ||
-    //   Number(data.tables) < 0 ||
-    //   Number(data.diagrams) < 0 ||
-    //   Number(data.maps) < 0 ||
-    //   Number(data.drawings) < 0
-    // ) {
-    //   res.status(400).json({ message: "Invalid input data." });
-    //   return;
-    // }
 
     if (user.isLibrarian && dbStoredDepositData?.confirmed) {
       res.status(400).json({ message: "Deposit confirmation data cannot be updated." });
@@ -181,10 +160,48 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           // data: filteredData
           data: {
             confirmed,
-            confirmed_timestamp,
+            confirmed_timestamp: new Date(),
             comments,
           }
         })
+
+        if (updateDeposit?.confirmed) {
+
+          console.log(`${ip} - [${new Date()}] - deposit update - deposit with id ${updateDeposit.id} confirmed.`)
+
+          const updateUser = await prisma.user.findUnique({
+            where: {
+              id: updateDeposit.submitter_id,
+            }
+          })
+
+          const proto =
+            req.headers["x-forwarded-proto"] || req.connection.encrypted
+              ? "https"
+              : "http";
+          const localHostname = 
+            req.headers["x-forwarded-host"] || req.headers.host;
+      
+          await fetch(
+            proto + '://' + localHostname + '/api/email',
+            {
+              method: 'POST',
+              mode: 'no-cors',
+              body: JSON.stringify(
+                {
+                  fullname: updateUser?.name_el + ' ' + updateUser?.surname_el,
+                  email: updateUser?.email,
+                  subject: 'Επιβεβαίωση απόθεσης',
+                  text: `Η απόθεση με τίτλο \"${updateDeposit.title_el}\" επιβεβαιώθηκε.`
+                }
+              ),
+            }
+          )
+          .then(() => {
+            console.log(`${ip} - [${new Date()}] - deposit update - email sent for deposit confirmation for deposit with id ${updateDeposit.id}.`)
+          })
+          
+        }
         res.json(updateDeposit);
         return;
       } catch (error) {
