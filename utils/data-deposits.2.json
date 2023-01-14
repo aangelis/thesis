@@ -1,8 +1,3 @@
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
-
-const deposits = 
 [
   {
     id: 1,
@@ -2315,27 +2310,3 @@ const deposits =
     date_uploaded: null
   }
 ]
-
-
-
-async function main() {
-
-  deposits.forEach(
-    async x => {
-    const deposit = await prisma.deposit.create({
-      data: x
-    })
-    console.log(deposit.title)
-  })
-
-}
-
-main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
-  .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })

@@ -1,8 +1,3 @@
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
-
-const permissions = 
 [
   {
     id: 2,
@@ -41,28 +36,3 @@ const permissions =
     secretary_id: 8
   }
 ]
-
-
-
-
-async function main() {
-
-  permissions.forEach(
-    async x => {
-    const permission = await prisma.permission.create({
-      data: x
-    })
-    console.log(permission.submitter_email)
-  })
-
-}
-
-main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
-  .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
