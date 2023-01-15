@@ -77,12 +77,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     ssl: process.env.SMTP_SSL === "true",
   });
 
+  const messageFooter = process.env.MESSAGE_FOOTER! || "";
+
   client.send(
     {
       from: `Σύστημα αυτοαπόθεσης <${process.env.SMTP_FROM_EMAIL!}>`,
       to: `${data.fullname} <${data.email!}>`,
       subject: data.subject!,
-      text: data.text!,
+      text: data.text! + messageFooter,
     },
     (err, message) => {
       if (err) {
