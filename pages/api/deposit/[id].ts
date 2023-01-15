@@ -153,6 +153,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     if (user.isLibrarian) {
       try {
+        const storedDeposit = await prisma.deposit.findUnique({
+          where: {
+            id
+          },
+        })
         const updateDeposit = await prisma.deposit.update({
           where: {
             id
@@ -165,43 +170,67 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           }
         })
 
-        if (updateDeposit?.confirmed) {
+        console.log(`${ip} - [${new Date()}] - deposit update - deposit with id ${updateDeposit.id} updated.`)
 
-          console.log(`${ip} - [${new Date()}] - deposit update - deposit with id ${updateDeposit.id} confirmed.`)
-
-          const updateUser = await prisma.user.findUnique({
-            where: {
-              id: updateDeposit.submitter_id,
-            }
-          })
-
-          const proto =
-            req.headers["x-forwarded-proto"] || req.connection.encrypted
-              ? "https"
-              : "http";
-          const localHostname = 
-            req.headers["x-forwarded-host"] || req.headers.host;
-      
-          await fetch(
-            proto + '://' + localHostname + '/api/email',
+        const depositConfirmed = updateDeposit?.confirmed;
+        const commentsUpdated = storedDeposit?.comments !== updateDeposit.comments
+        const { logMessage, emailTitle, emailMessage } = depositConfirmed?
+          {
+            logMessage: `deposit with id ${updateDeposit.id} confirmed.`,
+            emailTitle: 'Επιβεβαίωση απόθεσης',
+            emailMessage: `Η απόθεση με τίτλο \"${updateDeposit.title_el}\" επιβεβαιώθηκε.`,
+          }
+          : commentsUpdated?
             {
-              method: 'POST',
-              mode: 'no-cors',
-              body: JSON.stringify(
-                {
-                  fullname: updateUser?.name_el + ' ' + updateUser?.surname_el,
-                  email: updateUser?.email,
-                  subject: 'Επιβεβαίωση απόθεσης',
-                  text: `Η απόθεση με τίτλο \"${updateDeposit.title_el}\" επιβεβαιώθηκε.`
-                }
-              ),
+              logMessage: `comments in deposit with id ${updateDeposit.id} updated.`,
+              emailTitle: 'Νέο σχόλιο στην απόθεση',
+              emailMessage: `Υπάρχει ένα νέο σχόλιο στην απόθεση με τίτλο \"${updateDeposit.title_el}\".`,
             }
-          )
-          .then(() => {
-            console.log(`${ip} - [${new Date()}] - deposit update - email sent for deposit confirmation for deposit with id ${updateDeposit.id}.`)
-          })
+            :
+            { logMessage: ' ', emailTitle: ' ', emailMessage: ' ' };
+
+        console.log(`${ip} - [${new Date()}] - deposit update - ${logMessage}`)
+
+        const updateUser = await prisma.user.findUnique({
+          where: {
+            id: updateDeposit.submitter_id,
+          }
+        })
+
+        // ensure that fullname is populated with LDAP or user provided data
+        const fullname =
+        updateUser?.name_el && updateUser?.surname_el?
+          updateUser?.name_el + ' ' + updateUser?.surname_el
+          :
+          updateUser?.first_name + ' ' + updateUser?.last_name;
+
+        const proto =
+          req.headers["x-forwarded-proto"] || req.connection.encrypted
+            ? "https"
+            : "http";
+        const localHostname = 
+          req.headers["x-forwarded-host"] || req.headers.host;
+    
+        await fetch(
+          proto + '://' + localHostname + '/api/email',
+          {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(
+              {
+                fullname,
+                email: updateUser?.email,
+                subject: emailTitle,
+                text: emailMessage,
+              }
+            ),
+          }
+        )
+        .then(() => {
+          console.log(`${ip} - [${new Date()}] - deposit update - email sent for deposit update with id ${updateDeposit.id}.`)
+        })
           
-        }
+        
         res.json(updateDeposit);
         return;
       } catch (error) {
@@ -224,6 +253,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
         data: rest
       })
+      console.log(`${ip} - [${new Date()}] - deposit update - deposit with id ${updateDeposit.id} updated.`)
       res.json(updateDeposit);
       return;
     } catch (error) {
