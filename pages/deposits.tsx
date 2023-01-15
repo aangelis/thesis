@@ -32,6 +32,8 @@ import {
   GridValueFormatterParams,
   GridRowParams,
   GridToolbarQuickFilter,
+  GridInitialState,
+  useGridApiContext,
   elGR,
 } from '@mui/x-data-grid';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -516,18 +518,45 @@ export default ((
     // pickersElGR, // x-date-pickers translations
     coreElGR, // core translations
   );
+
+  const localStoredState = (typeof window !== 'undefined') ?
+    JSON.parse(localStorage.getItem('gridstate')!)
+    :
+    {
+      columns: { columnVisibilityModel: {} },
+      sorting: {
+        sortModel: [{ field: 'date_created', sort: 'desc' }],
+      },
+    };
+
+  const [savedState, setSavedState] = React.useState<{
+    // count: number;
+    initialState: GridInitialState;
+  }>({
+    // count: 0,
+    initialState:
+      localStoredState,
+  });
   
   // Rendered more hooks than during the previous render with custom hook
   const tableToShow = (
     <div style={{ height: 500, width: '100%' }}>
+      <Button
+        size="small"
+        onClick={() => {console.log(savedState);}}
+      >
+        Recreate the 2nd grid
+      </Button>
     <ThemeProvider theme={theme}>
       <DataGrid
+        initialState={savedState.initialState}
         rows={deposits}
         columns={columns}
         experimentalFeatures={{ newEditingApi: true }}
         // onRowClick={handleEvent}
         components={{ Toolbar: CustomToolbar }}
         pageSize={pageSize}
+        onStateChange={s => localStorage.setItem("gridstate", JSON.stringify(s))}
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
         rowsPerPageOptions={[10, 25, 50, 100]}
         pagination
@@ -541,7 +570,7 @@ export default ((
       /></ThemeProvider>
     </div> 
   )
-  
+
   const hasDeposits = deposits && Object.keys(deposits).length > 0
 
   const profileNotCompleted = !user.name_el || !user.name_en ||
