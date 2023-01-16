@@ -519,16 +519,16 @@ export default ((
 
   const changePageSize = (newPageSize: number) => {
     setPageSize(newPageSize);
-    localStorage.setItem("pagesize", JSON.stringify(newPageSize))
+    sessionStorage.setItem("pagesize", JSON.stringify(newPageSize))
   }
 
   const localStoredPageSize = (typeof window !== 'undefined') ?
-  JSON.parse(localStorage.getItem('pagesize')!)
+  JSON.parse(sessionStorage.getItem('pagesize')!)
   :
   100;
 
   const localStoredState = (typeof window !== 'undefined') ?
-    JSON.parse(localStorage.getItem('gridstate')!)
+    JSON.parse(sessionStorage.getItem('gridstate')!)
     :
     {
       columns: { columnVisibilityModel: {} },
@@ -560,7 +560,7 @@ export default ((
         // onRowClick={handleEvent}
         components={{ Toolbar: CustomToolbar }}
         pageSize={pageSize}
-        onStateChange={s => localStorage.setItem("gridstate", JSON.stringify(s))}
+        onStateChange={s => sessionStorage.setItem("gridstate", JSON.stringify(s))}
         // onPageSizeChange={newPageSize => setPageSize(newPageSize)}
         onPageSizeChange={newPageSize => changePageSize(newPageSize)}
         // columnVisibilityModel={columnVisibilityModel}
