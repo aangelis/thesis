@@ -506,8 +506,6 @@ export default ((
   //   router.push('/deposit/'+params.row.id)
   // };
 
-  const [pageSize, setPageSize] = React.useState<number>(100)
-
   const theme = createTheme(
     {
       palette: {
@@ -519,6 +517,16 @@ export default ((
     coreElGR, // core translations
   );
 
+  const changePageSize = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    localStorage.setItem("pagesize", JSON.stringify(newPageSize))
+  }
+
+  const localStoredPageSize = (typeof window !== 'undefined') ?
+  JSON.parse(localStorage.getItem('pagesize')!)
+  :
+  100;
+
   const localStoredState = (typeof window !== 'undefined') ?
     JSON.parse(localStorage.getItem('gridstate')!)
     :
@@ -528,6 +536,8 @@ export default ((
         sortModel: [{ field: 'date_created', sort: 'desc' }],
       },
     };
+  
+    const [pageSize, setPageSize] = React.useState<number>(localStoredPageSize)
 
   const [savedState, setSavedState] = React.useState<{
     // count: number;
@@ -541,12 +551,6 @@ export default ((
   // Rendered more hooks than during the previous render with custom hook
   const tableToShow = (
     <div style={{ height: 500, width: '100%' }}>
-      <Button
-        size="small"
-        onClick={() => {console.log(savedState);}}
-      >
-        Recreate the 2nd grid
-      </Button>
     <ThemeProvider theme={theme}>
       <DataGrid
         initialState={savedState.initialState}
@@ -557,7 +561,12 @@ export default ((
         components={{ Toolbar: CustomToolbar }}
         pageSize={pageSize}
         onStateChange={s => localStorage.setItem("gridstate", JSON.stringify(s))}
-        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        // onPageSizeChange={newPageSize => setPageSize(newPageSize)}
+        onPageSizeChange={newPageSize => changePageSize(newPageSize)}
+        // columnVisibilityModel={columnVisibilityModel}
+        // onColumnVisibilityModelChange={m =>
+          // setColumnVisibilityModel(m)
+        // }
         rowsPerPageOptions={[10, 25, 50, 100]}
         pagination
         autoHeight={true}
