@@ -44,3 +44,4 @@ next-env.d.ts
 pages/test*
 uploads/*
 pages/api/test*
+test*
