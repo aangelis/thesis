@@ -2,11 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from '@prisma/client'
 import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "lib/session";
-import permission from "./permission";
-import { response } from "express";
-import { pipeline } from "stream/promises";
-import { minioClient } from "lib/mc";
-import deposit from "./deposit";
 
 export default withIronSessionApiRoute(handler, sessionOptions);
 
@@ -42,7 +37,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // https://stackoverflow.com/questions/53377774/fetch-multiple-links-inside-foreach-loop
     Promise.all(depositsToUpload.map(x =>
       fetch(
-        proto + '://' + localHostname + '/api/upload_deposit_data_external_system',
+        proto + '://' + localHostname + '/api/deposit_uploader',
         {
           method: 'POST',
           mode: 'no-cors',
