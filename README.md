@@ -15,6 +15,10 @@ npm run dev
 
 Στη διεύθυνση [http://localhost:3000](http://localhost:3000) βλέπουμε το αποτέλεσμα.
 
+#### Οδηγίες εγκατάστασης k8s
+
+[k8s/README.md](k8s/README.md)
+
 ## Βάση χρηστών κατά τη διάρκεια της ανάπτυξης
 
 Στη διεύθυνση [http://localhost:3000/api/dummyldap](http://localhost:3000/api/dummyldap) στέλνουμε σε μορφή JSON το username (χωρίς το domain) και το password του χρήστη και μας επιστρέφει σε μορφή JSON τα στοιχεία email, username, first_name, last_name, full_name, title και department. Στην περίπτωση σφάλματος επιστρέφει αντίστοιχο μήνυμα.
