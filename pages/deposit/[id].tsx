@@ -5,7 +5,6 @@ import { withIronSessionSsr } from "iron-session/next";
 import { sessionOptions } from "lib/session";
 import { User } from "pages/api/user";
 import { InferGetServerSidePropsType } from "next";
-import useUser from "lib/useUser";
 import { PrismaClient } from '@prisma/client'
 
 import TextField from '@mui/material/TextField';
@@ -179,8 +178,6 @@ function DepositPage(
   }
   
   const [id, setId] = React.useState<number | null>(deposit?.id! || null)
-  // const [title_el, setTitle_el] = React.useState(deposit.title_el || "");
-  // const [title_en, setTitle_en] = React.useState(deposit.title_en || "");
   const [abstract_el, setAbstract_el] = React.useState(deposit?.abstract_el || "");
   const [abstract_en, setAbstract_en] = React.useState(deposit?.abstract_en || "");
   const [keywords_el, setKeywords_el] = React.useState(deposit?.keywords_el || "");
@@ -201,24 +198,6 @@ function DepositPage(
   const [openUploadSuccess, setOpenUploadSuccess] = React.useState(false)
   const [openError, setOpenError] = React.useState(false)
   const [openFileError, setOpenFileError] = React.useState("")
-  
-  // first version of error checking for pages field
-  //
-  // const [pages, setPages] = React.useState(deposit.pages || "");
-  // const [pagesError, setPagesError] = React.useState("");
-  // const [images, setImages] = React.useState(deposit.images || "");
-  // const [tables, setTables] = React.useState(deposit.tables || "");
-  // const [diagrams, setDiagrams] = React.useState(deposit.diagrams || "");
-  // const [maps, setMaps] = React.useState(deposit.maps || "");
-  // const [drawings, setDrawings] = React.useState(deposit.drawings || "");
-  // React.useEffect(() => {
-  //   if (Number(pages) >= 0 && pages !== "" && pagesError !== "") {
-  //     setPagesError("");
-  //   }
-  //   if ((Number(pages) < 0 || pages === "") && pagesError === "") {
-  //     setPagesError("Positive number needed!");
-  //   }
-  // }, [pages, pagesError]);
 
   const alphabeticalFields = [
     {name: "title_el", value: deposit?.title_el || "", error: "" },
@@ -277,8 +256,6 @@ function DepositPage(
     });
     setNumFields(result);
   };
-  // React.useEffect(() => {
-  // }, [numFields]);
 
   const handleCloseSuccess = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -444,20 +421,6 @@ function DepositPage(
       console.error(err);
     });
   }
-
-  // React.useEffect(() => {
-  //   handleTextFields(
-  //     {target:
-  //       {name: "title_el", value: textFields.find(o => o.name === "title_el")?.value}
-  //     });
-  //   handleTextFields(
-  //     {target:
-  //       {name: "title_en", value: textFields.find(o => o.name === "title_en")?.value}
-  //   });
-  // }, [])
-
-
-
 
   const [file, setFile] = React.useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);

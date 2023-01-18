@@ -1,10 +1,8 @@
 import type { User } from "./user";
-
 import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "lib/session";
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from '@prisma/client'
-import { NotAllowedOnNonLeafError } from "ldapjs";
 
 const prisma = new PrismaClient()
 
@@ -119,22 +117,6 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
         userData.id = storeUser.id;
       }
 
-      // static role assignments for development purposes
-      // const roles = [
-      //   { username: "ifigenia", isLibrarian: true  },
-      //   { username: "tsadimas", isLibrarian: true, isSecretary: true, isAdmin: true  },
-      //   { username: (process.env.LOGIN_ADMIN_EMAIL?.split('@')[0]), isLibrarian: true, isSecretary: true, isAdmin: true  },
-      //   { username: "daneli", isSecretary: true },
-      // ]
-  
-      // const currentUserRoles = roles.find((o) => {
-      //   return (o.username === userData.username);
-      // })
-  
-      // const isAdmin = currentUserRoles?.isAdmin ?? false;
-      // const isSecretary = currentUserRoles?.isSecretary ?? false;
-      // const isLibrarian = currentUserRoles?.isLibrarian ?? false;
-
       // Check if user data already exists in roles table
       const userRoles = isAdminLogin?
         { is_admin: true,  is_secretary: true, is_librarian: true, } 
@@ -172,16 +154,10 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
 
     } else {
       
-
       console.log(result);
       return;
 
-      
-      //res.status(result.status).json({ result });
     }
-
-
-   
 
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });

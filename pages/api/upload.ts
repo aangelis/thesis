@@ -30,11 +30,6 @@ const handler = async (
 
   try {
 
-    // const { fields, files } = await parseForm(req);
-
-    // const depositId = fields.depositId;
-    // const file = files.media;
-    // let url = Array.isArray(file) ? file.map((f) => f.filepath) : file.filepath;
     const { depositId, url } = await parseForm(req);
 
     res.status(200).json({

@@ -96,51 +96,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(400).json({ message: "Invalid input data." });
     return;
   }
-
-  
-
-  // if (id) {
-  //   res.status(400).json({ message: "Adding new deposit failed. Provided id input." });
-  //   return;
-  // }
-
-  // if (data.submitter_id !== user.id) {
-  //   res.status(400).json({ message: "Deposit must be owned by submitter." });
-  //   return;
-  // }
-
-  // if (
-  //   !data.title_el ||
-  //   !data.title_en ||
-  //   data.title_el === "" ||
-  //   data.title_en === "" ||
-  //   isNaN(+data.pages) ||
-  //   isNaN(+data.images) ||
-  //   isNaN(+data.tables) ||
-  //   isNaN(+data.diagrams) ||
-  //   isNaN(+data.maps) ||
-  //   isNaN(+data.drawings) ||
-  //   Number(data.pages) < 0 ||
-  //   Number(data.images) < 0 ||
-  //   Number(data.tables) < 0 ||
-  //   Number(data.diagrams) < 0 ||
-  //   Number(data.maps) < 0 ||
-  //   Number(data.drawings
-  // ) < 0) {
-  //   res.status(400).json({ message: "Invalid input data." });
-  //   return;
-  // }
-  
-  // interface FilteredData {
-  //   [key: string]: any; 
-  // }
-  // const filteredData: FilteredData = {};
-  // filter data and keep only the required three key value pairs
-  // const selectedKeys = ["id", "confirmed", "confirmed_timestamp"];
-  // Object.entries(data)
-  //   .filter(([k,v]) => selectedKeys.includes(k))
-  //   .forEach(([k,v]) => filteredData[k]=v);
-
   
   // Check is user can add a new deposit
   const unconfirmedCount = 
@@ -160,7 +115,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         submitter_email: user.email!,
         due_to: {
           gte: new Date(),
-          // gte: new Date('2022-12-26'),
         },
       },
       _count: {
@@ -189,6 +143,5 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(500).json({ message: (error as Error).message });
     return;
   }
-
 
 }

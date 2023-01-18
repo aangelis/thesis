@@ -106,23 +106,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return;
     }
 
-    // const validateEmail = (m: string) => {
-    //   return String(m)
-    //     .toLowerCase()
-    //     .match(
-    //       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    //     );
-    // }
-
-    // if (!data.submitter_email ||
-    //   data.submitter_email === "" ||
-    //   data.submitter_email.split('@')[1] !== 'hua.gr' ||
-    //   validateEmail(data.submitter_email) === null 
-    // ) {
-    //   res.status(400).json({ message: "Invalid input data." });
-    //   return;
-    // }
-
     try {
       const updatePermission = await prisma.permission.update({
         where: {

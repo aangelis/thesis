@@ -46,10 +46,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
     return (/^[ A-Za-z]*$/.test(str));
   }
-  // Remove spaces and commas at the end and beginning of all key values
-  // for (const key in data) {
-  //   data[key] = data[key].replace(/^[,\s]+|[,\s]+$/g, '')
-  // }
 
   const dataEntries = Object.entries(data)
   // check count of input data keys

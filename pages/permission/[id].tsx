@@ -1,50 +1,20 @@
-// import React from "react";
-import router, { useRouter } from 'next/router'
+import router from 'next/router'
 import Layout from "components/Layout";
 import { withIronSessionSsr } from "iron-session/next";
 import { sessionOptions } from "lib/session";
 import { User } from "pages/api/user";
 import { InferGetServerSidePropsType } from "next";
-import useUser from "lib/useUser";
 import { PrismaClient } from '@prisma/client'
-import { IncomingMessage } from "http";
-import { join } from "path";
-
 import TextField from '@mui/material/TextField';
-import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
-import Divider from '@mui/material/Divider';
 import React from 'react';
-import MenuItem from '@mui/material/MenuItem';
-import { color } from '@mui/system';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LoadingButton from '@mui/lab/LoadingButton';
-
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
-import Stack from '@mui/material/Stack';
-
 import Snackbar from '@mui/material/Snackbar';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
-
-import Script from 'next/script'
-
-import type { NextPage } from "next";
-import Head from "next/head";
-import Image from "next/image";
-import { ChangeEvent, MouseEvent, useState } from "react";
-import Button from '@mui/material/Button';
-import InputLabel from '@mui/material/InputLabel';
-import { Input } from '@mui/icons-material';
-import Fab from '@mui/material/Fab';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
-import { promisify } from 'util';
-
 import { Dayjs } from 'dayjs';
 import 'dayjs/locale/el';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -229,8 +199,6 @@ function PermissionPage(
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       );
   }
-
-
 
   React.useEffect(() => {
 

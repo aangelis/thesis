@@ -5,7 +5,6 @@ import { sessionOptions } from "lib/session";
 import { minioClient } from "lib/mc";
 import fetch from 'node-fetch'
 import FormData from 'form-data';
-import fs from 'fs';
 
 export default withIronSessionApiRoute(handler, sessionOptions);
 

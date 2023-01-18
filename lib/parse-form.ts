@@ -16,7 +16,6 @@ export const FormidableError = formidable.errors.FormidableError;
 export const parseForm = async (
   req: NextApiRequest
 ): Promise<{ depositId: string, url: string }> => {
-// ): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
   return await new Promise(async (resolve, reject) => {
 
     const user: any = req.session.user;
@@ -67,13 +66,6 @@ export const parseForm = async (
       },
     });
 
-    // Extended form.parse to move file to final destination folder
-    // form.parse(req, function (err, fields, files) {
-    //   console.log({fields, files});
-    //   if (err) reject(err);
-    //   resolve({ fields, files });
-    // });
-
     // Upload directory based on the form fields data in formidable
     // https://stackoverflow.com/questions/60519635/upload-directory-based-on-the-form-fields-data-in-formidable
     form.parse(req);
@@ -84,25 +76,20 @@ export const parseForm = async (
       // console.log({name, value});
       depositId = JSON.parse(value);
      
-
       prisma.deposit.findUnique({
         where: {
           id: depositId as unknown as number
         }
       })
-      .then(deposit => {
+      .then((deposit: any) => {
         // Check if deposit belongs to user before update
         if (deposit?.submitter_id !== user.id) {
-          // res.status(400).json({ data: null, error: "User cannot modify this deposit." });
-          // TODO: delete uploaded file 
           reject("User cannot modify this deposit.");
         }
-      }).catch (error => {
-        // res.status(500).json({ data: null, error: (error as Error).message });
+      }).catch ((error: any) => {
         reject((error as Error).message);
       })
      
-      
     });
 
     form.on("file", (field, file) => {
@@ -189,15 +176,14 @@ export const parseForm = async (
                   original_filename: file.originalFilename,
                 },
               })
-              .then(result => {
+              .then((result: any) => {
                 // console.log(result)
               })
-              .catch(error => {
+              .catch((error: any) => {
                 console.error(error);
                 reject(error);
               })
               .finally(() => {
-                // console.log({ depositId, url: filePath });
                 resolve({ depositId, url: filePath });
               })
           })          

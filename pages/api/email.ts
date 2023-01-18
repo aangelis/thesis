@@ -1,10 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "lib/session";
-import { User } from "pages/api/user";
 import * as yup from 'yup';
 import { SMTPClient } from 'emailjs';
-// import * as LH from 'is-localhost-ip';
 import isLocalHost from 'is-localhost-ip';
 
 export default withIronSessionApiRoute(handler, sessionOptions);

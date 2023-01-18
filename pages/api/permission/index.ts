@@ -26,14 +26,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(400).json({ message: "Access refused." });
     return;
   }
-
-  // const validateEmail = (m: string) => {
-  //   return String(m)
-  //     .toLowerCase()
-  //     .match(
-  //       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-  //     );
-  // }
   
   // Process a POST request
   const data = await req.body; // permission
@@ -54,20 +46,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.status(400).json({ message: "Invalid input data." });
     return;
   }
-
-  // if (data.id) {
-  //   res.status(400).json({ message: "Adding new permission failed. Provided id input." });
-  //   return;
-  // }
-
-  // if (!data.submitter_email ||
-  //   data.submitter_email === "" ||
-  //   data.submitter_email.split('@')[1] !== 'hua.gr' ||
-  //   validateEmail(data.submitter_email) === null 
-  // ) {
-  //   res.status(400).json({ message: "Invalid input data." });
-  //   return;
-  // }
 
   try {
     const permission = await prisma.permission.create({
