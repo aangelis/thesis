@@ -15,7 +15,7 @@ npm run dev
 
 Στη διεύθυνση [http://localhost:3000](http://localhost:3000) βλέπουμε το αποτέλεσμα.
 
-#### Οδηγίες εγκατάστασης k8s
+## Οδηγίες εγκατάστασης k8s
 
 [k8s/README.md](k8s/README.md)
 
