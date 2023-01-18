@@ -26,18 +26,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   console.log(`${ip} - [${new Date()}] - deposits uploader - ${depositsToUpload.length} ${depositsToUpload.length>1? 'deposits' : 'deposit'} to upload.`)
 
-  const proto =
-    req.headers["x-forwarded-proto"] || req.connection.encrypted
-      ? "https"
-      : "http";
-  const localHostname = 
-    req.headers["x-forwarded-host"] || req.headers.host;
+  // const proto =
+  //   req.headers["x-forwarded-proto"] || req.connection.encrypted
+  //     ? "https"
+  //     : "http";
+  // const localHostname = 
+  //   req.headers["x-forwarded-host"] || req.headers.host;
+
+  const localProtocolHostname = process.env.LOCAL_PROTO_HOST_PORT || "http://locahost:3000";
 
   try {
     // https://stackoverflow.com/questions/53377774/fetch-multiple-links-inside-foreach-loop
     Promise.all(depositsToUpload.map(x =>
       fetch(
-        proto + '://' + localHostname + '/api/deposit_uploader',
+        // proto + '://' + localHostname + '/api/deposit_uploader',
+        localProtocolHostname + '/api/deposit_uploader',
         {
           method: 'POST',
           mode: 'no-cors',
