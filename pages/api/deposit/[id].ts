@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from '@prisma/client'
 import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "lib/session";
+import sendEmail from "lib/email";
 import { User } from "pages/api/user";
 import * as yup from 'yup';
 
@@ -204,32 +205,40 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           :
           updateUser?.first_name + ' ' + updateUser?.last_name;
 
-        const proto =
-          req.headers["x-forwarded-proto"] || req.connection.encrypted
-            ? "https"
-            : "http";
-        const localHostname = 
-          req.headers["x-forwarded-host"] || req.headers.host;
+        // const proto =
+        //   req.headers["x-forwarded-proto"] || req.connection.encrypted
+        //     ? "https"
+        //     : "http";
+        // const localHostname = 
+        //   req.headers["x-forwarded-host"] || req.headers.host;
     
-        await fetch(
-          proto + '://' + localHostname + '/api/email',
-          {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(
-              {
-                fullname,
-                email: updateUser?.email,
-                subject: emailTitle,
-                text: emailMessage,
-              }
-            ),
-          }
-        )
+        // await fetch(
+        //   proto + '://' + localHostname + '/api/email',
+        //   {
+        //     method: 'POST',
+        //     mode: 'no-cors',
+        //     body: JSON.stringify(
+        //       {
+        //         fullname,
+        //         email: updateUser?.email,
+        //         subject: emailTitle,
+        //         text: emailMessage,
+        //       }
+        //     ),
+        //   }
+        // )
+        // .then(() => {
+        //   console.log(`${ip} - [${new Date()}] - deposit update - email sent for deposit update with id ${updateDeposit.id}.`)
+        // })
+        await sendEmail({
+          fullname,
+          email: updateUser?.email!,
+          subject: emailTitle,
+          text: emailMessage,
+        })
         .then(() => {
           console.log(`${ip} - [${new Date()}] - deposit update - email sent for deposit update with id ${updateDeposit.id}.`)
-        })
-          
+        });
         
         res.json(updateDeposit);
         return;
