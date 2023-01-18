@@ -42,6 +42,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         department: "Πληροφορικής και Τηλεματικής",
       })
       return;
+    } else if (email === "itp22039@hua.gr" && password === "1234") {
+      console.log(`${ip} - [${now}] - success - ${email}`);
+      res.json({
+        email: "itp22039@hua.gr",
+        username: "itp22039",
+        first_name: "ΕΥΑΓΓΕΛΟΣ",
+        last_name: "ΓΕΩΡΓΙΟΥ",
+        title: "Προπτυχιακός Φοιτητής",
+        department: "Πληροφορικής και Τηλεματικής",
+      })
+      return;
     } else if (email === "tsadimas@hua.gr" && password === "1234") {
       console.log(`${ip} - [${now}] - success - ${email}`);
       res.json({
