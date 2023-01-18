@@ -218,30 +218,31 @@ function RolePage(
       );
   }
 
-  const onEmailChange = (e: any) => {
-  // const onEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const emailValue = e.target.value || "";
-
-    // setEmail(emailValue);
-    if (emailValue === "") {
-      setEmailError("No email provided.");
-      return;
-    }
-    if (emailValue.split('@')[1] !== 'hua.gr') {
-      setEmailError("Invalid email.");
-      return;
-    }
-    const validEmail = validateEmail(emailValue);
-    if (validEmail === null) {
-      setEmailError("Invalid email.");
-      return;
-    }
-    setEmailError("");
-    return;
-
-  };
-
   React.useEffect(() => {
+
+    const onEmailChange = (e: any) => {
+    // const onEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
+      const emailValue = e.target.value || "";
+
+      // setEmail(emailValue);
+      if (emailValue === "") {
+        setEmailError("No email provided.");
+        return;
+      }
+      if (emailValue.split('@')[1] !== 'hua.gr') {
+        setEmailError("Invalid email.");
+        return;
+      }
+      const validEmail = validateEmail(emailValue);
+      if (validEmail === null) {
+        setEmailError("Invalid email.");
+        return;
+      }
+      setEmailError("");
+      return;
+
+    };
+
     onEmailChange(
       {target:
         {name: "email", value: email}

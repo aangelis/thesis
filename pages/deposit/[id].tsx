@@ -445,16 +445,16 @@ function DepositPage(
     });
   }
 
-  React.useEffect(() => {
-    handleTextFields(
-      {target:
-        {name: "title_el", value: textFields.find(o => o.name === "title_el")?.value}
-      });
-    handleTextFields(
-      {target:
-        {name: "title_en", value: textFields.find(o => o.name === "title_en")?.value}
-    });
-  }, [])
+  // React.useEffect(() => {
+  //   handleTextFields(
+  //     {target:
+  //       {name: "title_el", value: textFields.find(o => o.name === "title_el")?.value}
+  //     });
+  //   handleTextFields(
+  //     {target:
+  //       {name: "title_en", value: textFields.find(o => o.name === "title_en")?.value}
+  //   });
+  // }, [])
 
 
 

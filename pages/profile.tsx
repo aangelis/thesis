@@ -181,7 +181,7 @@ export default function Profile() {
       stringToBoolean(fatherNameEl) &&
       stringToBoolean(fatherNameEn)
     );
-  }, [nameEl, nameEl, surnameEl, surnameEn, fatherNameEl, fatherNameEn])
+  }, [nameEl, nameEn, surnameEl, surnameEn, fatherNameEl, fatherNameEn])
 
   if (!user?.isLoggedIn)
     return(<></>)
