@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 const roles = 
 [
   {
-    id: 4,
+    // id: 4,
     email: 'itp220022@hua.gr',
     is_admin: true,
     is_secretary: false,
@@ -13,7 +13,7 @@ const roles =
     is_active: false
   },
   {
-    id: 5,
+    // id: 5,
     email: 'itp22200@hua.gr',
     is_admin: false,
     is_secretary: true,
@@ -21,7 +21,7 @@ const roles =
     is_active: false
   },
   {
-    id: 6,
+    // id: 6,
     email: 'itp21101@hua.gr',
     is_admin: false,
     is_secretary: true,
@@ -29,7 +29,7 @@ const roles =
     is_active: false
   },
   {
-    id: 7,
+    // id: 7,
     email: 'ifigenia@hua.gr',
     is_admin: false,
     is_secretary: false,
@@ -37,7 +37,7 @@ const roles =
     is_active: true
   },
   {
-    id: 8,
+    // id: 8,
     email: 'mitsi@hua.gr',
     is_admin: false,
     is_secretary: true,
@@ -45,7 +45,7 @@ const roles =
     is_active: true
   },
   {
-    id: 9,
+    // id: 9,
     email: 'daneli@hua.gr',
     is_admin: false,
     is_secretary: true,

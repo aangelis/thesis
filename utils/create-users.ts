@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 const users = 
 [
   {
-    id: 1,
+    // id: 1,
     email: 'itp21101@hua.gr',
     username: 'itp21101',
     first_name: 'ΑΠΟΣΤΟΛΟΣ',
@@ -26,7 +26,7 @@ const users =
     date_joined: '2022-11-19T12:20:23.210Z'
   },
   {
-    id: 2,
+    // id: 2,
     email: 'itp21100@hua.gr',
     username: 'itp21100',
     first_name: 'ΒΑΣΙΛΗΣ',
@@ -47,7 +47,7 @@ const users =
     date_joined: '2022-11-19T12:20:35.849Z'
   },
   {
-    id: 4,
+    // id: 4,
     email: 'admin@hua.gr',
     username: 'admin',
     first_name: 'Διαχειριστής',
@@ -68,7 +68,7 @@ const users =
     date_joined: '2022-11-29T19:21:01.346Z'
   },
   {
-    id: 5,
+    // id: 5,
     email: 'tsadimas@hua.gr',
     username: 'tsadimas',
     first_name: 'ΑΝΑΡΓΥΡΟΣ',
@@ -89,7 +89,7 @@ const users =
     date_joined: '2022-12-01T18:06:05.283Z'
   },
   {
-    id: 6,
+    // id: 6,
     email: 'ifigenia@hua.gr',
     username: 'ifigenia',
     first_name: 'ΙΦΙΓΕΝΕΙΑ',
@@ -110,7 +110,7 @@ const users =
     date_joined: '2022-12-20T18:48:36.879Z'
   },
   {
-    id: 7,
+    // id: 7,
     email: 'mitsi@hua.gr',
     username: 'mitsi',
     first_name: 'ΜΗΤΣΗ',
@@ -131,11 +131,11 @@ const users =
     date_joined: '2022-12-24T17:37:58.608Z'
   },
   {
-    id: 8,
+    // id: 8,
     email: 'daneli@hua.gr',
     username: 'daneli',
     first_name: 'ΦΩΤΕΙΝΗ',
-    last_name: 'ΔΕΝΕΛΗ',
+    last_name: 'ΔΑΝΕΛΗ',
     name_el: null,
     name_en: null,
     surname_el: null,
@@ -152,7 +152,7 @@ const users =
     date_joined: '2022-12-27T11:25:46.981Z'
   },
   {
-    id: 9,
+    // id: 9,
     email: 'itp22044@hua.gr',
     username: 'itp22044',
     first_name: 'ΔΗΜΗΤΡΙΟΣ',

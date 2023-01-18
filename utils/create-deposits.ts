@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 const deposits = 
 [
   {
-    id: 1,
+  //  id: 1,
     title: 'NFR verification process',
     title_el: 'διαδικασία επαλήθευσης NFR',
     title_en: 'NFR verification process',
@@ -25,7 +25,7 @@ const deposits =
     confirmed_timestamp: null,
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: 'Ένα σύντομο σχόλιο για δοκιμή.',
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -35,7 +35,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 2,
+  //  id: 2,
     title: 'CSNFR verification process',
     title_el: 'διαδικασία επαλήθευσης CSNFRC',
     title_en: 'SNFR verification process',
@@ -55,7 +55,7 @@ const deposits =
     confirmed_timestamp: null,
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 2,
+    submitter_id: 8,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: null,
@@ -65,7 +65,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 3,
+  //  id: 3,
     title: 'RFSS7 verification process',
     title_el: 'διαδικασία επαλήθευσης RFSS7',
     title_en: 'RFSS7 verification process',
@@ -85,7 +85,7 @@ const deposits =
     confirmed_timestamp: '2022-12-28T10:35:47.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: '',
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -95,7 +95,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 4,
+  //  id: 4,
     title: 'διαδικασία επαλήθευσης FGRFSS7',
     title_el: 'διαδικασία επαλήθευσης FGRFSS7',
     title_en: 'FGRFSS7 verification process',
@@ -115,7 +115,7 @@ const deposits =
     confirmed_timestamp: '2022-12-28T10:35:47.984Z',
     license: 'Αναφορά Δημιουργού - Παρόμοια Διανομή 4.0',
     comments: '',
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: 'Ανάργυρος Τσαδήμας',
@@ -125,7 +125,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 5,
+  //  id: 5,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -145,7 +145,7 @@ const deposits =
     confirmed_timestamp: '2022-11-21T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -155,7 +155,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 6,
+  //  id: 6,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -175,7 +175,7 @@ const deposits =
     confirmed_timestamp: '2022-08-03T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -185,7 +185,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 7,
+  //  id: 7,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -205,7 +205,7 @@ const deposits =
     confirmed_timestamp: '2021-11-14T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -215,7 +215,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 8,
+  //  id: 8,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -235,7 +235,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -245,7 +245,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 9,
+  //  id: 9,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -265,7 +265,7 @@ const deposits =
     confirmed_timestamp: '2022-10-18T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -275,7 +275,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 10,
+  //  id: 10,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -295,7 +295,7 @@ const deposits =
     confirmed_timestamp: '2020-03-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -305,7 +305,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 11,
+  //  id: 11,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -325,7 +325,7 @@ const deposits =
     confirmed_timestamp: '2022-12-28T10:35:47.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -335,7 +335,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 12,
+  //  id: 12,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -355,7 +355,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -365,7 +365,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 13,
+  //  id: 13,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -385,7 +385,7 @@ const deposits =
     confirmed_timestamp: '2021-11-14T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -395,7 +395,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 14,
+  //  id: 14,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -415,7 +415,7 @@ const deposits =
     confirmed_timestamp: '2022-08-03T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -425,7 +425,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 15,
+  //  id: 15,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -445,7 +445,7 @@ const deposits =
     confirmed_timestamp: '2022-12-28T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -455,7 +455,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 16,
+  //  id: 16,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -475,7 +475,7 @@ const deposits =
     confirmed_timestamp: '2020-03-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -485,7 +485,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 17,
+  //  id: 17,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -505,7 +505,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -515,7 +515,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 18,
+  //  id: 18,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -535,7 +535,7 @@ const deposits =
     confirmed_timestamp: '2022-08-03T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -545,7 +545,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 19,
+  //  id: 19,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -565,7 +565,7 @@ const deposits =
     confirmed_timestamp: '2022-12-28T10:35:47.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -575,7 +575,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 20,
+  //  id: 20,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -595,7 +595,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -605,7 +605,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 21,
+  //  id: 21,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -625,7 +625,7 @@ const deposits =
     confirmed_timestamp: '2022-08-03T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -635,7 +635,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 22,
+  //  id: 22,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -655,7 +655,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -665,7 +665,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 23,
+  //  id: 23,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -685,7 +685,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -695,7 +695,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 24,
+  //  id: 24,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -715,7 +715,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -725,7 +725,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 25,
+  //  id: 25,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -745,7 +745,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -755,7 +755,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 26,
+  //  id: 26,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -775,7 +775,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -785,7 +785,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 27,
+  //  id: 27,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -805,7 +805,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -815,7 +815,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 28,
+  //  id: 28,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -835,7 +835,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -845,7 +845,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 29,
+  //  id: 29,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -865,7 +865,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -875,7 +875,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 30,
+  //  id: 30,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -895,7 +895,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -905,7 +905,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 31,
+  //  id: 31,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -925,7 +925,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -935,7 +935,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 32,
+  //  id: 32,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -955,7 +955,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -965,7 +965,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 33,
+  //  id: 33,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -985,7 +985,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -995,7 +995,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 34,
+  //  id: 34,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1015,7 +1015,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1025,7 +1025,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 35,
+  //  id: 35,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1045,7 +1045,7 @@ const deposits =
     confirmed_timestamp: '2019-06-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1055,7 +1055,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 36,
+  //  id: 36,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1075,7 +1075,7 @@ const deposits =
     confirmed_timestamp: '2021-11-14T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1085,7 +1085,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 37,
+  //  id: 37,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1105,7 +1105,7 @@ const deposits =
     confirmed_timestamp: '2021-11-14T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1115,7 +1115,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 38,
+  //  id: 38,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1135,7 +1135,7 @@ const deposits =
     confirmed_timestamp: '2021-11-14T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1145,7 +1145,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 39,
+  //  id: 39,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1165,7 +1165,7 @@ const deposits =
     confirmed_timestamp: '2021-11-14T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1175,7 +1175,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 40,
+  //  id: 40,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1195,7 +1195,7 @@ const deposits =
     confirmed_timestamp: '2020-03-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1205,7 +1205,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 41,
+  //  id: 41,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1225,7 +1225,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1235,7 +1235,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 42,
+  //  id: 42,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1255,7 +1255,7 @@ const deposits =
     confirmed_timestamp: '2020-03-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1265,7 +1265,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 43,
+  //  id: 43,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1285,7 +1285,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1295,7 +1295,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 44,
+  //  id: 44,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1315,7 +1315,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1325,7 +1325,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 45,
+  //  id: 45,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1345,7 +1345,7 @@ const deposits =
     confirmed_timestamp: '2021-11-14T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1355,7 +1355,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 46,
+  //  id: 46,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1375,7 +1375,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1385,7 +1385,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 47,
+  //  id: 47,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1405,7 +1405,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1415,7 +1415,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 48,
+  //  id: 48,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1435,7 +1435,7 @@ const deposits =
     confirmed_timestamp: '2020-03-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1445,7 +1445,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 49,
+  //  id: 49,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1465,7 +1465,7 @@ const deposits =
     confirmed_timestamp: '2021-11-14T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1475,7 +1475,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 50,
+  //  id: 50,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1495,7 +1495,7 @@ const deposits =
     confirmed_timestamp: '2020-03-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1505,7 +1505,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 51,
+  //  id: 51,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1525,7 +1525,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1535,7 +1535,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 52,
+  //  id: 52,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1555,7 +1555,7 @@ const deposits =
     confirmed_timestamp: '2021-11-14T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1565,7 +1565,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 53,
+  //  id: 53,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1585,7 +1585,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1595,7 +1595,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 54,
+  //  id: 54,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1615,7 +1615,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1625,7 +1625,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 55,
+  //  id: 55,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1645,7 +1645,7 @@ const deposits =
     confirmed_timestamp: '2020-03-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1655,7 +1655,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 56,
+  //  id: 56,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1675,7 +1675,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1685,7 +1685,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 57,
+  //  id: 57,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1705,7 +1705,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1715,7 +1715,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 58,
+  //  id: 58,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1735,7 +1735,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1745,7 +1745,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 59,
+  //  id: 59,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1765,7 +1765,7 @@ const deposits =
     confirmed_timestamp: '2021-11-14T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1775,7 +1775,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 60,
+  //  id: 60,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1795,7 +1795,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1805,7 +1805,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 61,
+  //  id: 61,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1825,7 +1825,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1835,7 +1835,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 62,
+  //  id: 62,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1855,7 +1855,7 @@ const deposits =
     confirmed_timestamp: '2020-03-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1865,7 +1865,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 65,
+  //  id: 65,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1885,7 +1885,7 @@ const deposits =
     confirmed_timestamp: '2020-03-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1895,7 +1895,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 66,
+  //  id: 66,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1915,7 +1915,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1925,7 +1925,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 67,
+  //  id: 67,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1945,7 +1945,7 @@ const deposits =
     confirmed_timestamp: '2021-11-14T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1955,7 +1955,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 68,
+  //  id: 68,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -1975,7 +1975,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -1985,7 +1985,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 69,
+  //  id: 69,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -2005,7 +2005,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -2015,7 +2015,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 70,
+  //  id: 70,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -2035,7 +2035,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -2045,7 +2045,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 71,
+  //  id: 71,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -2065,7 +2065,7 @@ const deposits =
     confirmed_timestamp: '2021-11-14T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -2075,7 +2075,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 72,
+  //  id: 72,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -2095,7 +2095,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -2105,7 +2105,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 73,
+  //  id: 73,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -2125,7 +2125,7 @@ const deposits =
     confirmed_timestamp: '2021-11-14T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -2135,7 +2135,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 74,
+  //  id: 74,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -2155,7 +2155,7 @@ const deposits =
     confirmed_timestamp: '2020-03-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -2165,7 +2165,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 75,
+  //  id: 75,
     title: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_el: 'Η επιρροή του COVID-19 στην τιμή των κρυπτονομισμάτων',
     title_en: 'The Influence of COVID-19 on Cryptocurrency Price',
@@ -2185,7 +2185,7 @@ const deposits =
     confirmed_timestamp: '2020-03-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -2195,7 +2195,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 76,
+  //  id: 76,
     title: 'Χρήση τεχνολογιών νευρωνικών δικτύων για αναγνώριση προσωπικότητας',
     title_el: 'Χρήση τεχνολογιών νευρωνικών δικτύων για αναγνώριση προσωπικότητας',
     title_en: 'Use of neural network technologies for personality recognition',
@@ -2215,7 +2215,7 @@ const deposits =
     confirmed_timestamp: '2020-03-08T13:51:14.050Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -2225,7 +2225,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 77,
+  //  id: 77,
     title: 'Ανάπτυξη αυτοματοποιημένου συστήματος διαχείρισης αγορών τροφίμων',
     title_el: 'Ανάπτυξη αυτοματοποιημένου συστήματος διαχείρισης αγορών τροφίμων',
     title_en: 'Development of an automated system for managing food purchases',
@@ -2245,7 +2245,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
@@ -2255,7 +2255,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 80,
+  //  id: 80,
     title: 'Εφαρμογές Big Data στον τραπεζικό κλάδο',
     title_el: 'Εφαρμογές Big Data στον τραπεζικό κλάδο',
     title_en: 'Applications of Big Data in the banking industry',
@@ -2275,7 +2275,7 @@ const deposits =
     confirmed_timestamp: null,
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 9,
+    submitter_id: 7,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Προπτυχιακός Φοιτητής',
     supervisor: '',
@@ -2285,7 +2285,7 @@ const deposits =
     date_uploaded: null
   },
   {
-    id: 81,
+  //  id: 81,
     title: 'Χρησιμοποιώντας αντίστροφη παρεμβολή για την επίλυση μη γραμμικών εξισώσεων',
     title_el: 'Χρησιμοποιώντας αντίστροφη παρεμβολή για την επίλυση μη γραμμικών εξισώσεων',
     title_en: 'Using inverse interpolation to solve non-linear equations',
@@ -2305,7 +2305,7 @@ const deposits =
     confirmed_timestamp: '2022-01-06T09:31:32.984Z',
     license: 'Αναφορά Δημιουργού – Μη Εμπορική Χρήση – Όχι Παράγωγα Έργα 4.0',
     comments: null,
-    submitter_id: 1,
+    submitter_id: 4,
     submitter_department: 'Πληροφορικής και Τηλεματικής',
     submitter_title: 'Μεταπτυχιακός Φοιτητής',
     supervisor: '',
