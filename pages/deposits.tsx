@@ -269,7 +269,7 @@ function CustomToolbar() {
   );
 }
 
-export default ((
+const Deposits = ((
   { user, deposits, depositMeta }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) => {
   
@@ -647,3 +647,5 @@ export default ((
   )
 
 });
+
+export default Deposits;

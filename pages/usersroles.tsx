@@ -343,7 +343,7 @@ function EnhancedTable(rows: any[]) {
 
 
 
-export default ((
+const UserRoles = ((
   { user, roles }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) => {
 
@@ -383,3 +383,5 @@ export default ((
 
 
 });
+
+export default UserRoles;

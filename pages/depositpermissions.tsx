@@ -393,7 +393,7 @@ function EnhancedTable(rows: Data[], user: any) {
 
 
 
-export default ((
+const DepositPermissions = ((
   { user, permissions }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) => {
 
@@ -436,3 +436,5 @@ export default ((
 
 
 });
+
+export default DepositPermissions;
