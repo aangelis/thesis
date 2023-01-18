@@ -134,8 +134,8 @@ function PermissionPage(
   const [id, setId] = React.useState<number | null>(permission?.id! || null)
   const [email, setEmail] = React.useState(permission.submitter_email || "");
   const [emailError, setEmailError] = React.useState("");
-  // const [dueTo, setDueTo] = React.useState<Dayjs | null>(permission?.due_to || null);
-  const [dueTo, setDueTo] = React.useState<Date>(new Date(permission?.due_to) || null);
+  const [dueTo, setDueTo] = React.useState<Dayjs | null>(permission?.due_to || null);
+  // const [dueTo, setDueTo] = React.useState<Date>(new Date(permission?.due_to) || null);
   const [dateError, setDateError] = React.useState("");
   const [secretary, setSecretary] = React.useState(
     permission?.secretary?.first_name + " " + permission?.secretary?.last_name
@@ -177,7 +177,7 @@ function PermissionPage(
       submitter_email: email,
       // secretary_id: permission.secretary_id,
       // due_to: dueTo?.$d,
-      due_to: dueTo,
+      due_to: dueTo?.toDate()!,
     };
     // add id key only when id is not null or undefined
     id && (body.id = id);
@@ -315,7 +315,7 @@ function PermissionPage(
               value={dueTo}
               onChange={(newValue) => {
                 const dj: Dayjs = newValue!;
-                setDueTo(dj.endOf('day').toDate())
+                setDueTo(dj.endOf('day'))
               }}
               renderInput={(params) =>
               <TextField
