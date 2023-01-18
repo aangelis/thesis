@@ -1,11 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "lib/session";
-import { createDecipheriv, scrypt } from 'crypto';
-import { promisify } from "util";
-import { join } from "path";
-import { promises as fs } from 'fs';
 import { pipeline } from "stream/promises";
+import { PipelineSource } from "stream";
 import { PrismaClient } from '@prisma/client'
 import { minioClient } from "lib/mc";
 
@@ -100,7 +97,7 @@ const handler = async (
 
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', `attachment; filename=${deposit.original_filename}`);
-  await pipeline(fileContents, res);
+  await pipeline(fileContents as PipelineSource<any>, res);
         
 }
 
