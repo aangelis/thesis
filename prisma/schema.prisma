@@ -16,17 +16,17 @@ model User {
   id Int @id @default(autoincrement())
   email String @unique
   username String @unique
-  first_name String?
-  last_name String?
-  name_el String?
-  name_en String?
-  surname_el String?
-  surname_en String?
-  father_name_el String?
-  father_name_en String?
-  department String?
-  title String?
-  title_ldap String?
+  first_name String? @db.VarChar(100)
+  last_name String? @db.VarChar(100)
+  name_el String? @db.VarChar(100)
+  name_en String? @db.VarChar(100)
+  surname_el String? @db.VarChar(100)
+  surname_en String? @db.VarChar(100)
+  father_name_el String? @db.VarChar(100)
+  father_name_en String? @db.VarChar(100)
+  department String? @db.VarChar(100)
+  title String? @db.VarChar(100)
+  title_ldap String? @db.VarChar(100)
   is_staff Boolean? @default(false)
   is_active Boolean? @default(true)
   is_superuser Boolean? @default(false)
@@ -38,16 +38,16 @@ model User {
 
 model Deposit {
   id Int @id @default(autoincrement())
-  title String
-  title_el String
-  title_en String
+  title String @db.VarChar(500)
+  title_el String @db.VarChar(500)
+  title_en String @db.VarChar(500)
   content String?
   abstract_el String?
   abstract_en String?
   keywords_el String?
   keywords_en String?
   pages Int @default(0)
-  language String
+  language String @db.VarChar(50)
   images Int @default(0)
   tables Int @default(0)
   diagrams Int @default(0)
@@ -55,13 +55,13 @@ model Deposit {
   drawings Int @default(0)	
   confirmed Boolean @default(false)
   confirmed_timestamp DateTime?
-  license String
+  license String @db.VarChar(100)
   comments String?
   submitter User @relation(fields: [submitter_id], references: [id])
   submitter_id Int
   submitter_department String?
   submitter_title String?
-  supervisor String?
+  supervisor String? @db.VarChar(100)
   new_filename String?
   original_filename String?
   date_created DateTime @default(now())
