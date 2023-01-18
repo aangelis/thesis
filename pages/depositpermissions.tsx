@@ -37,7 +37,8 @@ import { visuallyHidden } from '@mui/utils';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
-
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 
 export const getServerSideProps = withIronSessionSsr(async function ({
   req,
@@ -417,7 +418,10 @@ const DepositPermissions = ((
     <Layout>
       <h1>Διαχείριση δικαιωμάτων αυτοαπόθεσης</h1>
       { !hasPermissions && (
-        <h3>Δεν βρέθηκαν εγγραφές δικαιωμάτων</h3>
+        <Alert severity="warning" sx={{ m: 1 }}>
+          <AlertTitle>Προσοχή!</AlertTitle>
+          Δεν βρέθηκαν εγγραφές δικαιωμάτων.
+        </Alert>
       )
       }
       <Box sx={{ '& > button': { m: 1 } }}>

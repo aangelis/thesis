@@ -595,7 +595,10 @@ const Deposits = ((
         <h1>Οι αποθέσεις μου</h1>
       )}
       { !hasDeposits && (
-        <h3>Δεν βρέθηκαν αποθέσεις</h3>
+        <Alert severity="warning" sx={{ m: 1 }}>
+          <AlertTitle>Προσοχή!</AlertTitle>
+          Δεν βρέθηκαν αποθέσεις
+        </Alert>
       )}
       { !user?.is_superuser &&
         depositMeta.addNewCount === 0 && (
