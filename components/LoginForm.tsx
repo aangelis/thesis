@@ -15,6 +15,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, styled, ThemeProvider } from '@mui/material/styles';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
+import { validateEmail } from 'lib/utils';
 
 export default function Form({
   errorMessage,
@@ -51,14 +52,6 @@ export default function Form({
   const [password, setPassword] = React.useState("");
   
   const [disableSubmit, setDisableSubmit] = React.useState(true);
-
-  const validateEmail = (m: string) => {
-    return String(m)
-      .toLowerCase()
-      .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      );
-  };
 
   React.useEffect(() => {
     if (email === "") { setDisableSubmit(true); return; }

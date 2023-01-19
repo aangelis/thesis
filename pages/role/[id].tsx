@@ -16,7 +16,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Snackbar from '@mui/material/Snackbar';
-
+import { validateEmail } from 'lib/utils';
 
 // Fetch deposit data
 export const getServerSideProps = withIronSessionSsr(async function ({
@@ -180,14 +180,6 @@ function RolePage(
       setOpenError(true);
       console.error(err);
     });
-  }
-
-  const validateEmail = (m: string) => {
-    return String(m)
-      .toLowerCase()
-      .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      );
   }
 
   React.useEffect(() => {

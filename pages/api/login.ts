@@ -3,6 +3,7 @@ import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "lib/session";
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from '@prisma/client'
+import { validateEmail } from 'lib/utils';
 
 const prisma = new PrismaClient()
 
@@ -26,14 +27,6 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
       email,
       password,
       }
-
-    const validateEmail = (m: string) => {
-      return String(m)
-        .toLowerCase()
-        .match(
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        );
-    }
 
     if (email === "") {
       res.status(401).json({ message: "No email provided." });
