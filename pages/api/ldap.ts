@@ -10,13 +10,52 @@ https://github.com/vercel/next.js/blob/canary/examples/api-routes-cors/pages/api
 */
 
 export default async function handler(req: NextApiRequest, response: NextApiResponse) {
-  const { email, password } = await req.body;
   const ip = req.socket.remoteAddress
-  const now = new Date()
+
+  const validateEmail = (m: string) => {
+    return String(m)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  }
 
   if (req.method === "POST") {
     // Process a POST request
-    const { username, password } = await req.body;
+    const data = await req.body; // email and password data
+    const dataEntries = Object.entries(data);
+
+    // check count of input data keys
+    if (dataEntries.length !== 2) {
+      console.log(`${ip} - [${new Date()}] - LDAP endpoint - Invalid input data.`)
+      response.status(400).json({ message: "Invalid input data." });
+      return;
+    }
+
+    dataEntries.forEach(([k,v], i) => {
+      if(typeof v !== 'string') {
+        console.log(`${ip} - [${new Date()}] - LDAP endpoint - Invalid input data.`)
+        response.status(400).json({ message: "Invalid input data." });
+        return;
+      }
+    });
+
+    const { email, password } = data;
+
+    if (email.split('@')[1] !== 'hua.gr') {
+      console.log(`${ip} - [${new Date()}] - LDAP endpoint - Invalid email.`)
+      response.status(401).json({ message: "Invalid email." });
+      return;
+    }
+
+    const validEmail = validateEmail(email);
+    if (validEmail === null) {
+      console.log(`${ip} - [${new Date()}] - LDAP endpoint - Invalid email.`)
+      response.status(401).json({ message: "Invalid email." });
+      return;
+    }
+    
+    const username = email.split('@')[0];
 
     const client = ldap.createClient({
       url: process.env.LDAP_HOST as string,
@@ -87,17 +126,17 @@ export default async function handler(req: NextApiRequest, response: NextApiResp
       );
     }).then(
       (value) => {
-        console.log(`${ip} - [${now}] - success - ${email}`);
+        console.log(`${ip} - [${new Date()}] - LDAP success - ${email}`);
         response.status(200).json( value );
       },
       (error) => {
-        console.log(`${ip} - [${now}] - failure - ${email}`);
+        console.log(`${ip} - [${new Date()}] - LDAP failure - ${email}`);
         response.status(401).json({ message: error });
       }
     );
   } else {
     // Handle any other HTTP method
-    console.error(`${ip} - [${now}] - failure - - Bad HTTP method`);
+    console.error(`${ip} - [${new Date()}] - LDAP failure - - Bad HTTP method`);
     response.status(400).json({ message: "Bad HTTP method." });
   }
 }
