@@ -1,34 +1,22 @@
 ### Postgres installation (db folder)
 
-#### install helm
+### Thesis application (app folder)
 
-
-```bash
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-chmod 700 get_helm.sh
-./get_helm.sh
 ```
-Link
-* [install helm](https://helm.sh/docs/intro/install/)
-#### enable helm in microk8s
-
-```bash
-microk8s enable helm3
+kubectl apply -f thesis-configmap.yaml
+kubectl apply -f thesis-deployment.yaml
+kubectl apply -f thesis-clip.yaml
 ```
-#### add bitnami repo
 
-```bash
-helm repo add bitnami https://charts.bitnami.com/bitnami
-```
 
 #### install postgres
 ```bash
-helm install postgres -f k8s/db/values.yaml bitnami/postgresql
-```
+kubectl apply -f k8s/db/postgres-configmap.yaml 
+kubectl apply -f k8s/db/postgres-volume.yaml 
+kubectl apply -f k8s/db/postgres-pvc.yaml 
+kubectl apply -f k8s/db/postgres-deployment.yaml 
+kubectl apply -f k8s/db/postgres-service.yaml
 
-```
-microk8s.helm3 repo add bitnami https://charts.bitnami.com/bitnami
-microk8s.helm3 install postgres -f values.yaml bitnami/postgresql
 ```
 
 

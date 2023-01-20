@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thesis-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: thesis
+  template:
+    metadata:
+      labels:
+        component: thesis
+    spec:
+      containers:
+        - name: thesis
+          image: 'thesis-app:01191747'
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: thesis-configmap
