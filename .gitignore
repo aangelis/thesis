@@ -45,3 +45,4 @@ pages/test*
 uploads/*
 pages/api/test*
 test*
+k8s/app/thesis-configmap.yaml
