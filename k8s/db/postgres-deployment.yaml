@@ -1,7 +1,7 @@
 apiVersion: apps/v1
-kind: Deployment # Create a deployment
+kind: Deployment
 metadata:
-  name: postgres # Set the name of the deployment
+  name: postgres
 spec:
   replicas: 1 # Set 3 deployment replicas in production
   selector:
@@ -14,13 +14,13 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: postgres:14 # Docker image
+          image: postgres:14
           imagePullPolicy: "IfNotPresent"
           ports:
-            - containerPort: 5432 # Exposing the container port 5432 for PostgreSQL client connections.
+            - containerPort: 5432
           envFrom:
             - configMapRef:
-                name: postgres-secret # Using the ConfigMap postgres-secret
+                name: postgres-secret
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgresdata

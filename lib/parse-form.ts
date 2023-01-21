@@ -160,7 +160,7 @@ export const parseForm = async (
             fileMinio,
             metaData,
             function(err, etag) {
-              if (err) return console.log("fdfd ", err)
+              if (err) return console.log(err)
               console.log('File uploaded successfully.')
               
               // Delete file after upload to min.io
