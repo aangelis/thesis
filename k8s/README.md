@@ -14,9 +14,9 @@ kubectl apply -f k8s/db/postgres-volume.yaml
 kubectl apply -f k8s/db/postgres-pvc.yaml 
 kubectl apply -f k8s/db/postgres-deployment.yaml 
 kubectl apply -f k8s/db/postgres-service.yaml
-
 ```
 
+Use files init.pgsql, init-with-sample-data.pgsql and trigger.pgsql in folder assets to initialize database with or without sample data and add trigger.
 
 ### mailhog (mailhog folder)
 
