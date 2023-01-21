@@ -27,14 +27,14 @@ export default async function handler(req: NextApiRequest, response: NextApiResp
 
     // check count of input data keys
     if (dataEntries.length !== 2) {
-      console.log(`${ip} - [${new Date()}] - LDAP endpoint - Invalid input data.`)
+      console.log(`${ip} - [${new Date()}] - LDAP endpoint - - Invalid input data.`)
       response.status(400).json({ message: "Invalid input data." });
       return;
     }
 
     dataEntries.forEach(([k,v], i) => {
       if(typeof v !== 'string') {
-        console.log(`${ip} - [${new Date()}] - LDAP endpoint - Invalid input data.`)
+        console.log(`${ip} - [${new Date()}] - LDAP endpoint - - Invalid input data.`)
         response.status(400).json({ message: "Invalid input data." });
         return;
       }
@@ -43,14 +43,14 @@ export default async function handler(req: NextApiRequest, response: NextApiResp
     const { email, password } = data;
 
     if (email.split('@')[1] !== 'hua.gr') {
-      console.log(`${ip} - [${new Date()}] - LDAP endpoint - Invalid email.`)
+      console.log(`${ip} - [${new Date()}] - LDAP endpoint - - Invalid email.`)
       response.status(401).json({ message: "Invalid email." });
       return;
     }
 
     const validEmail = validateEmail(email);
     if (validEmail === null) {
-      console.log(`${ip} - [${new Date()}] - LDAP endpoint - Invalid email.`)
+      console.log(`${ip} - [${new Date()}] - LDAP endpoint - - Invalid email.`)
       response.status(401).json({ message: "Invalid email." });
       return;
     }
@@ -126,17 +126,17 @@ export default async function handler(req: NextApiRequest, response: NextApiResp
       );
     }).then(
       (value) => {
-        console.log(`${ip} - [${new Date()}] - LDAP success - ${email}`);
+        console.log(`${ip} - [${new Date()}] - LDAP endpoint success - ${email}`);
         response.status(200).json( value );
       },
       (error) => {
-        console.log(`${ip} - [${new Date()}] - LDAP failure - ${email}`);
+        console.log(`${ip} - [${new Date()}] - LDAP endpoint failure - ${email}`);
         response.status(401).json({ message: error });
       }
     );
   } else {
     // Handle any other HTTP method
-    console.error(`${ip} - [${new Date()}] - LDAP failure - - Bad HTTP method`);
+    console.error(`${ip} - [${new Date()}] - LDAP endpoint failure - - Bad HTTP method`);
     response.status(400).json({ message: "Bad HTTP method." });
   }
 }

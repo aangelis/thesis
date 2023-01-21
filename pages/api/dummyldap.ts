@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Process a POST request
 
     if (email === "itp21101@hua.gr" && password === "1234") {
-      console.log(`${ip} - [${now}] - success - ${email}`);
+      console.log(`${ip} - [${now}] - dummy LDAP endpoint success - ${email}`);
       res.json({
         email: "itp21101@hua.gr",
         username: "itp21101",
@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
       return;
     } else if (email === "itp21100@hua.gr" && password === "1234") {
-      console.log(`${ip} - [${now}] - success - ${email}`);
+      console.log(`${ip} - [${now}] - dummy LDAP endpoint success - ${email}`);
       res.json({
         email: "itp21100@hua.gr",
         username: "itp21100",
@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
       return;
     } else if (email === "itp22044@hua.gr" && password === "1234") {
-      console.log(`${ip} - [${now}] - success - ${email}`);
+      console.log(`${ip} - [${now}] - dummy LDAP endpoint success - ${email}`);
       res.json({
         email: "itp22044@hua.gr",
         username: "itp22044",
@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
       return;
     } else if (email === "itp22039@hua.gr" && password === "1234") {
-      console.log(`${ip} - [${now}] - success - ${email}`);
+      console.log(`${ip} - [${now}] - dummy LDAP endpoint success - ${email}`);
       res.json({
         email: "itp22039@hua.gr",
         username: "itp22039",
@@ -54,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
       return;
     } else if (email === "tsadimas@hua.gr" && password === "1234") {
-      console.log(`${ip} - [${now}] - success - ${email}`);
+      console.log(`${ip} - [${now}] - dummy LDAP endpoint success - ${email}`);
       res.json({
         email: "tsadimas@hua.gr",
         username: "tsadimas",
@@ -66,7 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
       return;
     } else if (email === "ifigenia@hua.gr" && password === "1234") {
-      console.log(`${ip} - [${now}] - success - ${email}`);
+      console.log(`${ip} - [${now}] - dummy LDAP endpoint success - ${email}`);
       res.json({          
         // id: 2,
         email: "ifigenia@hua.gr",
@@ -93,7 +93,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }); 
       return;
     } else if (email === "mitsi@hua.gr" && password === "1234") {
-      console.log(`${ip} - [${now}] - success - ${email}`);
+      console.log(`${ip} - [${now}] - dummy LDAP endpoint success - ${email}`);
       res.json({          
         // id: 2,
         email: "mitsi@hua.gr",
@@ -105,7 +105,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }); 
       return;
     } else if (email === "daneli@hua.gr" && password === "1234") {
-      console.log(`${ip} - [${now}] - success - ${email}`);
+      console.log(`${ip} - [${now}] - dummy LDAP endpoint success - ${email}`);
       res.json({          
         // id: 2,
         email: "daneli@hua.gr",
@@ -117,21 +117,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }); 
       return;
     } else if ( !email || !password ) {
-      console.error(`${ip} - [${now}] - failure - - No email and/or password provided`);
+      console.error(`${ip} - [${now}] - dummy LDAP endpoint failure - - No email and/or password provided`);
       res.status(400).json({ message: "No email and/or password provided." });
       return;
     } else {
-      console.error(`${ip} - [${now}] - failure - ${email} - Wrong credentials provided`);
+      console.error(`${ip} - [${now}] - dummy LDAP endpoint failure - ${email} - Wrong credentials provided`);
       res.status(401).json({ message: "Wrong credentials provided." });
       return;
     }
 
   } else {
     // Handle any other HTTP methods
-    console.error(`${ip} - [${now}] - failure - - Bad HTTP method`);
+    console.error(`${ip} - [${now}] - dummy LDAP endpoint failure - - Bad HTTP method`);
     res.status(400).json({ message: "Bad HTTP method." });
     return;
   }
   
 }
-
