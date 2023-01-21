@@ -21,6 +21,8 @@ import { visuallyHidden } from '@mui/utils';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 
 
 export const getServerSideProps = withIronSessionSsr(async function ({
@@ -348,7 +350,10 @@ const UserRoles = ((
     <Layout>
       <h1>Διαχείριση ρόλων χρηστών</h1>
       { !hasRoles && (
-        <h3>Δεν βρέθηκαν ρόλοι χρηστών</h3>
+        <Alert severity="warning" sx={{ m: 1 }}>
+          <AlertTitle>Προσοχή!</AlertTitle>
+          Δεν βρέθηκαν ρόλοι χρηστών
+        </Alert>
       )
       }
       <Box sx={{ '& > button': { m: 1 } }}>
