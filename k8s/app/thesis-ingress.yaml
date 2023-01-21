@@ -14,4 +14,14 @@ spec:
             name: thesis-clip
             port:
               number: 8080
+  - host: "ldap.thesis.new.hua.gr"
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: thesis-ldap-clip
+            port:
+              number: 8080
 
