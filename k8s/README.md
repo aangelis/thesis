@@ -1,5 +1,3 @@
-### Postgres installation (db folder)
-
 ### Thesis application (app folder)
 
 ```
@@ -9,7 +7,7 @@ kubectl apply -f thesis-clip.yaml
 ```
 
 
-#### install postgres
+### Postgres installation (db folder)
 ```bash
 kubectl apply -f k8s/db/postgres-configmap.yaml 
 kubectl apply -f k8s/db/postgres-volume.yaml 

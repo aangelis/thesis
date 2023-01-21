@@ -24,4 +24,13 @@ spec:
             name: thesis-ldap-clip
             port:
               number: 8080
-
+  - host: "mailhog.thesis.new.hua.gr"
+    http:
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: mailhog-clip
+              port:
+                number: 8025

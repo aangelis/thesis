@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: mailhog-clip
+  #namespace: ingress-ns
+spec:
+  type: ExternalName
+  externalName: mailhog.email.svc.cluster.local #or any external svc
+  ports:
+    - port: 8025 #specify the port of service you want to expose
+      targetPort: 8025 #port of external service
