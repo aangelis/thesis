@@ -46,5 +46,4 @@ uploads/*
 pages/api/test*
 test*
 k8s/app/thesis-configmap.yaml
-k8s/k8s/app/thesis-configmap.yaml
 k8s/app/thesis.env
