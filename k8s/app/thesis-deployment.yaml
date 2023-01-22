@@ -20,3 +20,24 @@ spec:
           envFrom:
             - configMapRef:
                 name: thesis-configmap
+          env:
+            - name: SECRET_COOKIE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysecrets
+                  key: secretcookie
+            - name: LOGIN_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysecrets
+                  key: adminpass
+            - name: LDAP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysecrets
+                  key: ldappass
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mysecrets
+                  key: miniosecret
