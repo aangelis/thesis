@@ -118,6 +118,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const depositData = deposit(dbStoredUserData, dbStoredDepositData);
 
     if (depositData.id) {
+
+      const { id, date_uploaded, ...rest } = dbStoredDepositData;
+
+      await prisma.deposit.update({
+        where: {
+          id,
+        },
+        data: {
+          date_uploaded: new Date(),
+          ...rest,
+        }
+      })
+      
       if (depositData.uploaded_file) {
         console.log(`${ip} - [${new Date()}] - deposits uploader - Η απόθεση ολοκληρώθηκε.`)
         res.json({ message: "Η απόθεση ολοκληρώθηκε."});
