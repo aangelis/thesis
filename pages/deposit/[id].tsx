@@ -555,6 +555,21 @@ function DepositPage(
             </Alert>
           )}
 
+          { deposit.confirmed && !deposit.date_uploaded && ( 
+            <Alert severity="info" sx={{ m: 1 }}>
+                Η απόθεση είναι <strong>επιβεβαιωμένη</strong>, αλλά <strong>δεν</strong> έχει
+                 ανέβει ακόμη στο κεντρικό αποθετήριο.
+            </Alert>
+          )}
+
+          { deposit.confirmed && deposit.date_uploaded && ( 
+            <Alert severity="success" sx={{ m: 1 }}>
+                Η απόθεση έχει ανέβει στο κεντρικό αποθετήριο 
+                στις {new Date(deposit.date_uploaded).toLocaleDateString('el-GR', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' })//.replace(',', '');
+}
+            </Alert>
+          )}
+
           { user?.is_superuser && (
             <>
               <FormControl fullWidth sx={{ m: 1 }}>
