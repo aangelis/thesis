@@ -6,7 +6,7 @@ export const sessionOptions: IronSessionOptions = {
   password: process.env.SECRET_COOKIE_PASSWORD as string,
   cookieName: process.env.SECRET_COOKIE_NAME as string,
   cookieOptions: {
-    secure: process.env.SECRET_COOKIE_SECURE === "enable" as string,
+    secure: process.env.SECRET_COOKIE_SECURE === "enable",
   },
 };
 
