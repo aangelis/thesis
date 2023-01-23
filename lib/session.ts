@@ -6,9 +6,7 @@ export const sessionOptions: IronSessionOptions = {
   password: process.env.SECRET_COOKIE_PASSWORD as string,
   cookieName: process.env.SECRET_COOKIE_NAME as string,
   cookieOptions: {
-    // set false to fix session issue in docker image
-    // secure: process.env.NODE_ENV === "production",
-    secure: false
+    secure: process.env.SECRET_COOKIE_SECURE === "enable" as string,
   },
 };
 
