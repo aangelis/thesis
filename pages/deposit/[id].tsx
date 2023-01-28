@@ -23,6 +23,12 @@ import { ChangeEvent, MouseEvent, useState } from "react";
 import Fab from '@mui/material/Fab';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 // Fetch deposit data
 export const getServerSideProps = withIronSessionSsr(async function ({
@@ -313,7 +319,7 @@ function DepositPage(
 
   const handleChangeKeywordsEn = (event: React.ChangeEvent<HTMLInputElement>) => {
     const str: string = event.target.value
-      .replace(/,(?=[^\s])/g, ", ").replace(/  +/g, ' ').replace(/, ,+/g, ',').replace(/,\s*$/, "");
+      .replace(/,(?=[^\s])/g, ", ").replace(/  +/g, ' ').replace(/, ,+/g, ',');
     setKeywordsEnValid(isKeywordsEnValid(str));
     setKeywords_en(str);
   };
@@ -401,6 +407,7 @@ function DepositPage(
   }
 
   async function handleClickDelete() {
+    handleCloseDialogDelete();
     setLoading(true);
     await fetch('/api/deposit/' + id, {
       method: 'DELETE',
@@ -533,6 +540,17 @@ function DepositPage(
   const profileNotCompleted = !submitterUser?.name_el || !submitterUser.name_en ||
     !submitterUser.surname_el || !submitterUser.surname_en ||
     !submitterUser.father_name_el || !submitterUser.father_name_en;
+
+    const [openDialogDelete, setOpenDialogDelete] = React.useState(false);
+
+    const handleClickOpenDialogDelete = () => {
+      setOpenDialogDelete(true);
+    };
+  
+    const handleCloseDialogDelete = () => {
+      setOpenDialogDelete(false);
+    };
+
 
   return (
     <Layout>   
@@ -1049,10 +1067,12 @@ function DepositPage(
                 Αποθηκευση
               </LoadingButton>
               { !user.is_superuser && (
+                <>
                 <LoadingButton
                   color="secondary"
                   disabled={!id}
-                  onClick={handleClickDelete}
+                  // onClick={handleClickDelete}
+                  onClick={handleClickOpenDialogDelete}
                   loading={loading}
                   loadingPosition="start"
                   startIcon={<DeleteIcon />}
@@ -1061,6 +1081,30 @@ function DepositPage(
                   >
                   Διαγραφή
                 </LoadingButton>
+                <Dialog
+                open={openDialogDelete}
+                onClose={handleCloseDialogDelete}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+              >
+                <DialogTitle id="alert-dialog-title">
+                  {"Είστε σίγουροι ότι θέλετε να διαγράψετε την απόθεση;"}
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                    Τα δεδομένα της διαγραμμένης απόθεσης δεν μπορούν να ανακτηθούν.
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleCloseDialogDelete}>Όχι</Button>
+                  <Button onClick={handleClickDelete} autoFocus>
+                    Ναι
+                  </Button>
+                </DialogActions>
+              </Dialog>
+              </>
+
+
               )}
           </Box>
 
