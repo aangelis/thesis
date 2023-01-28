@@ -5,6 +5,7 @@ import { sessionOptions } from "lib/session";
 import { User } from "pages/api/user";
 import { InferGetServerSidePropsType } from "next";
 import { PrismaClient } from '@prisma/client'
+import { validateEmail } from 'lib/utils';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
@@ -16,7 +17,12 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Snackbar from '@mui/material/Snackbar';
-import { validateEmail } from 'lib/utils';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 // Fetch deposit data
 export const getServerSideProps = withIronSessionSsr(async function ({
@@ -163,6 +169,7 @@ function RolePage(
   }
 
   async function handleClickDelete() {
+    handleCloseDialogDelete();
     setLoading(true);
     await fetch('/api/role/' + id, {
       method: 'DELETE',
@@ -215,6 +222,16 @@ function RolePage(
 
   const deleteButton = {
     backgroundColor: '#e62e00', '&:hover': { backgroundColor: '#cc0066' }
+  };
+
+  const [openDialogDelete, setOpenDialogDelete] = React.useState(false);
+
+  const handleClickOpenDialogDelete = () => {
+    setOpenDialogDelete(true);
+  };
+
+  const handleCloseDialogDelete = () => {
+    setOpenDialogDelete(false);
   };
 
   return (
@@ -330,7 +347,8 @@ function RolePage(
               <LoadingButton
                 color="secondary"
                 disabled={!id}
-                onClick={handleClickDelete}
+                // onClick={handleClickDelete}
+                onClick={handleClickOpenDialogDelete}
                 loading={loading}
                 loadingPosition="start"
                 startIcon={<DeleteIcon />}
@@ -339,6 +357,27 @@ function RolePage(
                 >
                 Διαγραφή
               </LoadingButton>
+              <Dialog
+                open={openDialogDelete}
+                onClose={handleCloseDialogDelete}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+              >
+                <DialogTitle id="alert-dialog-title">
+                  {"Είστε σίγουροι ότι θέλετε να διαγράψετε την εγγραφή;"}
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                    Τα δεδομένα της διαγραμμένης εγγραφής δεν μπορούν να ανακτηθούν.
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleCloseDialogDelete}>Όχι</Button>
+                  <Button onClick={handleClickDelete} autoFocus>
+                    Ναι
+                  </Button>
+                </DialogActions>
+              </Dialog>
           </Box>
 
           <Snackbar

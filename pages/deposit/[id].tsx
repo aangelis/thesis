@@ -22,7 +22,6 @@ import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import { ChangeEvent, MouseEvent, useState } from "react";
 import Fab from '@mui/material/Fab';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -541,15 +540,15 @@ function DepositPage(
     !submitterUser.surname_el || !submitterUser.surname_en ||
     !submitterUser.father_name_el || !submitterUser.father_name_en;
 
-    const [openDialogDelete, setOpenDialogDelete] = React.useState(false);
+  const [openDialogDelete, setOpenDialogDelete] = React.useState(false);
 
-    const handleClickOpenDialogDelete = () => {
-      setOpenDialogDelete(true);
-    };
-  
-    const handleCloseDialogDelete = () => {
-      setOpenDialogDelete(false);
-    };
+  const handleClickOpenDialogDelete = () => {
+    setOpenDialogDelete(true);
+  };
+
+  const handleCloseDialogDelete = () => {
+    setOpenDialogDelete(false);
+  };
 
 
   return (

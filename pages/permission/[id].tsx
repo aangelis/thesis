@@ -21,6 +21,12 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { validateEmail } from 'lib/utils';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 // Fetch deposit data
 export const getServerSideProps = withIronSessionSsr(async function ({
@@ -174,6 +180,7 @@ function PermissionPage(
   }
 
   async function handleClickDelete() {
+    handleCloseDialogDelete();
     setLoading(true);
     await fetch('/api/permission/' + id, {
       method: 'DELETE',
@@ -245,6 +252,16 @@ function PermissionPage(
 
   const deleteButton = {
     backgroundColor: '#e62e00', '&:hover': { backgroundColor: '#cc0066' }
+  };
+
+  const [openDialogDelete, setOpenDialogDelete] = React.useState(false);
+
+  const handleClickOpenDialogDelete = () => {
+    setOpenDialogDelete(true);
+  };
+
+  const handleCloseDialogDelete = () => {
+    setOpenDialogDelete(false);
   };
 
   return (
@@ -328,7 +345,8 @@ function PermissionPage(
                   <LoadingButton
                     color="secondary"
                     disabled={!id}
-                    onClick={handleClickDelete}
+                    // onClick={handleClickDelete}
+                    onClick={handleClickOpenDialogDelete}
                     loading={loading}
                     loadingPosition="start"
                     startIcon={<DeleteIcon />}
@@ -337,6 +355,27 @@ function PermissionPage(
                     >
                     Διαγραφή
                   </LoadingButton>
+                  <Dialog
+                    open={openDialogDelete}
+                    onClose={handleCloseDialogDelete}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                  >
+                    <DialogTitle id="alert-dialog-title">
+                      {"Είστε σίγουροι ότι θέλετε να διαγράψετε την εγγραφή;"}
+                    </DialogTitle>
+                    <DialogContent>
+                      <DialogContentText id="alert-dialog-description">
+                        Τα δεδομένα της διαγραμμένης εγγραφής δεν μπορούν να ανακτηθούν.
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={handleCloseDialogDelete}>Όχι</Button>
+                      <Button onClick={handleClickDelete} autoFocus>
+                        Ναι
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
               </Box>
             </>
 
