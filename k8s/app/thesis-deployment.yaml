@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: thesis
-          image: 'thesis-app:01191747'
+          image: 'thesis-app:01252143'
           ports:
             - containerPort: 3000
           envFrom:
