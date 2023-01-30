@@ -68,10 +68,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     abstract_el: yup.string().test(val => val!.toString().length >= 0),
     abstract_en: yup.string().test(val => val!.toString().length >= 0),
     keywords_el: yup.string().test(val => {
-      return (val!.toString().length >= 0 && isKeywordsElValid(val))
+      return (val!.toString().length == 0 || (val!.toString().length > 0 && isKeywordsElValid(val)))
     }),
     keywords_en: yup.string().test(val => {
-      return (val!.toString().length >= 0 && isKeywordsEnValid(val))
+      return (val!.toString().length == 0 || (val!.toString().length > 0 && isKeywordsEnValid(val)))
     }),
     pages: yup.number().integer().required().min(0),
     language: yup.string().test(val => val!.toString().length > 0),
@@ -81,12 +81,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     maps: yup.number().integer().required().min(0),
     drawings: yup.number().integer().required().min(0),
     confirmed: yup.boolean().required(),
-    confirmed_timestamp: yup.string().nullable()
-    .test(dateString => 
-      ((dateString === null) ||
-      ((new Date(dateString!).toString() !== 'Invalid Date')
-      && (new Date(dateString!) >= new Date())))
-    ),
+    // confirmed_timestamp: yup.string().nullable()
+    // .test(dateString => 
+    //   ((dateString === null) ||
+    //   ((new Date(dateString!).toString() !== 'Invalid Date')
+    //   && (new Date(dateString!) >= new Date())))
+    // ),
     license: yup.string().test((val) => val!.toString().length > 0),
     comments: yup.string().test((val) => val!.toString().length >= 0),
     supervisor: yup.string().test((val) => val!.toString().length >= 0),

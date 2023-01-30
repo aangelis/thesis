@@ -29,6 +29,9 @@ import {
   GridRowParams,
   GridToolbarQuickFilter,
   GridInitialState,
+  GridColumnVisibilityModel,
+  getGridNumericOperators,
+  getGridStringOperators,
   useGridApiContext,
   elGR,
 } from '@mui/x-data-grid';
@@ -95,98 +98,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     // submitter_title?: string | null;
   }
 
-  // in case of secretary find assigned users
-  const assignedUsers = user.isSecretary?
-    (await prisma.permission.findMany({
-      where: {
-        secretary_id: user!.id!
-      },
-      select: {
-        submitter_email: true,
-      }
-    }))
-    :
-    []
-
-  const emails: string[] = [];
-  assignedUsers.forEach(({submitter_email: v}) => emails.push(v))
-
-  const deposits: Deposit[] = user.is_superuser?
-  ((user.isSecretary && !user.isAdmin)?
-    // in case of secretary show only deposits of assigned users
-    // find find submitter id, email, first and last name
-    (await prisma.deposit.findMany({
-      include: {
-        submitter: {
-          select: {
-            id: true,
-            email: true,
-            first_name: true,
-            last_name: true,
-            name_el: true,
-            surname_el: true,
-            department: true,
-            title: true,
-          }
-        }
-      },
-      where: {
-        submitter: {
-          email: { in: emails },
-        }
-      }
-    }))
-    :
-    // in case of superuser find submitter first and last name
-    (await prisma.deposit.findMany({
-      include: {
-        submitter: {
-          select: {
-            id: true,
-            email: true,
-            first_name: true,
-            last_name: true,
-            name_el: true,
-            surname_el: true,
-            department: true,
-            title: true,
-          }
-        }
-      }
-    }))
-  )
-  :
-  (await prisma.deposit.findMany({
-    where: {
-      submitter_id: user.id || undefined,
-    },
-    include: {
-      submitter: {
-        select: {
-          id: true,
-          email: true,
-          first_name: true,
-          last_name: true,
-          name_el: true,
-          surname_el: true,
-          department: true,
-          title: true,
-        }
-      }
-    }
-  }))
-
-  deposits.map((x) => {
-    x.submitter_fullname =
-      (stringToBoolean(x.submitter?.surname_el)? x.submitter?.surname_el : "(κενό επίθετο)")
-      + ' '
-      + (stringToBoolean(x.submitter?.name_el)? x.submitter?.name_el : "(κενό όνομα)");
-    x.submitter_fullname_ldap = x.submitter?.first_name + ' ' + x.submitter?.last_name;
-    // x.submitter_department = x.submitter?.department;
-    // x.submitter_title = x.submitter?.title;
-    return x;
-  })
-
   const unconfirmedCount = !user.is_superuser?
     ((await prisma.deposit.aggregate({
       where: {
@@ -223,7 +134,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     }
 
   return {
-    props : { user, deposits: JSON.parse(JSON.stringify(deposits)), depositMeta }
+    props : { user, depositMeta }
   }
 }, sessionOptions);
 
@@ -258,15 +169,15 @@ function CustomToolbar() {
         <GridToolbarDensitySelector nonce={undefined} onResize={undefined} onResizeCapture={undefined} />
         <GridToolbarExport printOptions={{ disableToolbarButton: true }} />
       </Grid>
-      <Grid>
+      {/* <Grid>
         <GridToolbarQuickFilter />
-      </Grid>
+      </Grid> */}
     </GridToolbarContainer>
   );
 }
 
 const Deposits = ((
-  { user, deposits, depositMeta }: InferGetServerSidePropsType<typeof getServerSideProps>,
+  { user, depositMeta }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) => {
   
   // https://v4.mui.com/ru/api/data-grid/grid-col-def/
@@ -281,7 +192,12 @@ const Deposits = ((
           <span><Link sx={{cursor: 'pointer'}} color="inherit" onClick={() => router.push('/deposit/'+params.row.id)}>{params.value}</Link></span>
         </Tooltip>
       ),
-
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains' ||
+        operator.value === 'equals' ||
+        operator.value === 'startsWith' ||
+        operator.value === 'endsWith'
+      ),
     },
     {
       field: 'title_en',
@@ -294,6 +210,12 @@ const Deposits = ((
           <span>{params.value}</span>
         </Tooltip>
       ),
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains' ||
+        operator.value === 'equals' ||
+        operator.value === 'startsWith' ||
+        operator.value === 'endsWith'
+      ),
     },
     {
       field: 'abstract_el',
@@ -302,6 +224,12 @@ const Deposits = ((
       width: 350,
       editable: false,
       hide: true,
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains' ||
+        operator.value === 'equals' ||
+        operator.value === 'startsWith' ||
+        operator.value === 'endsWith'
+      ),
     },
     {
       field: 'abstract_en',
@@ -310,6 +238,12 @@ const Deposits = ((
       width: 350,
       editable: false,
       hide: true,
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains' ||
+        operator.value === 'equals' ||
+        operator.value === 'startsWith' ||
+        operator.value === 'endsWith'
+      ),
     },
     {
       field: 'keywords_el',
@@ -318,6 +252,12 @@ const Deposits = ((
       width: 350,
       editable: false,
       hide: true,
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains' ||
+        operator.value === 'equals' ||
+        operator.value === 'startsWith' ||
+        operator.value === 'endsWith'
+      ),
     },
     {
       field: 'keywords_en',
@@ -326,6 +266,12 @@ const Deposits = ((
       width: 350,
       editable: false,
       hide: true,
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains' ||
+        operator.value === 'equals' ||
+        operator.value === 'startsWith' ||
+        operator.value === 'endsWith'
+      ),
     },
     {
       field: 'submitter_fullname',
@@ -334,6 +280,12 @@ const Deposits = ((
       width: 250,
       hide: !user?.is_superuser,
       editable: false,
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains' ||
+        operator.value === 'equals' ||
+        operator.value === 'startsWith' ||
+        operator.value === 'endsWith'
+      ),
     },
     {
       field: 'submitter_fullname_ldap',
@@ -342,6 +294,12 @@ const Deposits = ((
       width: 250,
       hide: true,
       editable: false,
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains' ||
+        operator.value === 'equals' ||
+        operator.value === 'startsWith' ||
+        operator.value === 'endsWith'
+      ),
     },
     {
       field: 'submitter.email',
@@ -350,7 +308,13 @@ const Deposits = ((
       width: 250,
       hide: true,
       editable: false,
-      valueGetter: (params) => params.row.submitter.email
+      valueGetter: (params) => params.row.submitter.email,
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains' ||
+        operator.value === 'equals' ||
+        operator.value === 'startsWith' ||
+        operator.value === 'endsWith'
+      ),
     },
     {
       field: 'submitter_department',
@@ -360,6 +324,12 @@ const Deposits = ((
       hide: true,
       editable: false,
       // valueGetter: (params) => params.row.submitter.department,
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains' ||
+        operator.value === 'equals' ||
+        operator.value === 'startsWith' ||
+        operator.value === 'endsWith'
+      ),
     },
     {
       field: 'submitter_title',
@@ -369,6 +339,12 @@ const Deposits = ((
       hide: true,
       editable: false,
       // valueGetter: (params) => params.row.submitter.title,
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains' ||
+        operator.value === 'equals' ||
+        operator.value === 'startsWith' ||
+        operator.value === 'endsWith'
+      ),
     },
     {
       field: 'language',
@@ -377,6 +353,12 @@ const Deposits = ((
       width: 120,
       hide: true,
       editable: false,
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains' ||
+        operator.value === 'equals' ||
+        operator.value === 'startsWith' ||
+        operator.value === 'endsWith'
+      ),
     },
     {
       field: 'confirmed',
@@ -385,6 +367,9 @@ const Deposits = ((
       width: 120,
       type: 'boolean',
       editable: false,
+      filterOperators: getGridNumericOperators().filter(
+        (operator) => operator.value !== 'isEmpty' && operator.value !== 'isNotEmpty' && operator.value !== 'isAnyOf',
+      ),
     },
     {
       field: 'confirmed_timestamp',
@@ -392,6 +377,7 @@ const Deposits = ((
       headerAlign: 'center',
       width: 300,
       type: 'dateTime',
+      filterable: false,
       editable: false,
       valueFormatter: (params: GridValueFormatterParams) => (
         params.value? new Date(params.value) : ""
@@ -409,6 +395,12 @@ const Deposits = ((
           <span>{params.value}</span>
         </Tooltip>
       ),
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains' ||
+        operator.value === 'equals' ||
+        operator.value === 'startsWith' ||
+        operator.value === 'endsWith'
+      ),
     },  
     {
       field: 'date_created',
@@ -417,6 +409,7 @@ const Deposits = ((
       width: 300,
       hide: true,
       type: 'dateTime',
+      filterable: false,
       editable: false,
       valueFormatter: (params: GridValueFormatterParams) => (
         params.value? new Date(params.value) : ""
@@ -430,6 +423,9 @@ const Deposits = ((
       type: 'number',
       hide: true,
       editable: false,
+      filterOperators: getGridNumericOperators().filter(
+        (operator) => operator.value !== 'isEmpty' && operator.value !== 'isNotEmpty' && operator.value !== 'isAnyOf',
+      ),
     },
     {
       field: 'images',
@@ -439,6 +435,9 @@ const Deposits = ((
       type: 'number',
       hide: true,
       editable: false,
+      filterOperators: getGridNumericOperators().filter(
+        (operator) => operator.value !== 'isEmpty' && operator.value !== 'isNotEmpty' && operator.value !== 'isAnyOf',
+      ),
     },
     {
       field: 'tables',
@@ -448,6 +447,9 @@ const Deposits = ((
       type: 'number',
       hide: true,
       editable: false,
+      filterOperators: getGridNumericOperators().filter(
+        (operator) => operator.value !== 'isEmpty' && operator.value !== 'isNotEmpty' && operator.value !== 'isAnyOf',
+      ),
     },
     {
       field: 'diagrams',
@@ -458,6 +460,9 @@ const Deposits = ((
       type: 'number',
       hide: true,
       editable: false,
+      filterOperators: getGridNumericOperators().filter(
+        (operator) => operator.value !== 'isEmpty' && operator.value !== 'isNotEmpty' && operator.value !== 'isAnyOf',
+      ),
     },
     {
       field: 'maps',
@@ -467,6 +472,9 @@ const Deposits = ((
       type: 'number',
       hide: true,
       editable: false,
+      filterOperators: getGridNumericOperators().filter(
+        (operator) => operator.value !== 'isEmpty' && operator.value !== 'isNotEmpty' && operator.value !== 'isAnyOf',
+      ),
     },
     {
       field: 'drawings',
@@ -476,6 +484,9 @@ const Deposits = ((
       type: 'number',
       hide: true,
       editable: false,
+      filterOperators: getGridNumericOperators().filter(
+        (operator) => operator.value !== 'isEmpty' && operator.value !== 'isNotEmpty' && operator.value !== 'isAnyOf',
+      ),
     },
     {
       field: 'supervisor',
@@ -489,18 +500,27 @@ const Deposits = ((
           <span>{params.value}</span>
         </Tooltip>
       ),
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains' ||
+        operator.value === 'equals' ||
+        operator.value === 'startsWith' ||
+        operator.value === 'endsWith'
+      ),
     },
-    
     
   ];
 
-  // const handleEvent: GridEventListener<'rowClick'> = (
-  //   params, // GridRowParams
-  //   event, // MuiEvent<React.MouseEvent<HTMLElement>>
-  //   details, // GridCallbackDetails
-  // ) => {
-  //   router.push('/deposit/'+params.row.id)
-  // };
+  interface columnVisibilityModelInterface {
+    [key: string]: boolean
+  }
+  
+  const columnVisibilityModel: columnVisibilityModelInterface = {}
+  
+  columns.forEach(x => {
+      // if (x.hide) {
+          columnVisibilityModel[x.field] = !x.hide;
+      // }
+  })
 
   const theme = createTheme(
     {
@@ -515,25 +535,35 @@ const Deposits = ((
 
   const changePageSize = (newPageSize: number) => {
     setPageSize(newPageSize);
-    sessionStorage.setItem("pagesize", JSON.stringify(newPageSize))
+    setPageState(old => ({ ...old, pageSize: newPageSize }))
+    sessionStorage.setItem(user.username + 'pagesize', JSON.stringify(newPageSize))
   }
 
-  const localStoredPageSize = (typeof window !== 'undefined') ?
-  JSON.parse(sessionStorage.getItem('pagesize')!)
-  :
-  100;
+  const localStoredPageSize = (typeof window !== 'undefined') &&
+  JSON.parse(sessionStorage.getItem(user.username + 'pagesize')!) ?
+    JSON.parse(sessionStorage.getItem(user.username + 'pagesize')!)
+    :
+    10;
 
-  const localStoredState = (typeof window !== 'undefined') ?
-    JSON.parse(sessionStorage.getItem('gridstate')!)
+  const defaultSort = {
+    field: 'date_created',
+    sort: 'desc',
+  }
+  const localStoredState = (typeof window !== 'undefined') &&
+  JSON.parse(sessionStorage.getItem(user.username + 'gridstate')!) ?
+    JSON.parse(sessionStorage.getItem(user.username + 'gridstate')!)
     :
     {
-      columns: { columnVisibilityModel: {} },
+      columns: { columnVisibilityModel },
       sorting: {
-        sortModel: [{ field: 'date_created', sort: 'desc' }],
+        sortModel: [{ field: defaultSort.field, sort: defaultSort.sort }],
       },
+      // filter: {
+      //   filterModel: {}
+      // }
     };
   
-    const [pageSize, setPageSize] = React.useState<number>(localStoredPageSize)
+  const [pageSize, setPageSize] = React.useState<number>(localStoredPageSize)
 
   const [savedState, setSavedState] = React.useState<{
     // count: number;
@@ -543,40 +573,99 @@ const Deposits = ((
     initialState:
       localStoredState,
   });
+
+  const [pageState, setPageState] = React.useState({
+    isLoading: false,
+    data: [],
+    total: 0,
+    page: 1,
+    pageSize,
+    field: localStoredState.initialState?.sorting?.sortModel[0].field || 'date_created',
+    sort:  localStoredState.initialState?.sorting?.sortModel[0].sort || 'desc',
+    filterColumnField: savedState.initialState.filter?.filterModel?.items[0].columnField,
+    filterOperatorValue: savedState.initialState.filter?.filterModel?.items[0].operatorValue,
+    filterValue: savedState.initialState.filter?.filterModel?.items[0].value,
+  })
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setPageState(old => ({ ...old, isLoading: true }))
+
+      const mapFrom = [ "=", "is", "!=", ">=", ">", "<=", "<", ];
+      const mapTo = [ "equals", "equals", "not", "gte", "gt", "lte", "lt", ];
+     
+      const filterOperatorValue = !!pageState.filterOperatorValue ?
+        pageState.filterOperatorValue.replace(new RegExp(mapFrom.join("|"),'gi'), x => {return mapTo[mapFrom.indexOf(x)]}) : '';
+
+      // const { isLoading, data, total, ...fetchData } = pageState;
+      // const qs = Object.keys(fetchData).reduce(function(_qs, k, i){ return _qs + '&' + k + '=' + fetchData[k as keyof typeof filterModel]; }, '').substring(1);
+      const url = '/api/deposits?';
+      const params = `page=${pageState.page}&limit=${pageState.pageSize}&sortby=${pageState.field}&sortorder=${pageState.sort}`;
+      const filterParams = (!!pageState.filterColumnField && !!filterOperatorValue && !!pageState.filterValue) ?
+        `&filtercolumnfield=${pageState.filterColumnField}&filteroperatorvalue=${filterOperatorValue}&filtervalue=${pageState.filterValue}` : '';
+      const response = await fetch(url + params + filterParams)
+      .then(response => {
+        if(!response.ok) throw new Error(response.status as unknown as string);
+        return response.json();
+      })
+      setPageState(old => ({ ...old, isLoading: false, data: response.data, total: response.total }))
+    }
+    fetchData()
+  }, [pageState.page, pageState.pageSize, pageState.field, pageState.sort, pageState.filterColumnField, pageState.filterOperatorValue, pageState.filterValue])
   
+  // https://github.com/abhidiwakar/mui_data_grid_ssp/blob/master/src/App.js
+
+
   // Rendered more hooks than during the previous render with custom hook
   const tableToShow = (
     <div style={{ height: 500, width: '100%' }}>
     <ThemeProvider theme={theme}>
+
       <DataGrid
         initialState={savedState.initialState}
-        rows={deposits}
+        onStateChange={s => {
+          // console.log(s)
+          sessionStorage.setItem(user.username + 'gridstate', JSON.stringify(s))}}
+        // onStateChange={s => console.log(s)}
+        loading={pageState.isLoading}
+        page={pageState.page - 1}
+        rows={pageState.data}
+        rowCount={pageState.total}
         columns={columns}
         experimentalFeatures={{ newEditingApi: true }}
-        // onRowClick={handleEvent}
         components={{ Toolbar: CustomToolbar }}
-        pageSize={pageSize}
-        onStateChange={s => sessionStorage.setItem("gridstate", JSON.stringify(s))}
-        // onPageSizeChange={newPageSize => setPageSize(newPageSize)}
+        pageSize={pageState.pageSize}
+        paginationMode="server"
+        onPageChange={newPage => {
+          setPageState(old => ({ ...old, page: newPage + 1 }))
+        }}
         onPageSizeChange={newPageSize => changePageSize(newPageSize)}
-        // columnVisibilityModel={columnVisibilityModel}
-        // onColumnVisibilityModelChange={m =>
-          // setColumnVisibilityModel(m)
-        // }
+        onSortModelChange={newSortModel => {
+          if (newSortModel[0]) {
+            setPageState(old => ({ ...old, field: newSortModel[0].field, sort: newSortModel[0].sort! }))
+          } else {
+            setPageState(old => ({ ...old, field: defaultSort.field, sort: defaultSort.sort }))
+          }
+        }}
+        filterMode="server"
+        onFilterModelChange={x => {
+          console.log(x)
+          if (x.items && x.items.length == 1) {
+            setPageState(old => ({ ...old, filterColumnField: x.items[0].columnField!, filterOperatorValue: x.items[0].operatorValue!, filterValue: x.items[0].value! }))
+          } else {
+            setPageState(old => ({ ...old, filterColumnField: '', filterOperatorValue: '', filterValue: '' })) 
+          }
+        }}
         rowsPerPageOptions={[10, 25, 50, 100]}
         pagination
         autoHeight={true}
         isRowSelectable={(params: GridRowParams) => false}
-        // componentsProps={{
-        //   pagination: {
-        //     labelRowsPerPage: "Στοιχεία ανά σελίδα"
-        //   }
-        // }}
       /></ThemeProvider>
     </div> 
   )
 
-  const hasDeposits = deposits && Object.keys(deposits).length > 0
+  // const hasDeposits = deposits && Object.keys(deposits).length > 0
+  const hasDeposits = pageState.total > 0
 
   const profileNotCompleted = !user.name_el || !user.name_en ||
     !user.surname_el || !user.surname_en ||
@@ -590,12 +679,12 @@ const Deposits = ((
       { !user?.is_superuser && (
         <h1>Οι αποθέσεις μου</h1>
       )}
-      { !hasDeposits && (
+      {/* { !hasDeposits && (
         <Alert severity="warning" sx={{ m: 1 }}>
           <AlertTitle>Προσοχή!</AlertTitle>
           Δεν βρέθηκαν αποθέσεις
         </Alert>
-      )}
+      )} */}
       { !user?.is_superuser &&
         depositMeta.addNewCount === 0 && (
         <Alert severity="warning" sx={{ m: 1 }}>
@@ -641,7 +730,8 @@ const Deposits = ((
             </Button>
         </Box>
       )}
-      { hasDeposits && tableToShow }
+      {/* { hasDeposits && tableToShow } */}
+      { tableToShow }
     </Layout>
   )
 
