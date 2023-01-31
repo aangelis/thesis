@@ -572,6 +572,13 @@ function DepositPage(
             </Alert>
           )}
 
+          { user.is_superuser && !deposit.confirmed && !deposit.supervisor && ( 
+            <Alert severity="warning" sx={{ m: 1 }}>
+              <AlertTitle>Προσοχή!</AlertTitle>
+                Η απόθεση <strong>δεν περιλαμβάνει ονοματεπώνυμο επιβλέποντα</strong>.
+            </Alert>
+          )}
+
           { user.is_superuser && deposit.confirmed && !deposit.date_uploaded && ( 
             <Alert severity="info" sx={{ m: 1 }}>
                 Η απόθεση είναι <strong>επιβεβαιωμένη</strong>, αλλά <strong>δεν</strong> έχει

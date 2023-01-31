@@ -366,10 +366,11 @@ const Deposits = ((
       headerAlign: 'center',
       width: 120,
       type: 'boolean',
+      // filterable: false,
       editable: false,
-      filterOperators: getGridNumericOperators().filter(
-        (operator) => operator.value !== 'isEmpty' && operator.value !== 'isNotEmpty' && operator.value !== 'isAnyOf',
-      ),
+      // filterOperators: getGridNumericOperators().filter(
+      //   (operator) => operator.value !== 'isEmpty' && operator.value !== 'isNotEmpty' && operator.value !== 'isAnyOf',
+      // ),
     },
     {
       field: 'confirmed_timestamp',
@@ -545,19 +546,20 @@ const Deposits = ((
     :
     10;
 
-  const defaultSort = {
-    field: 'date_created',
-    sort: 'desc',
-  }
+  // const defaultSort = {
+  //   field: 'date_created',
+  //   sort: 'desc',
+  // }
   const localStoredState = (typeof window !== 'undefined') &&
   JSON.parse(sessionStorage.getItem(user.username + 'gridstate')!) ?
     JSON.parse(sessionStorage.getItem(user.username + 'gridstate')!)
     :
     {
       columns: { columnVisibilityModel },
-      sorting: {
-        sortModel: [{ field: defaultSort.field, sort: defaultSort.sort }],
-      },
+      // sorting: {
+        // sortModel: [{ field: defaultSort.field, sort: defaultSort.sort }],
+        // sortModel: [],
+      // },
       // filter: {
       //   filterModel: {}
       // }
@@ -565,14 +567,7 @@ const Deposits = ((
   
   const [pageSize, setPageSize] = React.useState<number>(localStoredPageSize)
 
-  const [savedState, setSavedState] = React.useState<{
-    // count: number;
-    initialState: GridInitialState;
-  }>({
-    // count: 0,
-    initialState:
-      localStoredState,
-  });
+  // const [savedState, setSavedState] = React.useState<GridInitialState>(localStoredState);
 
   const [pageState, setPageState] = React.useState({
     isLoading: false,
@@ -580,11 +575,11 @@ const Deposits = ((
     total: 0,
     page: 1,
     pageSize,
-    field: localStoredState.initialState?.sorting?.sortModel[0].field || 'date_created',
-    sort:  localStoredState.initialState?.sorting?.sortModel[0].sort || 'desc',
-    filterColumnField: savedState.initialState.filter?.filterModel?.items[0].columnField,
-    filterOperatorValue: savedState.initialState.filter?.filterModel?.items[0].operatorValue,
-    filterValue: savedState.initialState.filter?.filterModel?.items[0].value,
+    field: localStoredState.sorting?.sortModel[0]?.field! as any || '',
+    sort: localStoredState.sorting?.sortModel[0]?.sort! as any || '',
+    filterColumnField: localStoredState.filter?.filterModel?.items[0]?.columnField! || '',
+    filterOperatorValue: localStoredState.filter?.filterModel?.items[0]?.operatorValue! || '',
+    filterValue: localStoredState.filter?.filterModel?.items[0]?.value! || '',
   })
 
   React.useEffect(() => {
@@ -595,15 +590,16 @@ const Deposits = ((
       const mapTo = [ "equals", "equals", "not", "gte", "gt", "lte", "lt", ];
      
       const filterOperatorValue = !!pageState.filterOperatorValue ?
-        pageState.filterOperatorValue.replace(new RegExp(mapFrom.join("|"),'gi'), x => {return mapTo[mapFrom.indexOf(x)]}) : '';
+        pageState.filterOperatorValue.replace(new RegExp(mapFrom.join("|"),'gi'), (x: any) => {return mapTo[mapFrom.indexOf(x)]}) : '';
 
       // const { isLoading, data, total, ...fetchData } = pageState;
       // const qs = Object.keys(fetchData).reduce(function(_qs, k, i){ return _qs + '&' + k + '=' + fetchData[k as keyof typeof filterModel]; }, '').substring(1);
       const url = '/api/deposits?';
-      const params = `page=${pageState.page}&limit=${pageState.pageSize}&sortby=${pageState.field}&sortorder=${pageState.sort}`;
+      const pagingParams = `page=${pageState.page}&limit=${pageState.pageSize}`
+      const sortingParams = (!!pageState.field && !!pageState.sort) ? `&sortby=${pageState.field}&sortorder=${pageState.sort}` : '';
       const filterParams = (!!pageState.filterColumnField && !!filterOperatorValue && !!pageState.filterValue) ?
         `&filtercolumnfield=${pageState.filterColumnField}&filteroperatorvalue=${filterOperatorValue}&filtervalue=${pageState.filterValue}` : '';
-      const response = await fetch(url + params + filterParams)
+      const response = await fetch(url + pagingParams + sortingParams + filterParams)
       .then(response => {
         if(!response.ok) throw new Error(response.status as unknown as string);
         return response.json();
@@ -622,11 +618,10 @@ const Deposits = ((
     <ThemeProvider theme={theme}>
 
       <DataGrid
-        initialState={savedState.initialState}
+        initialState={localStoredState}
         onStateChange={s => {
-          // console.log(s)
-          sessionStorage.setItem(user.username + 'gridstate', JSON.stringify(s))}}
-        // onStateChange={s => console.log(s)}
+          sessionStorage.setItem(user.username + 'gridstate', JSON.stringify(s))
+        }}
         loading={pageState.isLoading}
         page={pageState.page - 1}
         rows={pageState.data}
@@ -640,16 +635,16 @@ const Deposits = ((
           setPageState(old => ({ ...old, page: newPage + 1 }))
         }}
         onPageSizeChange={newPageSize => changePageSize(newPageSize)}
+        sortingMode="server"
         onSortModelChange={newSortModel => {
           if (newSortModel[0]) {
             setPageState(old => ({ ...old, field: newSortModel[0].field, sort: newSortModel[0].sort! }))
           } else {
-            setPageState(old => ({ ...old, field: defaultSort.field, sort: defaultSort.sort }))
+            setPageState(old => ({ ...old, field: '', sort: 'asc' }))
           }
         }}
         filterMode="server"
         onFilterModelChange={x => {
-          console.log(x)
           if (x.items && x.items.length == 1) {
             setPageState(old => ({ ...old, filterColumnField: x.items[0].columnField!, filterOperatorValue: x.items[0].operatorValue!, filterValue: x.items[0].value! }))
           } else {

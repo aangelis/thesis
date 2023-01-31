@@ -20,26 +20,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const data = req.query; // paging data
   const page = parseInt(data.page as string);
   const limit = parseInt(data.limit as string);
-  const sortBy = data.sortby as string || 'id';
-  const sortOrder = data.sortorder as string || 'asc';
-  const filterColumnField = data.filtercolumnfield as string;
-  const filterOperatorValue = data.filteroperatorvalue as string;
-  const filterValue = data.filtervalue as string;
-
-  const orderByObj = {
-    [sortBy]: sortOrder,
-  }
-
-  const numberFields = ['id', 'pages', 'images', 'tables', 'diagrams', 'maps', 'drawings', 'submitter_id', ]
-
-  const filterValueObj = {
-    [filterOperatorValue]: numberFields.indexOf(filterColumnField)>=0 ? 
-      parseInt(filterValue) : 
-      filterColumnField === 'confirmed' ? filterValue === 'true' : filterValue
-  }
-  
-  const filterObj = (data.filtercolumnfield && data.filteroperatorvalue && data.filtervalue) ?
-  { [filterColumnField]: filterValueObj, } : {}
 
   if (isNaN(+page!) || isNaN(+limit!)) {
     res.status(400).json({ message: "Invalid input data." });
@@ -51,6 +31,46 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
+  const sortBy = data.sortby as string || 'id';
+  const sortOrder = data.sortorder as string || 'asc';
+  const filterColumnField = data.filtercolumnfield as string;
+  const filterOperatorValue = data.filteroperatorvalue as string;
+  const filterValue = data.filtervalue as string;
+
+  const orderByObj = (!!sortBy && !!sortOrder) ?
+    (sortBy === 'submitter_fullname' ?
+    [ { submitter: { surname_el: sortOrder, } }, { submitter: { name_el: sortOrder, } }, ] : 
+    (sortBy === 'submitter_fullname_ldap' ?
+    [ { submitter: { last_name: sortOrder, } }, { submitter: { first_name: sortOrder, } }, ] :
+    (sortBy === 'submitter.email' ?
+    [ { submitter: { email: sortOrder, } }, ]
+    : [ { [sortBy]: sortOrder, } ])))
+    : []
+
+  const numberFields = [ 'id', 'pages', 'images', 'tables', 'diagrams', 'maps', 'drawings', 'submitter_id', ]
+
+  const filterValueObj = {
+    [filterOperatorValue]: numberFields.indexOf(filterColumnField)>=0 ? 
+      parseInt(filterValue) : 
+      filterColumnField === 'confirmed' ? filterValue === 'true' : filterValue
+  }
+    
+  const filterObjArray = (!!filterColumnField && !!filterOperatorValue && !!filterValue) ?
+    (filterColumnField === 'submitter_fullname' ?
+    [ { submitter: { surname_el: filterValueObj, } }, { submitter: { name_el: filterValueObj, } }, ] : 
+    (filterColumnField === 'submitter_fullname_ldap' ?
+    [ { submitter: { last_name: filterValueObj, } }, { submitter: { first_name: filterValueObj, } }, ] :
+    (filterColumnField === 'submitter.email' ?
+    [ { submitter: { email: filterValueObj, } }, ]
+    : [ { [filterColumnField]: filterValueObj, } ] )))
+    : [ {} ]
+
+  const filterObj = filterObjArray[1] ?
+    { OR: [ ...filterObjArray ] } :
+    filterObjArray[0] ?
+    filterObjArray[0] :
+    {}
+    
   interface Deposit {
     id: number;
     title: string;
@@ -123,7 +143,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       skip: (page - 1) * limit,
       take: limit,
       orderBy: [
-        orderByObj
+        ...orderByObj as any,
       ],
       include: {
         submitter: {
@@ -158,7 +178,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       skip: (page - 1) * limit,
       take: limit,
       orderBy: [
-        orderByObj
+        ...orderByObj as any,
       ],
       where: {
         ...filterObj,
@@ -192,7 +212,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     skip: (page - 1) * limit,
     take: limit,
     orderBy: [
-      orderByObj
+      ...orderByObj as any,
     ],
     where: {
       submitter_id: user.id || undefined,
@@ -221,11 +241,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       (!!(x.submitter?.surname_el)? x.submitter?.surname_el : "(κενό επίθετο)")
       + ' '
       + ((x.submitter?.name_el)? x.submitter?.name_el : "(κενό όνομα)");
-    x.submitter_fullname_ldap = x.submitter?.first_name + ' ' + x.submitter?.last_name;
+    x.submitter_fullname_ldap = x.submitter?.last_name + ' ' + x.submitter?.first_name;
     // x.submitter_department = x.submitter?.department;
     // x.submitter_title = x.submitter?.title;
     return x;
   })
+
+  /*
 
   const unconfirmedCount = !user.is_superuser?
     ((await prisma.deposit.aggregate({
@@ -261,27 +283,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       addNewCount,
       canAddNewDeposit
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/*
 
 /*
 
@@ -332,7 +334,5 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     take: limit, 
     total, 
     data: deposits});
-
-
 
 }
