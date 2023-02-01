@@ -142,7 +142,7 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
 
     } else if (result.status === 401) {
 
-      res.status(401).json({ message: "Wrong credentials." });
+      res.status(401).json({ message: "Λάθος στοιχεία εισόδου." });
       return;
 
     } else {
