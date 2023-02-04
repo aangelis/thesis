@@ -11,6 +11,7 @@ const prisma = new PrismaClient()
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
     // Handle any other HTTP methods
     res.status(400).json({ message: "Bad HTTP method." });
     return;
@@ -81,12 +82,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     maps: yup.number().integer().required().min(0),
     drawings: yup.number().integer().required().min(0),
     confirmed: yup.boolean().required(),
-    // confirmed_timestamp: yup.string().nullable()
-    // .test(dateString => 
-    //   ((dateString === null) ||
-    //   ((new Date(dateString!).toString() !== 'Invalid Date')
-    //   && (new Date(dateString!) >= new Date())))
-    // ),
     license: yup.string().test((val) => val!.toString().length > 0),
     comments: yup.string().test((val) => val!.toString().length >= 0),
     supervisor: yup.string().test((val) => val!.toString().length >= 0),

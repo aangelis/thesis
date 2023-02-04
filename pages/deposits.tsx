@@ -40,10 +40,6 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { elGR as coreElGR } from '@mui/material/locale';
 import Grid from "@mui/material/Grid";
 
-const stringToBoolean = (s: string | null | undefined): boolean => {
-  return !!s
-}
-
 // Fetch deposits of current user
 export const getServerSideProps = withIronSessionSsr(async function ({
   req,
@@ -58,45 +54,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   }
   
   const prisma = new PrismaClient()
-
-  interface Deposit {
-    id: number;
-    title: string;
-    title_el: string;
-    title_en: string;
-    content: string | null;
-    abstract_el: string | null;
-    abstract_en: string | null;
-    pages: number;
-    language: string | null;
-    images: number;
-    tables: number;
-    diagrams: number;
-    maps: number;
-    drawings: number;	
-    confirmed: boolean;
-    confirmed_timestamp: Date | null;
-    license: string | null;
-    comments: string | null;
-    submitter_id: number;
-    supervisor: string | null;
-    new_filename: string | null;
-    original_filename: string | null;
-    submitter?: {
-      id: number;
-      email: string;
-      first_name: string | null;
-      last_name: string | null;
-      name_el: string | null;
-      surname_el: string | null;
-      department: string | null;
-      title: string | null;
-    }
-    submitter_fullname?: string | null;
-    submitter_fullname_ldap?: string | null;
-    // submitter_department?: string | null;
-    // submitter_title?: string | null;
-  }
 
   const unconfirmedCount = !user.is_superuser?
     ((await prisma.deposit.aggregate({
@@ -138,28 +95,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   }
 }, sessionOptions);
 
-
-interface Data {
-  id: number;
-  title_el: string;
-  title_en: string;
-  pages: number;
-  language: string;
-  images: number;
-  tables: number;
-  diagrams: number;
-  maps: number;
-  drawings: number;
-  supervisor: string;
-  // confirmed: boolean;
-  confirmed: string;
-  confirmed_timestamp: string;
-  license: string;
-  submitter_fullname: string;
-  // submitter_department: string;
-  // submitter_title: string;
-}
-
 function CustomToolbar() {
   return (
     <GridToolbarContainer>
@@ -169,9 +104,6 @@ function CustomToolbar() {
         <GridToolbarDensitySelector nonce={undefined} onResize={undefined} onResizeCapture={undefined} />
         <GridToolbarExport printOptions={{ disableToolbarButton: true }} />
       </Grid>
-      {/* <Grid>
-        <GridToolbarQuickFilter />
-      </Grid> */}
     </GridToolbarContainer>
   );
 }
@@ -323,7 +255,6 @@ const Deposits = ((
       width: 250,
       hide: true,
       editable: false,
-      // valueGetter: (params) => params.row.submitter.department,
       filterOperators: getGridStringOperators().filter(
         (operator) => operator.value === 'contains' ||
         operator.value === 'equals' ||
@@ -338,7 +269,6 @@ const Deposits = ((
       width: 250,
       hide: true,
       editable: false,
-      // valueGetter: (params) => params.row.submitter.title,
       filterOperators: getGridStringOperators().filter(
         (operator) => operator.value === 'contains' ||
         operator.value === 'equals' ||
@@ -366,11 +296,7 @@ const Deposits = ((
       headerAlign: 'center',
       width: 120,
       type: 'boolean',
-      // filterable: false,
       editable: false,
-      // filterOperators: getGridNumericOperators().filter(
-      //   (operator) => operator.value !== 'isEmpty' && operator.value !== 'isNotEmpty' && operator.value !== 'isAnyOf',
-      // ),
     },
     {
       field: 'confirmed_timestamp',
@@ -518,9 +444,7 @@ const Deposits = ((
   const columnVisibilityModel: columnVisibilityModelInterface = {}
   
   columns.forEach(x => {
-      // if (x.hide) {
           columnVisibilityModel[x.field] = !x.hide;
-      // }
   })
 
   const theme = createTheme(
@@ -546,28 +470,15 @@ const Deposits = ((
     :
     10;
 
-  // const defaultSort = {
-  //   field: 'date_created',
-  //   sort: 'desc',
-  // }
   const localStoredState = (typeof window !== 'undefined') &&
   JSON.parse(sessionStorage.getItem(user.username + 'gridstate')!) ?
     JSON.parse(sessionStorage.getItem(user.username + 'gridstate')!)
     :
     {
       columns: { columnVisibilityModel },
-      // sorting: {
-        // sortModel: [{ field: defaultSort.field, sort: defaultSort.sort }],
-        // sortModel: [],
-      // },
-      // filter: {
-      //   filterModel: {}
-      // }
     };
   
   const [pageSize, setPageSize] = React.useState<number>(localStoredPageSize)
-
-  // const [savedState, setSavedState] = React.useState<GridInitialState>(localStoredState);
 
   const [pageState, setPageState] = React.useState({
     isLoading: false,
@@ -610,7 +521,6 @@ const Deposits = ((
   }, [pageState.page, pageState.pageSize, pageState.field, pageState.sort, pageState.filterColumnField, pageState.filterOperatorValue, pageState.filterValue])
   
   // https://github.com/abhidiwakar/mui_data_grid_ssp/blob/master/src/App.js
-
 
   // Rendered more hooks than during the previous render with custom hook
   const tableToShow = (
@@ -659,9 +569,6 @@ const Deposits = ((
     </div> 
   )
 
-  // const hasDeposits = deposits && Object.keys(deposits).length > 0
-  const hasDeposits = pageState.total > 0
-
   const profileNotCompleted = !user.name_el || !user.name_en ||
     !user.surname_el || !user.surname_en ||
     !user.father_name_el || !user.father_name_en;
@@ -674,12 +581,6 @@ const Deposits = ((
       { !user?.is_superuser && (
         <h1>Οι αποθέσεις μου</h1>
       )}
-      {/* { !hasDeposits && (
-        <Alert severity="warning" sx={{ m: 1 }}>
-          <AlertTitle>Προσοχή!</AlertTitle>
-          Δεν βρέθηκαν αποθέσεις
-        </Alert>
-      )} */}
       { !user?.is_superuser &&
         depositMeta.addNewCount === 0 && (
         <Alert severity="warning" sx={{ m: 1 }}>
@@ -725,7 +626,6 @@ const Deposits = ((
             </Button>
         </Box>
       )}
-      {/* { hasDeposits && tableToShow } */}
       { tableToShow }
     </Layout>
   )

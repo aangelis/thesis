@@ -29,7 +29,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-// Fetch deposit data
 export const getServerSideProps = withIronSessionSsr(async function ({
   params,
   req,
@@ -37,7 +36,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 }) {
   const user: User = req.session.user!;
 
-  // https://www.learnbestcoding.com/post/25/nextjs-how-to-use-getserversideprops
   const depositId: number = Number(params?.id);
 
   if (user === undefined) {
@@ -49,7 +47,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   const prisma = new PrismaClient()
 
   if (isNaN(+depositId)) {
-
     const unconfirmedCount = !user.is_superuser?
       ((await prisma.deposit.aggregate({
         where: {
@@ -68,7 +65,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
           submitter_email: user.email!,
           due_to: {
             gte: new Date(),
-            // gte: new Date('2022-12-26'),
           },
         },
         _count: {
@@ -103,26 +99,26 @@ export const getServerSideProps = withIronSessionSsr(async function ({
       }
     }))
 
-    const submitterUser = user.is_superuser?
-      await prisma.user.findUnique(
-        {
-          where: {
-            id: deposit?.submitter_id!,
-          },
-          select: {
-            first_name: true,
-            last_name: true,
-            name_el: true,
-            name_en: true,
-            surname_el: true,
-            surname_en: true,
-            father_name_el: true,
-            father_name_en: true,
-          }
+  const submitterUser = user.is_superuser?
+    await prisma.user.findUnique(
+      {
+        where: {
+          id: deposit?.submitter_id!,
+        },
+        select: {
+          first_name: true,
+          last_name: true,
+          name_el: true,
+          name_en: true,
+          surname_el: true,
+          surname_en: true,
+          father_name_el: true,
+          father_name_en: true,
         }
-      )
-      :
-      null;
+      }
+    )
+    :
+    null;
 
   return {
     props : { user, deposit: JSON.parse(JSON.stringify(deposit)), submitterUser, canAddNewDeposit: false }
@@ -135,13 +131,9 @@ function DepositPage(
   ) {
 
   const depositReadOnly = !canAddNewDeposit && (user.id !== deposit?.submitter_id || deposit.confirmed)
-
   const canConfirm = user.isLibrarian
 
-  // no entry in array
   const licenseChoices: string[] = []
-  // first entry in array is empty string
-  // const licenseChoices: string[] = ['']
 
   process.env.NEXT_PUBLIC_DEPOSIT_LICENSE_CHOICES?
     process.env.NEXT_PUBLIC_DEPOSIT_LICENSE_CHOICES.split(', ')
@@ -195,7 +187,6 @@ function DepositPage(
   const [language, setLanguage] = React.useState(deposit?.language || (!id? process.env.NEXT_PUBLIC_DEPOSIT_LANGUAGE_DEFAULT : "") || "");
   const [comments, setComments] = React.useState(deposit?.comments || "");
   const [supervisor, setSupervisor] = React.useState(deposit?.supervisor || "");
-  
   const [loading, setLoading] = React.useState(false);
   const [numFieldsErrors, setNumFieldsErrors] = React.useState(0)
   const [textFieldsErrors, setTextFieldsErrors] = React.useState(0) 
@@ -339,7 +330,6 @@ function DepositPage(
     maps: number;
     drawings: number;
     confirmed: boolean;
-    // confirmed_timestamp: Date;
     license: string;
     comments: string;
     supervisor: string;
@@ -351,8 +341,6 @@ function DepositPage(
     setKeywords_el(keywords_el.replace(/^[,\s]+|[,\s]+$/g, ''));
     setKeywords_en(keywords_en.replace(/^[,\s]+|[,\s]+$/g, ''));
     const body: Body = {
-      //id: deposit?.id,
-      // id: id,
       title: textFields.find(o => o.name === "title_el")?.value,
       title_el: textFields.find(o => o.name === "title_el")?.value,
       title_en: textFields.find(o => o.name === "title_en")?.value,
@@ -373,7 +361,6 @@ function DepositPage(
       maps: Number(numFields.find(o => o.name === "maps")?.value),
       drawings: Number(numFields.find(o => o.name === "drawings")?.value),
       confirmed,
-      // confirmed_timestamp: confirmedTimestamp || null,
       license: (
         (license === '')?
           (process.env.NEXT_PUBLIC_DEPOSIT_LICENSE_DEFAULT?
@@ -410,8 +397,6 @@ function DepositPage(
     setLoading(true);
     await fetch('/api/deposit/' + id, {
       method: 'DELETE',
-      // headers: { 'Content-Type': 'application/json' },
-      // body: JSON.stringify({id}),
     }) 
     .then(response => {
       setLoading(false);
@@ -477,7 +462,6 @@ function DepositPage(
   };
 
   const onUploadFile = async (e: MouseEvent<HTMLButtonElement>) => {
-  // const onUploadFile = async () => {
     e.preventDefault();
     setLoading(true);
 
@@ -508,7 +492,6 @@ function DepositPage(
 
       if (error || !data) {
         setOpenFileError("Κάτι δεν πήγε καλά!");
-        // alert(error || "Sorry! something went wrong.");
         return;
       }
 
@@ -517,19 +500,16 @@ function DepositPage(
       setStoredFile(file.name);
       setFile(null);
       setPreviewUrl(null);
-      // console.log("File was uploaded successfylly:", data);
     } catch (error) {
       setLoading(false);
       console.error(error);
       setOpenFileError("Κάτι δεν πήγε καλά!");
-      // alert("Sorry! something went wrong.");
     }
   };
 
   const onDownloadFile = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     router.push('/api/download_file/' + deposit?.id);
-
   };
   
   const deleteButton = {
@@ -549,7 +529,6 @@ function DepositPage(
   const handleCloseDialogDelete = () => {
     setOpenDialogDelete(false);
   };
-
 
   return (
     <Layout>   
@@ -627,7 +606,6 @@ function DepositPage(
               rows={2}
               value={textFields.find(o => o.name === "title_el")?.value}
               onChange={(v) => {
-                // setTitle_el(v.target.value);
                 handleTextFields(v);
               }}
             />
@@ -644,7 +622,6 @@ function DepositPage(
               rows={2}
               value={textFields.find(o => o.name === "title_en")?.value}
               onChange={(v) => {
-                // setTitle_en(v.target.value);
                 handleTextFields(v);
               }}
             />
@@ -726,15 +703,6 @@ function DepositPage(
                   handleNumFields(v);
                 }}
               />
-              {/* <TextField
-                id="outlined-basic"
-                label="Εικόνες"
-                variant="outlined"
-                value={images}
-                onChange={(v) => {
-                  setImages(v.target.value);
-                }}
-              /> */}
               <TextField
                 id="outlined-basic"
                 disabled={depositReadOnly}
@@ -864,29 +832,8 @@ function DepositPage(
             </div>
           </Box>
           <Box sx={{ m: 2 }} />
-          {/* <FormControl fullWidth sx={{ m: 1 }}>
-            <TextField
-              id="outlined-multiline-static"
-              disabled={depositReadOnly}
-              label="Άδεια"
-              multiline
-              rows={2}
-              value={license}
-              onChange={(v) => {
-                setLicense(v.target.value);
-              }}
-            />
-          </FormControl> */}
 
           <FormControl fullWidth sx={{ m: 1 }}>
-          {/* <Box
-            component="form"
-            sx={{
-              '& .MuiTextField-root': { m: 1, width: '40ch' },
-            }}
-            noValidate
-            autoComplete="off"
-          > */}
             <div>
               <TextField
                 id="outlined-select-confirmation"
@@ -907,7 +854,6 @@ function DepositPage(
                 ))}
               </TextField>
             </div>
-          {/* </Box> */}
           </FormControl>
 
           <FormControl fullWidth sx={{ m: 1 }}>
@@ -964,7 +910,6 @@ function DepositPage(
           {/* https://kiranvj.com/blog/blog/file-upload-in-material-ui/ */}
           {/* https://codesandbox.io/s/eager-euclid-mo7de?from-embed=&file=/src/index.js:241-271 */}
 
-
           { !depositReadOnly && (
             <>
 
@@ -978,23 +923,13 @@ function DepositPage(
             autoComplete="off"
           >
             <div>
-              
-
-
-
-
-
-
               <TextField
-                // disabled
                 inputProps={{readOnly: true}}
                 id="show-pdf"
                 label="Αρχείο PDF απόθεσης"
                 variant="outlined"
-                // Solved: `value` prop on `input` should not be null in React
                 value={file?.name || storedFile || ""}
               />
-
 
                 <label htmlFor="upload-file">
                   <input
@@ -1016,7 +951,6 @@ function DepositPage(
                   </Fab>
                 </label>
 
-
                 <Fab
                   color="secondary"
                   size="small"
@@ -1029,7 +963,6 @@ function DepositPage(
                 >
                   Ακυρωση αρχειου
                 </Fab>
-
                 
                 <LoadingButton
                   color="secondary"
@@ -1044,14 +977,8 @@ function DepositPage(
                   Ανεβασμα PDF
                 </LoadingButton>
 
-              
-
             </div>
           </Box>
-
-
-
-
           </>
                 )}        
 
@@ -1077,7 +1004,6 @@ function DepositPage(
                 <LoadingButton
                   color="secondary"
                   disabled={!id}
-                  // onClick={handleClickDelete}
                   onClick={handleClickOpenDialogDelete}
                   loading={loading}
                   loadingPosition="start"
@@ -1109,7 +1035,6 @@ function DepositPage(
                 </DialogActions>
               </Dialog>
               </>
-
 
               )}
           </Box>
@@ -1163,7 +1088,6 @@ function DepositPage(
       
         </div>
 
-      {/* <pre>{viewData}</pre> */}
     </Layout>
   )
 }

@@ -34,60 +34,17 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     res.setHeader("location", "/login");
     res.statusCode = 302;
     res.end();
-    // return {
-    //   props: {
-    //     permissions: {}
-    //   },
-    // };
   }
 
   if (!user?.isSecretary) {
     res.setHeader("location", "/profile");
     res.statusCode = 302;
     res.end();
-    // return {
-    //   props: {
-    //     permissions: {}
-    //   },
-    // };
   }
 
   const prisma = new PrismaClient()
-  // Record<string, any> to solve error - Property 'secretary_fullname' does not exist on type ''
-  // const permissions: Record<string, any> = await prisma.permission.findMany({
-  //   include: {
-  //     secretary: {
-  //       select: {
-  //         first_name: true,
-  //         last_name: true,
-  //       }
-  //     }
-  //   }
-  // })
-          
-  // view only your own permissions
-  // const permissions = await prisma.permission.findMany({
-  //   where: {
-  //     secretary_id: user.id
-  //   }
-  // })
-              
-  // https://stackoverflow.com/questions/70449092/reason-object-object-date-cannot-be-serialized-as-json-please-only-ret
-  // data hooks provided by Next.js do not allow you to transmit Javascript objects like Dates
-  // https://github.com/blitz-js/superjson
-  
-  // permissions.map((x: Record<string, any>) => {
-  //   x.secretary_fullname = x.secretary.first_name + ' ' + x.secretary.last_name;
-  //   return x;
-  // })
                 
   interface Permission {
-    // Declaration merging
-    // https://blog.logrocket.com/types-vs-interfaces-in-typescript/
-    // id: number;
-    // submitter_email: string;
-    // due_to: Date;
-    // secretary_id: number;
     secretary: {
       first_name: string | null;
       last_name: string | null;
@@ -121,7 +78,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 interface Data {
   id: number;
   submitter_email: string;
-  // due_to: Date;
   due_to: string;
   secretary_id: number;
   secretary_fullname: string;
@@ -368,18 +324,11 @@ function EnhancedTable(rows: Data[], user: any) {
   );
 }
 
-
-
 const DepositPermissions = ((
   { user, permissions }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) => {
 
   const tableToShow = EnhancedTable(permissions, user);
-
-  
-  const getHeadings = () => {
-    return Object.keys(permissions[0]);
-  }
   
   const hasPermissions = permissions && Object.keys(permissions).length > 0
   
@@ -409,7 +358,6 @@ const DepositPermissions = ((
       { hasPermissions && tableToShow }
     </Layout>
   )
-
 
 });
 

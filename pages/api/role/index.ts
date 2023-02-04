@@ -10,6 +10,7 @@ const prisma = new PrismaClient()
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
     // Handle any other HTTP methods
     res.status(400).json({ message: "Bad HTTP method." });
     return;

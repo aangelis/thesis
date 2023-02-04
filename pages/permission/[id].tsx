@@ -28,7 +28,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-// Fetch deposit data
 export const getServerSideProps = withIronSessionSsr(async function ({
   params,
   req,
@@ -42,24 +41,12 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     res.setHeader("location", "/login");
     res.statusCode = 302;
     res.end();
-    // return {
-    //   props: {
-    //     user: { id: null, email: null, username: null, isLoggedIn: false } as User,
-    //     permission: {}
-    //   },
-    // };
   }
 
   if (!user?.isSecretary) {
     res.setHeader("location", "/profile");
     res.statusCode = 302;
     res.end();
-    // return {
-    //   props: {
-    //     user,
-    //     permission: {}
-    //   },
-    // };
   }
 
   if (isNaN(+permissionId)) {
@@ -86,7 +73,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     }
   })
 
-
   return {
     props : { user, permission: JSON.parse(JSON.stringify(permission)) }
   }
@@ -112,19 +98,14 @@ function PermissionPage(
   const [email, setEmail] = React.useState(permission.submitter_email || "");
   const [emailError, setEmailError] = React.useState("");
   const [dueTo, setDueTo] = React.useState<Dayjs | null>(permission?.due_to || null);
-  // const [dueTo, setDueTo] = React.useState<Date>(new Date(permission?.due_to) || null);
   const [dateError, setDateError] = React.useState("");
   const [secretary, setSecretary] = React.useState(
     permission?.secretary?.first_name + " " + permission?.secretary?.last_name
     );
-
   const [loading, setLoading] = React.useState(false);
-  
   const [openSuccess, setOpenSuccess] = React.useState(false);
   const [openError, setOpenError] = React.useState(false);
-  
   const [viewData, setViewData] = React.useState(JSON.stringify(permission, null, 2));
-
 
   const handleCloseSuccess = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -139,21 +120,17 @@ function PermissionPage(
     }
     setOpenError(false);
   };
-  
+
   interface Body {
     [key: string]: any;
     submitter_email: string,
-    // secretary_id: string;
     due_to: Date;
   }
 
   async function handleClickSave() {
     setLoading(true);
     const body: Body = {
-      // id,
       submitter_email: email,
-      // secretary_id: permission.secretary_id,
-      // due_to: dueTo?.$d,
       due_to: dueTo?.toDate()!,
     };
     // add id key only when id is not null or undefined
@@ -203,10 +180,7 @@ function PermissionPage(
   React.useEffect(() => {
 
     const onEmailChange = (e: any) => {
-      // const onEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
       const emailValue = e.target.value || "";
-  
-      // setEmail(emailValue);
       if (emailValue === "") {
         setEmailError("No email provided.");
         return;
@@ -314,10 +288,6 @@ function PermissionPage(
               id="outlined-basic"
               label="Υπεύθυνος/η Γραμματείας"
               value={secretary}
-              // onChange={handleChangeConfirmed}
-              // onChange={
-              //   (v) => { setSecretaryId(v.target.value) }
-              // }
               sx={{ m: 1, width: 350 }}
             />
             </>
@@ -345,7 +315,6 @@ function PermissionPage(
                   <LoadingButton
                     color="secondary"
                     disabled={!id}
-                    // onClick={handleClickDelete}
                     onClick={handleClickOpenDialogDelete}
                     loading={loading}
                     loadingPosition="start"
@@ -405,7 +374,6 @@ function PermissionPage(
       
         </div>
 
-      {/* <pre>{viewData}</pre> */}
     </Layout>
   )
 }

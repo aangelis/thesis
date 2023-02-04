@@ -1,4 +1,3 @@
-
 export const validateEmail = (m: string) => {
   return String(m)
     .toLowerCase()
@@ -7,3 +6,6 @@ export const validateEmail = (m: string) => {
     );
 }
 
+export const stringToBoolean = (s: string | null | undefined): boolean => {
+  return !!s
+}

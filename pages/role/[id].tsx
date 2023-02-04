@@ -24,7 +24,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-// Fetch deposit data
 export const getServerSideProps = withIronSessionSsr(async function ({
   params,
   req,
@@ -103,14 +102,10 @@ function RolePage(
   const [isSecretary, setIsSecretary] = React.useState(role.is_secretary || false);
   const [isLibrarian, setIsLibrarian] = React.useState(role.is_librarian || false);
   const [isActive, setIsActive] = React.useState(role.is_active || false);
-
   const [loading, setLoading] = React.useState(false);
-  
   const [openSuccess, setOpenSuccess] = React.useState(false);
   const [openError, setOpenError] = React.useState(false);
-  
   const [viewData, setViewData] = React.useState(JSON.stringify(role, null, 2));
-
 
   const handleCloseSuccess = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -138,7 +133,6 @@ function RolePage(
   async function handleClickSave() {
     setLoading(true);
     const body: Body = {
-      // id: role.id,
       email,
       is_admin: isAdmin,
       is_secretary: isSecretary,
@@ -192,10 +186,8 @@ function RolePage(
   React.useEffect(() => {
 
     const onEmailChange = (e: any) => {
-    // const onEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
       const emailValue = e.target.value || "";
 
-      // setEmail(emailValue);
       if (emailValue === "") {
         setEmailError("No email provided.");
         return;
@@ -245,7 +237,6 @@ function RolePage(
               label="Ηλεκτρονική διεύθυνση ταχυδρομείου"
               helperText={emailError}
               value={email}
-              // onChange={onEmailChange}
               onChange={
                 (v) => { setEmail(v.target.value); }
               }
@@ -260,7 +251,6 @@ function RolePage(
             select
             label="Διαχειριστής"
             value={isAdmin}
-            // onChange={handleChangeConfirmed}
             onChange={
               (v) => { setIsAdmin(v.target.value.toLowerCase() === 'true'); }
             }
@@ -278,7 +268,6 @@ function RolePage(
             select
             label="Γραμματεία"
             value={isSecretary}
-            // onChange={handleChangeConfirmed}
             onChange={
               (v) => { setIsSecretary(v.target.value.toLowerCase() === 'true'); }
             }
@@ -296,7 +285,6 @@ function RolePage(
             select
             label="Βιβλιοθηκονόμος"
             value={isLibrarian}
-            // onChange={handleChangeConfirmed}
             onChange={
               (v) => { setIsLibrarian(v.target.value.toLowerCase() === 'true'); }
             }
@@ -314,7 +302,6 @@ function RolePage(
             select
             label="Ενεργός"
             value={isActive}
-            // onChange={handleChangeConfirmed}
             onChange={
               (v) => { setIsActive(v.target.value.toLowerCase() === 'true') }
             }
@@ -326,9 +313,6 @@ function RolePage(
               </MenuItem>
             ))}
           </TextField>
-
-
-
 
           <Box sx={{ m: 2 }} />
           
@@ -347,7 +331,6 @@ function RolePage(
               <LoadingButton
                 color="secondary"
                 disabled={!id}
-                // onClick={handleClickDelete}
                 onClick={handleClickOpenDialogDelete}
                 loading={loading}
                 loadingPosition="start"
@@ -404,7 +387,6 @@ function RolePage(
       
         </div>
 
-      {/* <pre>{viewData}</pre> */}
     </Layout>
   )
 }

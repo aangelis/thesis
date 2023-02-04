@@ -15,7 +15,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         username: "itp21101",
         first_name: "ΑΠΟΣΤΟΛΟΣ",
         last_name: "ΑΓΓΕΛΗΣ",
-        // full_name: "ΑΠΟΣΤΟΛΟΣ ΑΓΓΕΛΗΣ",
         title: "Μεταπτυχιακός Φοιτητής",
         department: "Πληροφορικής και Τηλεματικής",
       })
@@ -62,44 +61,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         last_name: "ΤΣΑΔΗΜΑΣ",
         title: "Διδακτικό Προσωπικό",
         department: "Πληροφορικής και Τηλεματικής",
-        // is_superuser: true,
       })
       return;
     } else if (email === "ifigenia@hua.gr" && password === "1234") {
       console.log(`${ip} - [${now}] - dummy LDAP endpoint success - ${email}`);
       res.json({          
-        // id: 2,
         email: "ifigenia@hua.gr",
         username: "ifigenia",
         first_name: "ΙΦΙΓΕΝΕΙΑ",
         last_name: "ΒΑΡΔΑΚΩΣΤΑ",
         title: "Bιβλιοθηκάριος",
         department: "Βιβλιοθήκη και Κέντρο Πληροφόρησης",
-        // name_el: null,
-        // name_en: null,
-        // surname_el: null,
-        // surname_en: null,
-        // father_name_el: null,
-        // father_name_en: null,
-        // department: null,
-        // title: null,
-        // title_ldap: null,
-        // is_staff: false,
-        // is_active: true,
-        // is_superuser: false,
-        // last_login: null,
-        // date_joined is auto polulated due to prisma conf 
-        // date_joined: "2022-10-17T18:34:10.969Z"
       }); 
       return;
     } else if (email === "mitsi@hua.gr" && password === "1234") {
       console.log(`${ip} - [${now}] - dummy LDAP endpoint success - ${email}`);
       res.json({          
-        // id: 2,
         email: "mitsi@hua.gr",
         username: "mitsi",
-        first_name: "ΜΗΤΣΗ",
-        last_name: "ΛΟΡΕΤΑ",
+        first_name: "ΛΟΡΕΤΑ",
+        last_name: "ΜΗΤΣΗ",
         title: "Διοικητική Υπάλληλος",
         department: "Γραμματεία Τμήματος Πληροφορικής και Τηλεματικής",
       }); 
@@ -107,7 +88,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else if (email === "daneli@hua.gr" && password === "1234") {
       console.log(`${ip} - [${now}] - dummy LDAP endpoint success - ${email}`);
       res.json({          
-        // id: 2,
         email: "daneli@hua.gr",
         username: "daneli",
         first_name: "ΦΩΤΕΙΝΗ",
@@ -127,6 +107,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
   } else {
+    res.setHeader("Allow", "POST");
     // Handle any other HTTP methods
     console.error(`${ip} - [${now}] - dummy LDAP endpoint failure - - Bad HTTP method`);
     res.status(400).json({ message: "Bad HTTP method." });

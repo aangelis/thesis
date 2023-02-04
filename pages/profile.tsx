@@ -12,8 +12,6 @@ import AlertTitle from '@mui/material/AlertTitle';
 import Snackbar from '@mui/material/Snackbar';
 import Button from "@mui/material/Button";
 
-// info on how to use layouts
-// https://nextjs.org/docs/basic-features/layouts
 export default function Profile() {
   const { user } = useUser({
     redirectTo: "/login",
@@ -120,7 +118,6 @@ export default function Profile() {
     .then((data) => {
       setOpenSuccess(true);
       setProfileCompleted(true);
-      // setViewData(JSON.stringify(data, null, 2));
     })
     .catch(err => {
       setOpenError(true);
@@ -185,8 +182,6 @@ export default function Profile() {
 
   if (!user?.isLoggedIn)
     return(<></>)
-
-
 
   return (
     <Layout>
@@ -496,10 +491,6 @@ export default function Profile() {
             — <strong>Οι αλλαγές αποθηκεύτηκαν!</strong>
         </Alert>
       </Snackbar>
-
-      
-      {/* <pre>{JSON.stringify(user, null, 2)}</pre> */}
-
 
     </Layout>
   );

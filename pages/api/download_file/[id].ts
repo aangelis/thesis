@@ -61,9 +61,7 @@ const handler = async (
 
   // Append folder name (deposit's id) to filename
   const objectName = deposit.id + '/' + deposit.new_filename;
-  
-  // const fileContents = await fs.readFile(downloadDir + data.id + '/' + data.new_filename, 'utf8');
-  
+    
   async function getObjectContents() {
 
     const promise = new Promise((resolve, reject) => {

@@ -5,11 +5,7 @@ import Form from "components/LoginForm";
 import fetchJson, { FetchError } from "lib/fetchJson";
 
 export default function Login() {
-  // check if user is already logged in and redirect to deposits
-  // const { user } = useUser();
-  // console.log(user);
-  // const redirectTo: string = 
-  //   (user?.isAdmin || user?.isSecretary || user?.isLibrarian)? "/deposits" : "/mydeposits";
+  // check if user is already logged in and redirect to profile
   const { mutateUser } = useUser({
     redirectTo: "/profile",
     redirectIfFound: true,

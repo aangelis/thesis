@@ -11,6 +11,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const ip = req.socket.remoteAddress;
   const method = req.method;
   if (method !== "POST") {
+    res.setHeader("Allow", "POST");
     // Handle any other HTTP methods
     console.log(`${ip} - [${new Date()}] - email endpoint - Bad HTTP method.`)
     res.status(400).json({ message: "Bad HTTP method." });

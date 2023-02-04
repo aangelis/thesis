@@ -19,6 +19,7 @@ const settings = {
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
     // Handle any other HTTP methods
     res.status(400).json({ message: "Bad HTTP method." });
     return;
@@ -199,7 +200,6 @@ const tryParseJSONObject: any = (jsonString: any) => {
   }
 
   throw new Error('Invalid JSON formatted server response data.')
-  // return null;
 };
 
 const get_token: any = async () => {
@@ -207,9 +207,7 @@ const get_token: any = async () => {
 }
 
 const get_token_: any = async (username: string, password: string, url: string) => {
-  const headers = {
-    // 'Content-Type': 'application/x-www-form-urlencoded',
-  };
+  const headers = {};
   const payload = { username, password, };
   return await fetchJson(url + '/authenticate', {
     method: 'POST',
@@ -357,7 +355,6 @@ const get_item_data_ = async (item_id: number, url: string) => {
     return response['results'][0]['id'] as unknown as number;
   });
 }
-
 
 const get_department_id: any = async (department: string, root_col_id: number) => {
   return get_department_id_(department, root_col_id, settings.BURL);

@@ -21,7 +21,6 @@ const handler = async (
     });
     return;
   }
-  // Just after the "Method Not Allowed" code
   const user: any = req.session.user;
 
   if (!user?.isLoggedIn) {
@@ -55,5 +54,4 @@ export const config = {
   },
 };
 
-// export default handler;
 export default withIronSessionApiRoute(handler, sessionOptions);

@@ -94,7 +94,6 @@ export default async function handler(req: NextApiRequest, response: NextApiResp
                       } else {
                         resolve({
                           email: entries[0].object.mail,
-                          //entries[0].attributes.find(x => x.type === "mail")?.vals[0],
                           username: entries[0].object.sAMAccountName,
                           first_name: entries[0].object.givenName,
                           last_name: entries[0].object.sn,
@@ -136,6 +135,7 @@ export default async function handler(req: NextApiRequest, response: NextApiResp
     );
   } else {
     // Handle any other HTTP method
+    response.setHeader("Allow", "POST");
     console.error(`${ip} - [${new Date()}] - LDAP endpoint failure - - Bad HTTP method`);
     response.status(400).json({ message: "Bad HTTP method." });
   }

@@ -10,6 +10,7 @@ const prisma = new PrismaClient()
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
+    res.setHeader("Allow", "GET");
     // Handle any other HTTP methods
     res.status(400).json({ message: "Bad HTTP method." });
     return;
@@ -70,45 +71,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     filterObjArray[0] ?
     filterObjArray[0] :
     {}
-    
-  interface Deposit {
-    id: number;
-    title: string;
-    title_el: string;
-    title_en: string;
-    content: string | null;
-    abstract_el: string | null;
-    abstract_en: string | null;
-    pages: number;
-    language: string | null;
-    images: number;
-    tables: number;
-    diagrams: number;
-    maps: number;
-    drawings: number;	
-    confirmed: boolean;
-    confirmed_timestamp: Date | null;
-    license: string | null;
-    comments: string | null;
-    submitter_id: number;
-    supervisor: string | null;
-    new_filename: string | null;
-    original_filename: string | null;
-    submitter?: {
-      id: number;
-      email: string;
-      first_name: string | null;
-      last_name: string | null;
-      name_el: string | null;
-      surname_el: string | null;
-      department: string | null;
-      title: string | null;
-    }
-    submitter_fullname?: string | null;
-    submitter_fullname_ldap?: string | null;
-    // submitter_department?: string | null;
-    // submitter_title?: string | null;
-  }
 
   // in case of secretary find assigned users
   const assignedUsers = user.isSecretary?
@@ -129,7 +91,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const dbData = user.is_superuser?
   ((user.isSecretary && !user.isAdmin)?
     // in case of secretary show only deposits of assigned users
-    // find find submitter id, email, first and last name
+    // find submitter id, email, first and last name
     (await prisma.$transaction([
       prisma.deposit.count({
         where: {
@@ -242,87 +204,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       + ' '
       + ((x.submitter?.name_el)? x.submitter?.name_el : "(κενό όνομα)");
     x.submitter_fullname_ldap = x.submitter?.last_name + ' ' + x.submitter?.first_name;
-    // x.submitter_department = x.submitter?.department;
-    // x.submitter_title = x.submitter?.title;
     return x;
   })
-
-  /*
-
-  const unconfirmedCount = !user.is_superuser?
-    ((await prisma.deposit.aggregate({
-      where: {
-        submitter_id: user.id!,
-        confirmed: false,
-      },
-      _count: {
-        confirmed: true,
-      },
-    }))._count.confirmed || 0)
-    : 0
-
-  const addNewCount = !user.is_superuser?
-    ((await prisma.permission.aggregate({
-      where: {
-        submitter_email: user.email!,
-        due_to: {
-          gte: new Date(),
-          // gte: new Date('2022-12-26'),
-        },
-      },
-      _count: {
-        _all: true
-      }
-    }))._count._all || 0)
-    : 0
-
-    const canAddNewDeposit = !user?.is_superuser && unconfirmedCount < addNewCount;
-
-    const depositMeta = {
-      unconfirmedCount,
-      addNewCount,
-      canAddNewDeposit
-    }
-/*
-
-/*
-
-  const dbData = await prisma.$transaction([
-    prisma.deposit.count({
-      where: {
-        submitter_id: user.id || undefined,
-      },
-    }),
-    prisma.deposit.findMany({
-      skip: (page - 1) * limit,
-      take: limit,
-      orderBy: [
-        orderByObj
-      ],
-      include: {
-        submitter: {
-          select: {
-            id: true,
-            email: true,
-            first_name: true,
-            last_name: true,
-            name_el: true,
-            surname_el: true,
-            department: true,
-            title: true,
-          }
-        }
-      },
-      where: {
-        submitter_id: user.id || undefined,
-      },
-    })
-  ])
-
-  const deposits = dbData[1];
-  const total = dbData[0];
-
-  */
 
   const total = dbData[0];
 

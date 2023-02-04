@@ -78,7 +78,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const {
       confirmed,
-      // confirmed_timestamp,
       comments,
       submitter_department,
       submitter_title,
@@ -131,12 +130,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       maps: yup.number().integer().required().min(0),
       drawings: yup.number().integer().required().min(0),
       confirmed: yup.boolean().required(),
-      // confirmed_timestamp: yup.string().nullable()
-      // .test(dateString => 
-      //   ((dateString === null) ||
-      //   ((new Date(dateString!).toString() !== 'Invalid Date')
-      //   && (new Date(dateString!) >= new Date())))
-      // ),
       license: yup.string().test((val) => val!.toString().length > 0),
       comments: yup.string().test((val) => val!.toString().length >= 0),
       supervisor: yup.string().test((val) => val!.toString().length >= 0),
@@ -163,7 +156,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           where: {
             id
           },
-          // data: filteredData
           data: {
             confirmed,
             confirmed_timestamp: new Date(),
@@ -205,31 +197,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           :
           updateUser?.first_name + ' ' + updateUser?.last_name;
 
-        // const proto =
-        //   req.headers["x-forwarded-proto"] || req.connection.encrypted
-        //     ? "https"
-        //     : "http";
-        // const localHostname = 
-        //   req.headers["x-forwarded-host"] || req.headers.host;
-    
-        // await fetch(
-        //   proto + '://' + localHostname + '/api/email',
-        //   {
-        //     method: 'POST',
-        //     mode: 'no-cors',
-        //     body: JSON.stringify(
-        //       {
-        //         fullname,
-        //         email: updateUser?.email,
-        //         subject: emailTitle,
-        //         text: emailMessage,
-        //       }
-        //     ),
-        //   }
-        // )
-        // .then(() => {
-        //   console.log(`${ip} - [${new Date()}] - deposit update - email sent for deposit update with id ${updateDeposit.id}.`)
-        // })
         await sendEmail({
           fullname,
           email: updateUser?.email!,

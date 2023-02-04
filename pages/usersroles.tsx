@@ -35,22 +35,12 @@ export const getServerSideProps = withIronSessionSsr(async function ({
       res.setHeader("location", "/login");
       res.statusCode = 302;
       res.end();
-      // return {
-      //   props: {
-      //     roles: {}
-      //   },
-      // };
     }
 
     if (!user?.isAdmin) {
       res.setHeader("location", "/profile");
       res.statusCode = 302;
       res.end();
-      // return {
-      //   props: {
-      //     roles: {}
-      //   },
-      // };
     }
 
   const prisma = new PrismaClient()
@@ -60,12 +50,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     props : { user, roles }
   }
 
-
 }, sessionOptions);
-
-
-
-
 
 interface Data {
   id: number;
@@ -335,10 +320,6 @@ const UserRoles = ((
 
   // Rendered more hooks than during the previous render with custom hook
   const tableToShow = EnhancedTable(roles);
-
-  // const { user } = useUser({
-  //   // redirectTo: "/login",
-  // });
 
   if (!user || !(user.isAdmin))
     return(<></>);
