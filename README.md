@@ -15,7 +15,7 @@ npm run dev
 
 Στη διεύθυνση [http://localhost:3000](http://localhost:3000) βλέπουμε το αποτέλεσμα.
 
-Η λειτουργικότητα του LDAP endpoint έχει μεταφερθεί και σε μεμονωμένο microservice.
+Η λειτουργικότητα των endpoint LDAP, deposit_uploader, deposits_uploader και email έχουν μεταφερθεί και σε μεμονωμένα microservice.
 
 ## Οδηγίες εγκατάστασης k8s
 
