@@ -318,7 +318,6 @@ function DepositPage(
   
   interface Body {
     [key: string]: any;
-    title: string;
     title_el: string;
     title_en: string;
     abstract_el: string;
@@ -341,7 +340,6 @@ function DepositPage(
     setKeywords_el(keywords_el.replace(/^[,\s]+|[,\s]+$/g, ''));
     setKeywords_en(keywords_en.replace(/^[,\s]+|[,\s]+$/g, ''));
     const body: Body = {
-      title: textFields.find(o => o.name === "title_el")?.value,
       title_el: textFields.find(o => o.name === "title_el")?.value,
       title_en: textFields.find(o => o.name === "title_en")?.value,
       abstract_el,

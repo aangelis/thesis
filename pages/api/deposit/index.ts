@@ -63,7 +63,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const depositSchema = yup.object().shape({
-    title: yup.string().required(),
     title_el: yup.string().required(),
     title_en: yup.string().required(),
     abstract_el: yup.string().test(val => val!.toString().length >= 0),

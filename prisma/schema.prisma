@@ -38,7 +38,6 @@ model User {
 
 model Deposit {
   id Int @id @default(autoincrement())
-  title String @db.VarChar(500)
   title_el String @db.VarChar(500)
   title_en String @db.VarChar(500)
   content String?
