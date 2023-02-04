@@ -97,7 +97,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       if (str.length === 0) {
         return true;
       }
-      return (/^[, \u0370-\u03FF\u1F00-\u1FFF]*$/.test(str));
+      return (/^[, -.()\u0370-\u03FF\u1F00-\u1FFF]*$/.test(str));
     }
   
     const isKeywordsEnValid = (str: string | null | undefined): boolean => {
@@ -107,7 +107,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       if (str.length === 0) {
         return true;
       }
-      return (/^[, A-Za-z]*$/.test(str));
+      return (/^[, -.()A-Za-z]*$/.test(str));
     }
     
     const depositSchema = yup.object().shape({

@@ -172,14 +172,14 @@ function DepositPage(
     if (str.length === 0) {
       return true;
     }
-    return (/^[, \u0370-\u03FF\u1F00-\u1FFF]*$/.test(str));
+    return (/^[, -.()\u0370-\u03FF\u1F00-\u1FFF]*$/.test(str));
   }
 
   const isKeywordsEnValid = (str: string): boolean => {
     if (str.length === 0) {
       return true;
     }
-    return (/^[, A-Za-z]*$/.test(str));
+    return (/^[, -.()A-Za-z]*$/.test(str));
   }
   
   const [id, setId] = React.useState<number | null>(deposit?.id! || null)
@@ -683,7 +683,7 @@ function DepositPage(
               disabled={depositReadOnly}
               error={!keywordsElValid}
               label="Λέξεις κλειδιά"
-              helperText={!keywordsElValid && "Επιτρέπονται μόνο χαρακτήρες και το κόμμα"}
+              helperText={!keywordsElValid && "Επιτρέπονται μόνο ελληνικοί χαρακτήρες, παρενθέσεις, η τελεία, η παύλα και το κόμμα"}
               multiline
               rows={3}
               value={keywords_el}
@@ -696,7 +696,7 @@ function DepositPage(
               disabled={depositReadOnly}
               error={!keywordsEnValid}
               label="Λεξεις κλειδιά (Αγγλικά)"
-              helperText={!keywordsEnValid && "Επιτρέπονται μόνο χαρακτήρες και το κόμμα"}
+              helperText={!keywordsEnValid && "Επιτρέπονται μόνο αγγλικοί χαρακτήρες, παρενθέσεις, η τελεία, η παύλα και το κόμμα"}
               multiline
               rows={3}
               value={keywords_en}
