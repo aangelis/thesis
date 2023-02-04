@@ -26,7 +26,6 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Deposit" (
     "id" SERIAL NOT NULL,
-    "title" VARCHAR(500) NOT NULL,
     "title_el" VARCHAR(500) NOT NULL,
     "title_en" VARCHAR(500) NOT NULL,
     "content" TEXT,
