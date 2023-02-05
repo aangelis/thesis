@@ -671,7 +671,7 @@ function DepositPage(
               disabled={depositReadOnly}
               error={!keywordsEnValid}
               label="Λεξεις κλειδιά (Αγγλικά)"
-              helperText={!keywordsEnValid && "Επιτρέπονται μόνο αγγλικοί χαρακτήρες, παρενθέσεις, η τελεία, η παύλα και το κόμμα"}
+              helperText={!keywordsEnValid && "Επιτρέπονται μόνο λατινικοί χαρακτήρες, παρενθέσεις, η τελεία, η παύλα και το κόμμα"}
               multiline
               rows={3}
               value={keywords_en}
