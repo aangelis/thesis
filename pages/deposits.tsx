@@ -67,13 +67,30 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     }))._count.confirmed || 0)
     : 0
 
+  const beforeTwoMonths = new Date();
+  beforeTwoMonths.setHours(beforeTwoMonths.getHours() - 24 * 60);
+
+  const recentConfirmedCount = !user.is_superuser?
+  ((await prisma.deposit.aggregate({
+    where: {
+      submitter_id: user.id!,
+      confirmed: true,
+      date_created: {
+        gte: beforeTwoMonths.toISOString(),
+      },
+    },
+    _count: {
+      confirmed: true,
+    },
+  }))._count.confirmed || 0)
+  : 0
+
   const addNewCount = !user.is_superuser?
     ((await prisma.permission.aggregate({
       where: {
         submitter_email: user.email!,
         due_to: {
           gte: new Date(),
-          // gte: new Date('2022-12-26'),
         },
       },
       _count: {
@@ -82,9 +99,13 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     }))._count._all || 0)
     : 0
 
-    const canAddNewDeposit = !user?.is_superuser && unconfirmedCount < addNewCount;
+    // can create new deposit when the sum of unconfirmed deposits and 
+    // recently confirmed ones is less than deposit permission count
+    const canAddNewDeposit = !user?.is_superuser
+      && recentConfirmedCount + unconfirmedCount < addNewCount;
 
     const depositMeta = {
+      recentConfirmedCount,
       unconfirmedCount,
       addNewCount,
       canAddNewDeposit
