@@ -197,7 +197,7 @@ function DepositPage(
     {name: "title_el", value: deposit?.title_el || "", error: deposit?.title_el? "" : "Το πεδίο δεν μπορεί να είναι κενό!" },
     {name: "title_en", value: deposit?.title_en || "", error: deposit?.title_en? "" : "Το πεδίο δεν μπορεί να είναι κενό!" },
   ]
-  const [textFieldsErrors, setTextFieldsErrors] = React.useState(alphabeticalFields.map(x => !!x.error? 1 as number : 0 as number).reduce((i,j) => {return i+j}))
+  const [textFieldsErrors, setTextFieldsErrors] = React.useState(alphabeticalFields.map(x => !!x.error? 1 as number : 0 as number).reduce((i,j) => i+j))
   const [textFields, setTextFields] = React.useState(alphabeticalFields);
 
   const handleTextFields = (e: any) => {
