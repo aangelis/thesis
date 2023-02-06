@@ -4,6 +4,7 @@ import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "lib/session";
 import sendEmail from "lib/email";
 import { User } from "pages/api/user";
+import { minioClient } from "lib/mc";
 import * as yup from 'yup';
 
 export default withIronSessionApiRoute(handler, sessionOptions);
@@ -61,9 +62,36 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         where: {
           id
         },
+      }).then(deposit => {
+        console.log(`${ip} - [${new Date()}] - deposit delete - deposit with id ${deposit.id} deleted from DB.`)
+        if (deposit.new_filename) {
+          var objectsList:any = []
+          var stream = minioClient.listObjects(
+            process.env.MINIO_BUCKET || "thesis",
+            deposit.id + '/',
+            true)
+          stream.on('data', function(obj) { objectsList.push(obj.name) } )
+          stream.on('end', function () { 
+            minioClient.removeObjects(
+              process.env.MINIO_BUCKET || "thesis",
+              objectsList,
+              function(e) {
+              if (e) {
+                  return console.log('Unable to remove Objects ',e)
+              }
+              // console.log('Removed the objects successfully')
+              console.log(`${ip} - [${new Date()}] - deposit delete - Document of deposit with id ${deposit.id} deleted from storage.`)
+              res.json(deposit);
+              return;         
+            })
+          })
+          stream.on('error', function(err) { console.log(err) } )
+        } else {
+          res.json(deposit);
+          return; 
+        }
       })
-      res.json(deleteDeposit);
-      return;
+
     } catch (error) {
       res.status(500).json({ message: (error as Error).message });
       return;
