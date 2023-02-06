@@ -188,18 +188,16 @@ function DepositPage(
   const [comments, setComments] = React.useState(deposit?.comments || "");
   const [supervisor, setSupervisor] = React.useState(deposit?.supervisor || "");
   const [loading, setLoading] = React.useState(false);
-  const [numFieldsErrors, setNumFieldsErrors] = React.useState(0)
-  const [textFieldsErrors, setTextFieldsErrors] = React.useState(0) 
   const [openSuccess, setOpenSuccess] = React.useState(false)
   const [openUploadSuccess, setOpenUploadSuccess] = React.useState(false)
   const [openError, setOpenError] = React.useState(false)
   const [openFileError, setOpenFileError] = React.useState("")
-
+  
   const alphabeticalFields = [
-    {name: "title_el", value: deposit?.title_el || "", error: "" },
-    {name: "title_en", value: deposit?.title_en || "", error: "" },
+    {name: "title_el", value: deposit?.title_el || "", error: deposit?.title_el? "" : "Το πεδίο δεν μπορεί να είναι κενό!" },
+    {name: "title_en", value: deposit?.title_en || "", error: deposit?.title_en? "" : "Το πεδίο δεν μπορεί να είναι κενό!" },
   ]
-
+  const [textFieldsErrors, setTextFieldsErrors] = React.useState(alphabeticalFields.map(x => !!x.error? 1 as number : 0 as number).reduce((i,j) => {return i+j}))
   const [textFields, setTextFields] = React.useState(alphabeticalFields);
 
   const handleTextFields = (e: any) => {
@@ -212,7 +210,7 @@ function DepositPage(
         setTextFieldsErrors(textFieldsErrors + 1);
       }
       if (el.name === e.target.name && el.value === "") {
-        el.error = "Cannot left blank!";
+        el.error = "Το πεδίο δεν μπορεί να είναι κενό!";
       }
       if (el.name === e.target.name && el.value !== "") {
         el.error = "";
@@ -231,20 +229,21 @@ function DepositPage(
     {name: "drawings", value: deposit?.drawings || 0, error: "" }
   ]
 
+  const [numFieldsErrors, setNumFieldsErrors] = React.useState(0)
   const [numFields, setNumFields] = React.useState(numericalFields);
 
   const handleNumFields = (e: any) => {
     const result = numFields.map((el) => {
       if (el.name === e.target.name) {
         el.value = e.target.value;
-        if (Number(el.value) >= 0
+        if (Number(el.value) >= 0 && Number.isInteger(Number(el.value))
             && el.value !== "" && el.error !== "") {
           el.error = "";
           setNumFieldsErrors(numFieldsErrors - 1);
         }
-        if ((Number(el.value) < 0 || isNaN(+el.value) || el.value === "")
+        if ((Number(el.value) < 0 || !Number.isInteger(Number(el.value)) || isNaN(+el.value) || el.value === "")
             && el.error === "") {
-          el.error = "Positive number needed!";
+          el.error = "Χρειάζεται μη αρνητικος ακέραιος αριθμός!";
           setNumFieldsErrors(numFieldsErrors + 1);
         }
       }
@@ -469,9 +468,8 @@ function DepositPage(
 
     try {
       var formData = new FormData();
-      formData.append("depositId", deposit?.id as unknown as string);
+      formData.append("depositId", id as unknown as string);
       formData.append("media", file);
-
       
       const res = await fetch("/api/upload", {
         method: "POST",
@@ -603,6 +601,9 @@ function DepositPage(
               multiline
               rows={2}
               value={textFields.find(o => o.name === "title_el")?.value}
+              onLoad={(v) => {
+                handleTextFields(v);
+              }}
               onChange={(v) => {
                 handleTextFields(v);
               }}
@@ -964,7 +965,7 @@ function DepositPage(
                 
                 <LoadingButton
                   color="secondary"
-                  disabled={!previewUrl}
+                  disabled={!previewUrl || !id}
                   onClick={onUploadFile}
                   loading={loading}
                   loadingPosition="start"
