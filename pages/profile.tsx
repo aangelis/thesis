@@ -1,6 +1,7 @@
 import React from "react";
 import Layout from "components/Layout";
 import useUser from "lib/useUser";
+import { stringToBoolean } from "lib/utils";
 
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
@@ -34,10 +35,6 @@ export default function Profile() {
       return true;
     }
     return (/^[ A-Za-z]*$/.test(str));
-  }
-
-  const stringToBoolean = (s: string | null | undefined): boolean => {
-    return !!s
   }
 
   const [nameEl, setNameEl] = React.useState(user?.name_el || "")
