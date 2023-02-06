@@ -65,7 +65,7 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
         }
       }}
       : await fetch(process.env.LOGIN_API_ENDPOINT as string,
-        {
+      {
         method: "POST",
         headers:new Headers({
             "Content-Type": "application/json"
@@ -81,6 +81,8 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
         where: {
           email,
         },
+      }).catch(err => {
+        res.status(500).json({ message: "Εμφανίστηκε σφάλμα κατά την επικοινωνία με τη βάση." });
       })
       // Rename remaining properties variable when object destructuring (spreading) userData
       const { id: userId, email: ldapEmail, username: ldapUsername, ...userDataStripped } = userData;
