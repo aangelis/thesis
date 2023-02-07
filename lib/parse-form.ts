@@ -120,7 +120,7 @@ export const parseForm = async (
           minioClient.makeBucket(
             process.env.MINIO_BUCKET || "thesis",
             'local',
-            function(err: any) {
+            (err: any) => {
               if (err.code === "BucketAlreadyOwnedByYou") return;
               return console.log(err);
             })
@@ -138,28 +138,28 @@ export const parseForm = async (
             process.env.MINIO_BUCKET || "thesis",
             depositId + '/',
             true)
-          stream.on('data', function(obj) { objectsList.push(obj.name) } )
-          stream.on('end', function () { 
+          stream.on('data', obj => objectsList.push(obj.name) )
+          stream.on('end', () => { 
 
             minioClient.removeObjects(
               process.env.MINIO_BUCKET || "thesis",
               objectsList,
-              function(e) {
+              e => {
               if (e) {
-                  return console.log('Unable to remove Objects ',e)
+                return console.log('Unable to remove Objects ',e)
               }
               console.log('Removed the objects successfully')
             })
 
            })
-          stream.on('error', function(err) { console.log(err) } )
+          stream.on('error', err => console.log(err) )
 
           minioClient.fPutObject(
-            process.env.MINIO_BUCKET || "thesis",
+            process.env.MINIO_BUCKET || 'thesis',
             objectName,
             fileMinio,
             metaData,
-            function(err, etag) {
+            (err, etag) => {
               if (err) return console.log(err)
               console.log('File uploaded successfully.')
               
