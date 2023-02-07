@@ -67,36 +67,35 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         if (deposit.new_filename) {
           var objectsList:any = []
           var stream = minioClient.listObjects(
-            process.env.MINIO_BUCKET || "thesis",
+            process.env.MINIO_BUCKET || 'thesis',
             deposit.id + '/',
             true)
-          stream.on('data', function(obj) { objectsList.push(obj.name) } )
-          stream.on('end', function () { 
+          stream.on('data', obj => objectsList.push(obj.name) )
+          stream.on('end', () => { 
             minioClient.removeObjects(
-              process.env.MINIO_BUCKET || "thesis",
+              process.env.MINIO_BUCKET || 'thesis',
               objectsList,
-              function(e) {
+              e => {
               if (e) {
-                  return console.log('Unable to remove Objects ',e)
+                // return console.log('Unable to remove Objects ',e)
+                console.log(`${ip} - [${new Date()}] - deposit delete - Unable to remove document of deposit with id ${deposit.id} from storage.`);
+                return deposit;
               }
               // console.log('Removed the objects successfully')
-              console.log(`${ip} - [${new Date()}] - deposit delete - Document of deposit with id ${deposit.id} deleted from storage.`)
-              res.json(deposit);
-              return;         
+              console.log(`${ip} - [${new Date()}] - deposit delete - Document of deposit with id ${deposit.id} deleted from storage.`);
+              return deposit;
             })
           })
-          stream.on('error', function(err) { console.log(err) } )
-        } else {
-          res.json(deposit);
-          return; 
+          stream.on('error', err => console.log(err) )
         }
+        return deposit;
       })
-
+      res.json(deleteDeposit);
+      return;
     } catch (error) {
       res.status(500).json({ message: (error as Error).message });
       return;
     }
-
   }
 
   if (req.method === 'PATCH') {
