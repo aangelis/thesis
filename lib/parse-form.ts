@@ -46,7 +46,7 @@ export const parseForm = async (
     let filename = ""; 
     const form = formidable({
       maxFiles: 2,
-      maxFileSize: 100 * 1024 * 1024, // 100 MegaBytes
+      maxFileSize: (process.env.MAX_FILE_SIZE as unknown as number || 100) * 1024 * 1024, // 100 MegaBytes default value
       uploadDir: uploadDirTemp,
       filename: (_name, _ext, part) => {
         if (filename !== "") {
