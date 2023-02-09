@@ -86,7 +86,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   []
 
   const emails: string[] = [];
-  assignedUsers.forEach(({submitter_email: v}) => emails.push(v))
+  assignedUsers.forEach(({submitter_email: v}) => {if (emails.indexOf(v) === -1) emails.push(v)})
 
   const dbData = user.is_superuser?
   ((user.isSecretary && !user.isAdmin)?
