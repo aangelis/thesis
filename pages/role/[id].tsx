@@ -37,51 +37,45 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     res.setHeader("location", "/login");
     res.statusCode = 302;
     res.end();
-    return {
-      props: {
-        user: { id: null, email: null, username: null, isLoggedIn: false } as User,
-        role: {}
-      },
-    };
   }
 
   if (!user?.isAdmin) {
     res.setHeader("location", "/profile");
     res.statusCode = 302;
     res.end();
-    return {
-      props: {
-        user,
-        role: {}
-      },
-    };
   }
+
+  const prisma = new PrismaClient()
+
+  const roles = await prisma.role.findMany()
+
+  const emails: string[] = [];
+  roles.forEach(({email: v}) => emails.push(v))
 
   if (isNaN(+roleId)) {
     return {
       props: {
         user,
-        role: {}
+        role: {},
+        emails,
       },
     };
   }
 
-  const prisma = new PrismaClient()
   const role: any = await prisma.role.findFirst({
     where: {
      id: roleId,
     }
   })
 
-
   return {
-    props : { user, role }
+    props : { user, role, emails }
   }
 }, sessionOptions);
 
 
 function RolePage(
-  { user, role }: InferGetServerSidePropsType<typeof getServerSideProps>,
+  { user, role, emails }: InferGetServerSidePropsType<typeof getServerSideProps>,
   ) {
 
   const booleanStatus = [
@@ -95,7 +89,7 @@ function RolePage(
     },
   ]
 
-  const [id, setId] = React.useState<number | null>(role?.id! || null)
+  const [id, setId] = React.useState<number | null>(role?.id! || null);
   const [email, setEmail] = React.useState(role.email || "");
   const [emailError, setEmailError] = React.useState("");
   const [isAdmin, setIsAdmin] = React.useState(role.is_admin || false);
@@ -189,16 +183,20 @@ function RolePage(
       const emailValue = e.target.value || "";
 
       if (emailValue === "") {
-        setEmailError("No email provided.");
+        setEmailError("Το email είναι κενό.");
         return;
       }
       if (emailValue.split('@')[1] !== 'hua.gr') {
-        setEmailError("Invalid email.");
+        setEmailError("Μη αποδεκτό email.");
         return;
       }
       const validEmail = validateEmail(emailValue);
       if (validEmail === null) {
-        setEmailError("Invalid email.");
+        setEmailError("Μη αποδεκτό email.");
+        return;
+      }
+      if (emails.indexOf(emailValue) !== -1) {
+        setEmailError("Μη αποδεκτό email, υπάρχει ήδη σε άλλη εγγραφή.");
         return;
       }
       setEmailError("");
@@ -210,7 +208,7 @@ function RolePage(
       {target:
         {name: "email", value: email}
       });
-  }, [email]);
+  }, [email, emails]);
 
   const deleteButton = {
     backgroundColor: '#e62e00', '&:hover': { backgroundColor: '#cc0066' }
