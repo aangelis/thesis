@@ -50,6 +50,15 @@ export const getServerSideProps = withIronSessionSsr(async function ({
       last_name: string | null;
     }
     secretary_fullname?: string | null;
+    submitter_email: string;
+    submitter_fullname?: string | null;
+  }
+
+  interface Submitter {
+    first_name: string | null;
+    last_name: string | null;
+    email: string;
+    submitter_fullname?: string | null;
   }
   
   const permissions: Permission[] = await prisma.permission.findMany({
@@ -63,15 +72,33 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     }
   })
 
-  permissions.map((x) => {
-    x.secretary_fullname = x.secretary.first_name + ' ' + x.secretary.last_name;
+  const submitter_emails: string[] = [];
+  permissions.forEach(({submitter_email: v}) => submitter_emails.push(v))
+
+  const submitters: Submitter[] = await prisma.user.findMany({
+    where: {
+      email: { in: submitter_emails },
+    },
+    select: {
+      email: true,
+      first_name: true,
+      last_name: true,
+    }
+  })
+
+  submitters.map((x) => {
+    x.submitter_fullname = x.last_name + ' ' + x.first_name;
     return x;
   })
+
+  permissions.map((x) => {
+    x.secretary_fullname = x.secretary.last_name + ' ' + x.secretary.first_name;
+    x.submitter_fullname = submitters.find(y => x.submitter_email == y.email)?.submitter_fullname || ''
+  });
 
   return {
     props : { user, permissions: JSON.parse(JSON.stringify(permissions)) }
   }
-
 
 }, sessionOptions);
 
@@ -81,6 +108,7 @@ interface Data {
   due_to: string;
   secretary_id: number;
   secretary_fullname: string;
+  submitter_fullname: string;
 }
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -134,6 +162,12 @@ const headCells: readonly HeadCell[] = [
     numeric: false,
     disablePadding: false,
     label: 'E-mail',
+  },
+  {
+    id: 'submitter_fullname',
+    numeric: false,
+    disablePadding: false,
+    label: 'Δημιουργός',
   },
   {
     id: 'due_to',
@@ -278,6 +312,9 @@ function EnhancedTable(rows: Data[], user: any) {
                         scope="row"
                         sx={{cursor: 'pointer', fontWeight: !owned? 'plain' : 'bold'}}
                       >{row.submitter_email}</TableCell>
+                      <TableCell
+                        sx={{fontWeight: !owned? 'plain' : 'bold'}}
+                        >{row.submitter_fullname}</TableCell>
                       <TableCell
                         align="right"
                         sx={{fontWeight: !owned? 'plain' : 'bold'}}
