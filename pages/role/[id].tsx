@@ -68,6 +68,11 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     }
   })
 
+  const index: number = emails.indexOf(role.email, 0);
+  if (index > -1) {
+    emails.splice(index, 1);
+  }
+
   return {
     props : { user, role, emails }
   }
@@ -91,6 +96,7 @@ function RolePage(
 
   const [id, setId] = React.useState<number | null>(role?.id! || null);
   const [email, setEmail] = React.useState(role.email || "");
+  const [storedEmails, setStoredEmails] = React.useState(emails || []);
   const [emailError, setEmailError] = React.useState("");
   const [isAdmin, setIsAdmin] = React.useState(role.is_admin || false);
   const [isSecretary, setIsSecretary] = React.useState(role.is_secretary || false);
@@ -99,7 +105,6 @@ function RolePage(
   const [loading, setLoading] = React.useState(false);
   const [openSuccess, setOpenSuccess] = React.useState(false);
   const [openError, setOpenError] = React.useState(false);
-  const [viewData, setViewData] = React.useState(JSON.stringify(role, null, 2));
 
   const handleCloseSuccess = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -148,7 +153,7 @@ function RolePage(
     .then((data) => {
       setOpenSuccess(true);
       setId(data.id);
-      setViewData(JSON.stringify(data, null, 2));
+      setStoredEmails(data.stored_emails);
     })
     .catch(err => {
       setOpenError(true);
@@ -195,7 +200,7 @@ function RolePage(
         setEmailError("Μη αποδεκτό email.");
         return;
       }
-      if (emails.indexOf(emailValue) !== -1) {
+      if (storedEmails.indexOf(emailValue) !== -1) {
         setEmailError("Μη αποδεκτό email, υπάρχει ήδη σε άλλη εγγραφή.");
         return;
       }
@@ -208,7 +213,7 @@ function RolePage(
       {target:
         {name: "email", value: email}
       });
-  }, [email, emails]);
+  }, [email, storedEmails]);
 
   const deleteButton = {
     backgroundColor: '#e62e00', '&:hover': { backgroundColor: '#cc0066' }

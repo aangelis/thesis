@@ -44,7 +44,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const role = await prisma.role.create({
       data
     })
-    res.json(role);
+
+    const roles = await prisma.role.findMany()
+
+    const emails: string[] = [];
+    roles.forEach(({email: v}) => emails.push(v))
+
+    const index: number = emails.indexOf(role.email, 0);
+    if (index > -1) {
+      emails.splice(index, 1);
+    }
+
+    res.json({...role, stored_emails: emails});
     return;
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
