@@ -73,7 +73,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   })
 
   const submitter_emails: string[] = [];
-  permissions.forEach(({submitter_email: v}) => submitter_emails.push(v))
+  permissions.forEach(({submitter_email: v}) => {if (submitter_emails.indexOf(v) === -1) submitter_emails.push(v)})
 
   const submitters: Submitter[] = await prisma.user.findMany({
     where: {
