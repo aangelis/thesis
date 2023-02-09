@@ -151,7 +151,7 @@ const headCells: readonly HeadCell[] = [
   {
     id: 'email',
     numeric: false,
-    disablePadding: true,
+    disablePadding: false,
     label: 'E-mail',
   },
   {
@@ -308,13 +308,10 @@ function EnhancedTable(rows: any[]) {
                       selected={isItemSelected}
                     >
                       <TableCell
-                        // onClick={() => {
-                        //   console.log("Detected Title_el Cell Click", row.id);}}
                         onClick={() => router.push('/role/'+row.id)}
                         component="th"
                         id={labelId}
                         scope="row"
-                        padding="none"
                         sx={{cursor: 'pointer'}}
                       >{row.email}</TableCell>
                        <TableCell
