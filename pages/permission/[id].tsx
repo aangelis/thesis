@@ -15,7 +15,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Snackbar from '@mui/material/Snackbar';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from "dayjs";
 import 'dayjs/locale/el';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -93,11 +93,11 @@ function PermissionPage(
       label: 'Όχι',
     },
   ]
-
+  
   const [id, setId] = React.useState<number | null>(permission?.id! || null)
   const [email, setEmail] = React.useState(permission.submitter_email || "");
   const [emailError, setEmailError] = React.useState("");
-  const [dueTo, setDueTo] = React.useState<Dayjs | null>(permission?.due_to || null);
+  const [dueTo, setDueTo] = React.useState<Dayjs | null>(dayjs(new Date(permission?.due_to)) || null);
   const [dateError, setDateError] = React.useState("");
   const [secretary, setSecretary] = React.useState(
     permission?.secretary?.first_name + " " + permission?.secretary?.last_name
@@ -265,11 +265,11 @@ function PermissionPage(
               disabled={permissionReadOnly}
               label="Καταληκτική ημερομηνία"
               value={dueTo}
-              onChange={(newValue) => {
+              onChange={newValue => {
                 const dj: Dayjs = newValue!;
                 setDueTo(dj.endOf('day'))
               }}
-              renderInput={(params) =>
+              renderInput={params =>
               <TextField
                 error={dateError !== ""}
                 helperText={dateError}
