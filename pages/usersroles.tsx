@@ -44,7 +44,47 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     }
 
   const prisma = new PrismaClient()
-  const roles = await prisma.role.findMany()
+
+  interface Role {
+    email: string;
+    is_admin: Boolean;
+    is_secretary: Boolean;
+    is_librarian: Boolean;
+    is_active: Boolean;
+    fullname?: string | null;
+  }
+
+  interface Role_owners {
+    first_name: string | null;
+    last_name: string | null;
+    email: string;
+    fullname?: string | null;
+  }
+
+  const roles: Role[] = await prisma.role.findMany()
+
+  const emails: string[] = [];
+  roles.forEach(({email: v}) => emails.push(v))
+
+  const role_owners: Role_owners[] = await prisma.user.findMany({
+    where: {
+      email: { in: emails },
+    },
+    select: {
+      email: true,
+      first_name: true,
+      last_name: true,
+    }
+  })
+
+  role_owners.map((x) => {
+    x.fullname = x.last_name + ' ' + x.first_name;
+    return x;
+  })
+
+  roles.map((x) => {
+    x.fullname = role_owners.find(y => x.email == y.email)?.fullname || ''
+  });
 
   return {
     props : { user, roles }
@@ -54,6 +94,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 
 interface Data {
   id: number;
+  fullname: string;
   email: string;
   is_admin: boolean;
   is_secretary: boolean;
@@ -112,6 +153,12 @@ const headCells: readonly HeadCell[] = [
     numeric: false,
     disablePadding: true,
     label: 'E-mail',
+  },
+  {
+    id: 'fullname',
+    numeric: false,
+    disablePadding: false,
+    label: 'Ονοματεπώνυμο',
   },
   {
     id: 'is_admin',
@@ -270,6 +317,8 @@ function EnhancedTable(rows: any[]) {
                         padding="none"
                         sx={{cursor: 'pointer'}}
                       >{row.email}</TableCell>
+                       <TableCell
+                        >{row.fullname}</TableCell>
                       <TableCell align="right">{row.is_admin ? "Ναι" : "Όχι" }</TableCell>
                       <TableCell align="right">{row.is_secretary ? "Ναι" : "Όχι" }</TableCell>
                       <TableCell align="right">{row.is_librarian ? "Ναι" : "Όχι" }</TableCell>
