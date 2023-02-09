@@ -201,18 +201,18 @@ function DepositPage(
   const [textFields, setTextFields] = React.useState(alphabeticalFields);
 
   const handleTextFields = (e: any) => {
-    const result = textFields.map((el) => {
+    const result = textFields.map(el => {
       setTextFieldsErrors(0);
       if (el.name === e.target.name) {
         el.value = e.target.value;
       }
-      if (el.value === "") {
+      if (el.value.replaceAll(' ', '').length === 0) {
         setTextFieldsErrors(textFieldsErrors + 1);
       }
-      if (el.name === e.target.name && el.value === "") {
+      if (el.name === e.target.name && el.value.replaceAll(' ', '').length === 0) {
         el.error = "Το πεδίο δεν μπορεί να είναι κενό!";
       }
-      if (el.name === e.target.name && el.value !== "") {
+      if (el.name === e.target.name && el.value.replaceAll(' ', '').length !== 0) {
         el.error = "";
       }
       return el;
