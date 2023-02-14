@@ -201,18 +201,21 @@ function DepositPage(
   const [textFields, setTextFields] = React.useState(alphabeticalFields);
 
   const handleTextFields = (e: any) => {
+    setTextFieldsErrors(0);
     const result = textFields.map(el => {
-      setTextFieldsErrors(0);
       if (el.name === e.target.name) {
         el.value = e.target.value;
       }
-      if (el.value.replaceAll(' ', '').length === 0) {
+      if (el.value.replaceAll(' ', '').length === 0 || el.value.length > 500) {
         setTextFieldsErrors(textFieldsErrors + 1);
       }
       if (el.name === e.target.name && el.value.replaceAll(' ', '').length === 0) {
         el.error = "Το πεδίο δεν μπορεί να είναι κενό!";
       }
-      if (el.name === e.target.name && el.value.replaceAll(' ', '').length !== 0) {
+      if (el.name === e.target.name && el.value.length > 500) {
+        el.error = "Το πεδίο υπερβαίνει το όριο μεγέθους!";
+      }
+      if (el.name === e.target.name && el.value.replaceAll(' ', '').length > 0 && el.value.length <= 500) {
         el.error = "";
       }
       return el;
@@ -338,6 +341,7 @@ function DepositPage(
     // Remove spaces and commas at the end and beginning
     setKeywords_el(keywords_el.replace(/^[,\s]+|[,\s]+$/g, ''));
     setKeywords_en(keywords_en.replace(/^[,\s]+|[,\s]+$/g, ''));
+    setSupervisor(supervisor.replace(/^[,\s]+|[,\s]+$/g, '').substring(0,100));
     const body: Body = {
       title_el: textFields.find(o => o.name === "title_el")?.value,
       title_en: textFields.find(o => o.name === "title_en")?.value,
@@ -364,7 +368,7 @@ function DepositPage(
             process.env.NEXT_PUBLIC_DEPOSIT_LICENSE_DEFAULT : "")
           : license),
       comments,
-      supervisor,
+      supervisor: supervisor.replace(/^[,\s]+|[,\s]+$/g, '').substring(0,100),
     };
     id && (body.id = id);
     await fetch('/api/deposit' + (id? ('/' + id) : ""), {

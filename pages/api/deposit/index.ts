@@ -63,27 +63,27 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const depositSchema = yup.object().shape({
-    title_el: yup.string().required(),
-    title_en: yup.string().required(),
-    abstract_el: yup.string().test(val => val!.toString().length >= 0),
-    abstract_en: yup.string().test(val => val!.toString().length >= 0),
+    title_el: yup.string().test(val => val!.toString().length > 0 && val!.toString().length <= 500),
+    title_en: yup.string().test(val => val!.toString().length > 0 && val!.toString().length <= 500),
+    abstract_el: yup.string().test(val => val!.toString().length >= 0 && val!.toString().length <= 65535),
+    abstract_en: yup.string().test(val => val!.toString().length >= 0 && val!.toString().length <= 65535),
     keywords_el: yup.string().test(val => {
-      return (val!.toString().length == 0 || (val!.toString().length > 0 && isKeywordsElValid(val)))
+      return (val!.toString().length == 0 || (val!.toString().length > 0 && val!.toString().length <= 65535 && isKeywordsElValid(val)))
     }),
     keywords_en: yup.string().test(val => {
-      return (val!.toString().length == 0 || (val!.toString().length > 0 && isKeywordsEnValid(val)))
+      return (val!.toString().length == 0 || (val!.toString().length > 0 && val!.toString().length <= 65535 && isKeywordsEnValid(val)))
     }),
     pages: yup.number().integer().required().min(0),
-    language: yup.string().test(val => val!.toString().length > 0),
+    language: yup.string().test(val => val!.toString().length > 0 && val!.toString().length <= 50),
     images: yup.number().integer().required().min(0),
     tables: yup.number().integer().required().min(0),
     diagrams: yup.number().integer().required().min(0),
     maps: yup.number().integer().required().min(0),
     drawings: yup.number().integer().required().min(0),
     confirmed: yup.boolean().required(),
-    license: yup.string().test((val) => val!.toString().length > 0),
-    comments: yup.string().test((val) => val!.toString().length >= 0),
-    supervisor: yup.string().test((val) => val!.toString().length >= 0),
+    license: yup.string().test(val => val!.toString().length > 0 && val!.toString().length <= 100),
+    comments: yup.string().test(val => val!.toString().length >= 0),
+    supervisor: yup.string().test(val => val!.toString().length >= 0 && val!.toString().length <= 100),
   }).noUnknown();
 
   if (!(depositSchema.isValidSync(data, { abortEarly: true, strict: true, }))) {
