@@ -1,13 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-
 import ldap from 'ldapjs';
 
-/*
-API Routes do not specify CORS headers, meaning they are same-origin only by default.
-You can customize such behavior by wrapping the request handler
-with the CORS request helpers.
-https://github.com/vercel/next.js/blob/canary/examples/api-routes-cors/pages/api/cors.ts
-*/
 
 export default async function handler(req: NextApiRequest, response: NextApiResponse) {
   const ip = req.socket.remoteAddress
@@ -59,15 +52,28 @@ export default async function handler(req: NextApiRequest, response: NextApiResp
 
     const client = ldap.createClient({
       url: process.env.LDAP_HOST as string,
+      timeout: 400, // Milliseconds client should let operations live for before timing out (Default: Infinity)
+      connectTimeout: 400, // Milliseconds client should wait before timing out on TCP connections (Default: OS default)
     });
 
     const entries: ldap.SearchEntry[] = [];
 
     return new Promise((resolve, reject) => {
+      client.on('error', error => {
+        console.debug('Connection to LDAP server failed');
+      });
+      client.on('timeout', error => {
+        console.debug(`${ip} - [${new Date()}] - Connection to LDAP server timeout - ${email}`);
+        reject('timeout');
+      });
+      client.on('connectTimeout', error => {
+        console.debug(`${ip} - [${new Date()}] - TCP connection to LDAP server timeout - ${email}`);
+        reject('connectTimeout');
+      });
       client.bind(
         process.env.LDAP_DN as string,
         process.env.LDAP_PASSWORD as string,
-        (error) => {
+        error => {
           if (error) {
             reject("LDAP bound failed");
           } else {
@@ -84,9 +90,9 @@ export default async function handler(req: NextApiRequest, response: NextApiResp
                 if (err) {
                   reject(`User ${username} LDAP search error`);
                 } else {
-                  res.on("searchRequest", (searchRequest) => {
+                  res.on("searchRequest", searchRequest => {
                   });
-                  res.on("searchEntry", (entry) => {
+                  res.on("searchEntry", entry => {
                     entries.push(entry);
                     client.bind(entry.dn, password, (err, res) => {
                       if (err) {
@@ -104,12 +110,12 @@ export default async function handler(req: NextApiRequest, response: NextApiResp
                       }
                     });
                   });
-                  res.on("searchReference", (referral) => {
+                  res.on("searchReference", referral => {
                   });
-                  res.on("error", (err) => {
+                  res.on("error", error => {
                     reject("LDAP SEARCH error");
                   });
-                  res.on("end", (result) => {
+                  res.on("end", result => {
                     if (entries.length == 0) {
                       reject("Wrong credentials provided.");
                     }
@@ -124,12 +130,12 @@ export default async function handler(req: NextApiRequest, response: NextApiResp
         }
       );
     }).then(
-      (value) => {
+      value => {
         console.log(`${ip} - [${new Date()}] - LDAP endpoint success - ${email}`);
         response.status(200).json( value );
       },
-      (error) => {
-        console.log(`${ip} - [${new Date()}] - LDAP endpoint failure - ${email}`);
+      error => {
+        console.error(`${ip} - [${new Date()}] - LDAP endpoint failure - ${email}`);
         response.status(401).json({ message: error });
       }
     );
