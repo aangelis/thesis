@@ -171,6 +171,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return;
     }
 
+    if (!dbStoredDepositData?.new_filename && data?.confirmed) {
+      res.status(400).json({ message: "Deposit confirmation data cannot be updated due to missing file." });
+      return;
+    }
+
+    if (!dbStoredDepositData?.supervisor && data?.confirmed) {
+      res.status(400).json({ message: "Deposit confirmation data cannot be updated due to missing supervisor." });
+      return;
+    }
+
     if (user.isLibrarian) {
       try {
         const storedDeposit = await prisma.deposit.findUnique({

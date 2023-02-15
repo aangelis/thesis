@@ -993,7 +993,7 @@ function DepositPage(
           <Box sx={{ '& > button': { m: 1 } }}>
             <LoadingButton
                 color="secondary"
-                disabled={!keywordsElValid || !keywordsEnValid || numFieldsErrors > 0 || textFieldsErrors > 0}
+                disabled={ (confirmed && (!storedFile || !supervisor)) || !keywordsElValid || !keywordsEnValid || numFieldsErrors > 0 || textFieldsErrors > 0}
                 onClick={handleClickSave}
                 loading={loading}
                 loadingPosition="start"
